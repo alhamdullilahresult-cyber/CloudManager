@@ -1,12 +1,55 @@
 {
   "version": 2,
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/api/admin/scripts/:id", "destination": "/api/admin/scripts/[id]" },
-    { "source": "/api/admin/scripts", "destination": "/api/admin/scripts" },
-    { "source": "/api/scripts/:id", "destination": "/api/scripts/[id]" },
-    { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/raw", "destination": "/api/raw" }
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/auth/login",
+      "dest": "/api/auth/login.js"
+    },
+    {
+      "src": "/api/auth/verify",
+      "dest": "/api/auth/verify.js"
+    },
+    {
+      "src": "/api/admin/stats",
+      "dest": "/api/admin/stats.js"
+    },
+    {
+      "src": "/api/admin/scripts/(?<id>[^/]+)",
+      "dest": "/api/admin/scripts/[id].js"
+    },
+    {
+      "src": "/api/admin/scripts",
+      "dest": "/api/admin/scripts/index.js"
+    },
+    {
+      "src": "/api/scripts/(?<id>[^/]+)",
+      "dest": "/api/scripts/[id].js"
+    },
+    {
+      "src": "/raw",
+      "dest": "/api/raw.js"
+    },
+    {
+      "src": "/api/script",
+      "dest": "/api/script.js"
+    },
+    {
+      "src": "/login",
+      "dest": "/login.html"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
   ]
 }
