@@ -1,15 +1,12 @@
 {
   "version": 2,
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/api/auth/login", "destination": "/api/auth/login.js" },
-    { "source": "/api/auth/verify", "destination": "/api/auth/verify.js" },
-    { "source": "/api/admin/stats", "destination": "/api/admin/stats.js" },
-    { "source": "/api/admin/scripts/:id", "destination": "/api/admin/scripts/[id].js" },
-    { "source": "/api/admin/scripts", "destination": "/api/admin/scripts/index.js" },
-    { "source": "/api/scripts/:id", "destination": "/api/scripts/[id].js" },
+    { "source": "/api/admin/scripts/:id", "destination": "/api/admin/scripts/[id]" },
+    { "source": "/api/admin/scripts", "destination": "/api/admin/scripts" },
+    { "source": "/api/scripts/:id", "destination": "/api/scripts/[id]" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/login", "destination": "/login.html" },
-    { "source": "/raw", "destination": "/api/raw.js" },
-    { "source": "/api/script", "destination": "/api/script.js" }
+    { "source": "/raw", "destination": "/api/raw" }
   ]
 }
