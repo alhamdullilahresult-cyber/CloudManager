@@ -56,3 +56,4 @@ ALTER TABLE public.script_history ENABLE ROW LEVEL SECURITY;
 -- ── 6. VERIFY ────────────────────────────────────────────
 SELECT table_name FROM information_schema.tables
 WHERE table_schema = 'public' AND table_name IN ('scripts', 'script_history');
+

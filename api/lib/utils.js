@@ -21,3 +21,4 @@ export function sanitizeString(str, maxLen = 500) {
     if (typeof str !== 'string') return '';
     return str.trim().slice(0, maxLen);
 }
+
