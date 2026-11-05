@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login — Boyfinity Script Manager</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+        body {
+            background: #0a0812;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(ellipse at 50% 0%, rgba(147,51,234,0.15) 0%, transparent 60%);
+        }
+
+        .login-card {
+            background: #110d1f;
+            border: 1px solid #2a1f4a;
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(147,51,234,0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #9333ea, #4f46e5);
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 16px rgba(147,51,234,0.4);
+        }
+
+        .logo h1 {
+            color: #e9d5ff;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .logo p {
+            color: #6b5f8a;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #a78bfa;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            background: #1a1030;
+            border: 1px solid #3b2b63;
+            border-radius: 8px;
+            color: #f1edfa;
+            font-size: 15px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="password"]:focus {
+            border-color: #9333ea;
+            box-shadow: 0 0 0 3px rgba(147,51,234,0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #9333ea, #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(147,51,234,0.35);
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(147,51,234,0.5);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-msg {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #fca5a5;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #3d2f5e;
+            font-size: 12px;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo">
+            <div class="logo-badge">BOYFINITY</div>
+            <h1>Script Manager</h1>
+            <p>Admin Panel — Secure Login</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="password">Admin Password</label>
+                <input type="password" id="password" placeholder="Enter admin password..." autocomplete="current-password" required autofocus>
+            </div>
+            <button type="submit" class="btn-login" id="loginBtn">
+                Sign In
+            </button>
+            <div class="error-msg" id="errorMsg"></div>
+        </form>
+
+        <div class="footer-note">Protected area • Boyfinity Script Platform v2.0</div>
+    </div>
+
+    <script>
+        // If already logged in, redirect to admin
+        const token = localStorage.getItem('admin_token');
+        if (token) {
+            fetch('/api/auth/verify', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            }).then(r => r.json()).then(d => {
+                if (d.success) window.location.href = '/admin';
+            }).catch(() => {});
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Signing in...';
+            errorMsg.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await res.json();
+
+                if (data.success && data.token) {
+                    localStorage.setItem('admin_token', data.token);
+                    window.location.href = '/admin';
+                } else {
+                    errorMsg.textContent = data.error || 'Login failed. Check your password.';
+                    errorMsg.style.display = 'block';
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                }
+            } catch (err) {
+                errorMsg.textContent = 'Network error. Please try again.';
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Sign In';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,13 +1,18 @@
 {
   "name": "boyfinity-cloud-script-manager",
-  "version": "1.0.0",
-  "description": "Cloud Script Manager with Real-time Web Interface and Raw Lua API for Roblox Executors",
+  "version": "2.0.0",
+  "description": "Script Management Platform with Admin Dashboard, Supabase backend, and public Lua API",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
-  "keywords": ["roblox", "script-manager", "raw-api", "lua"],
+  "keywords": ["roblox", "script-manager", "lua", "supabase", "vercel"],
   "author": "Boyfinity",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2"
+  }
 }
-
