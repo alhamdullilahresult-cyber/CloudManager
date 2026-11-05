@@ -3,9 +3,11 @@
   "version": "2.0.0",
   "description": "Script Management Platform with Admin Dashboard, Supabase backend, and public Lua API",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "node test_endpoints.mjs"
   },
   "keywords": ["roblox", "script-manager", "lua", "supabase", "vercel"],
   "author": "Boyfinity",

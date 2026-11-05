@@ -27,8 +27,9 @@ export function verifyToken(token) {
  * Usage: const admin = requireAuth(req, res); if (!admin) return;
  */
 export function requireAuth(req, res) {
-    const authHeader = req.headers['authorization'] || '';
-    const cookieHeader = req.headers['cookie'] || '';
+    const headers = req.headers || {};
+    const authHeader = headers['authorization'] || headers['Authorization'] || '';
+    const cookieHeader = headers['cookie'] || headers['Cookie'] || '';
 
     // Try Authorization: Bearer <token>
     let token = null;
@@ -62,4 +63,3 @@ export function setCorsHeaders(res) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
-

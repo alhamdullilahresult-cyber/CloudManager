@@ -1,13 +1,8 @@
 // Vercel Serverless Function: /api/raw
-import fs from 'fs';
+// Fetches the default/active script from Supabase database
+import { supabase } from './lib/supabase.js';
 
-const TMP_FILE = '/tmp/script.lua';
-const DEFAULT_SCRIPT = `-- Boyfinity Violence District Cloud Script
--- Loaded dynamically via Antigravity Loader
-print("[Boyfinity Cloud] Script initialized via game:HttpGet!")
-`;
-
-export default function handler(req, res) {
+export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -21,14 +16,39 @@ export default function handler(req, res) {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
-    let output = DEFAULT_SCRIPT;
-    if (fs.existsSync(TMP_FILE)) {
-        try {
-            output = fs.readFileSync(TMP_FILE, 'utf-8');
-        } catch (e) {}
-    } else if (process.env.SAVED_LUA_SCRIPT) {
-        output = process.env.SAVED_LUA_SCRIPT;
-    }
+    try {
+        // Query active script from Supabase (by id 'default', or first active script)
+        let { data: script, error } = await supabase
+            .from('scripts')
+            .select('id, name, code, active, updated_at, version')
+            .eq('id', 'default')
+            .eq('active', true)
+            .maybeSingle();
 
-    return res.status(200).send(output);
+        if (!script) {
+            // Fallback to the latest updated active script
+            const { data: latestScript, error: latestErr } = await supabase
+                .from('scripts')
+                .select('id, name, code, active, updated_at, version')
+                .eq('active', true)
+                .order('updated_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            script = latestScript;
+            error = latestErr;
+        }
+
+        if (error || !script) {
+            return res.status(404).send('-- Error: No active script found in database');
+        }
+
+        res.setHeader('X-Script-ID', script.id);
+        res.setHeader('X-Script-Version', String(script.version || 1));
+        return res.status(200).send(script.code);
+
+    } catch (err) {
+        console.error('[raw.js] Error fetching from Supabase:', err);
+        return res.status(500).send('-- Error: Internal server error while fetching script');
+    }
 }
