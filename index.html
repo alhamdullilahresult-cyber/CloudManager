@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boyfinity Cloud Script Manager</title>
+    <!-- CodeMirror 5 CDN for full Lua Syntax Highlighting & Editing -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/lua/lua.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background: #0d0a17;
+            color: #f1edfa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: #171129;
+            border-bottom: 1px solid #2d214f;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-badge {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: #fff;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(168, 85, 247, 0.4);
+        }
+
+        .brand h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e9d5ff;
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .raw-link-box {
+            display: flex;
+            align-items: center;
+            background: #1f1738;
+            border: 1px solid #433273;
+            border-radius: 6px;
+            padding: 5px 10px;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .raw-link-box input {
+            background: transparent;
+            border: none;
+            color: #c084fc;
+            font-family: monospace;
+            font-size: 12px;
+            width: 250px;
+            outline: none;
+        }
+
+        .btn {
+            background: #2b1f4c;
+            color: #f1edfa;
+            border: 1px solid #4f3b82;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #3c2a6b;
+            border-color: #7952c4;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #9333ea, #4f46e5);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 10px rgba(147, 51, 234, 0.35);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            transform: translateY(-1px);
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .meta-bar {
+            background: #140e24;
+            padding: 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #9d8ec2;
+            border-bottom: 1px solid #241a3d;
+        }
+
+        .editor-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'Consolas', 'Fira Code', Monaco, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .loader-snippet-panel {
+            background: #150f28;
+            border-top: 1px solid #2d214f;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .loader-snippet-panel .info {
+            font-size: 13px;
+            color: #d8b4fe;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .snippet-code {
+            font-family: monospace;
+            background: #0d091a;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #3b2b63;
+            color: #a78bfa;
+            font-size: 12px;
+            max-width: 650px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1f143a;
+            border: 1px solid #a855f7;
+            color: #f3e8ff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <span class="brand-badge">BOYFINITY</span>
+            <h1>Cloud Script Manager (Lua API)</h1>
+        </div>
+        <div class="header-actions">
+            <div class="raw-link-box">
+                <span style="color:#a78bfa;">RAW URL:</span>
+                <input id="rawUrlInput" readonly value="Loading..." />
+                <button class="btn" style="padding:4px 8px; font-size:11px;" onclick="copyRawUrl()">Copy</button>
+                <a id="openRawBtn" href="/raw" target="_blank" class="btn" style="padding:4px 8px; font-size:11px;">Open</a>
+            </div>
+            <button class="btn" onclick="fetchScript()">↻ Reload</button>
+            <button class="btn btn-primary" onclick="saveScript()">💾 Save & Deploy</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="meta-bar">
+            <div>Status: <span id="syncStatus" style="color:#4ade80;">● Connected</span> | Target: <strong id="targetFile">Main Lua</strong></div>
+            <div>Lines: <span id="lineCount">0</span> | Characters: <span id="charCount">0</span> | Last Saved: <span id="lastSavedTime">-</span></div>
+        </div>
+
+        <div class="editor-container">
+            <textarea id="codeEditor"></textarea>
+        </div>
+
+        <div class="loader-snippet-panel">
+            <div class="info">
+                <span>⚡ <strong>Roblox Executor Loader:</strong></span>
+                <div class="snippet-code" id="executorSnippet">loadstring(game:HttpGet("..."))()</div>
+            </div>
+            <button class="btn" onclick="copySnippet()">Copy One-Liner</button>
+        </div>
+    </main>
+
+    <div id="toast" class="notification">Script successfully saved and deployed!</div>
+
+    <script>
+        let editor;
+
+        function initEditor() {
+            const textarea = document.getElementById('codeEditor');
+            editor = CodeMirror.fromTextArea(textarea, {
+                lineNumbers: true,
+                mode: 'lua',
+                theme: 'dracula',
+                indentUnit: 4,
+                tabSize: 4,
+                lineWrapping: false,
+                autofocus: true
+            });
+
+            editor.on('change', () => {
+                updateStats();
+            });
+        }
+
+        function updateStats() {
+            if (!editor) return;
+            const content = editor.getValue();
+            document.getElementById('lineCount').innerText = editor.lineCount();
+            document.getElementById('charCount').innerText = content.length;
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.borderColor = isError ? '#ef4444' : '#a855f7';
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function updateRawUrls() {
+            const rawUrl = window.location.origin + '/raw';
+            document.getElementById('rawUrlInput').value = rawUrl;
+            document.getElementById('openRawBtn').href = rawUrl;
+            document.getElementById('executorSnippet').innerText = `loadstring(game:HttpGet("${rawUrl}"))()`;
+        }
+
+        async function fetchScript() {
+            try {
+                document.getElementById('syncStatus').innerText = '⏳ Fetching...';
+                document.getElementById('syncStatus').style.color = '#facc15';
+                const res = await fetch('/api/script');
+                const data = await res.json();
+                if (data.success) {
+                    editor.setValue(data.content || '');
+                    document.getElementById('lastSavedTime').innerText = new Date(data.lastModified).toLocaleTimeString();
+                    document.getElementById('syncStatus').innerText = '● Synced';
+                    document.getElementById('syncStatus').style.color = '#4ade80';
+                    updateStats();
+                } else {
+                    showToast('Failed to load script: ' + data.error, true);
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('syncStatus').innerText = '✖ Disconnected';
+                document.getElementById('syncStatus').style.color = '#ef4444';
+            }
+        }
+
+        async function saveScript() {
+            const content = editor.getValue();
+            try {
+                document.getElementById('syncStatus').innerText = '⏳ Saving...';
+                const res = await fetch('/api/script', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('lastSavedTime').innerText = new Date().toLocaleTimeString();
+                    document.getElementById('syncStatus').innerText = '● Synced';
+                    document.getElementById('syncStatus').style.color = '#4ade80';
+                    showToast('✅ Script deployed! Roblox game:HttpGet will now load this update.');
+                } else {
+                    showToast('Save failed: ' + data.error, true);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Save failed: Network error', true);
+            }
+        }
+
+        function copyRawUrl() {
+            const input = document.getElementById('rawUrlInput');
+            navigator.clipboard.writeText(input.value);
+            showToast('📋 Raw API URL copied!');
+        }
+
+        function copySnippet() {
+            const rawUrl = window.location.origin + '/raw';
+            const snippet = `local scriptUrl = "${rawUrl}"\nlocal success, code = pcall(function()\n    return game:HttpGet(scriptUrl)\nend)\n\nif success and code then\n    local executable, err = loadstring(code)\n    if executable then\n        executable()\n    else\n        warn("Format Lua salah:", err)\n    end\nelse\n    warn("Gagal mengambil kode dari API web.")\nend`;
+            navigator.clipboard.writeText(snippet);
+            showToast('📋 Roblox Executor loader snippet copied!');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initEditor();
+            updateRawUrls();
+            fetchScript();
+        });
+
+        // Hotkey Ctrl+S / Cmd+S untuk simpan instan
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveScript();
+            }
+        });
+    </script>
+</body>
+</html>
+

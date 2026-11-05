@@ -1,0 +1,13 @@
+{
+  "name": "boyfinity-cloud-script-manager",
+  "version": "1.0.0",
+  "description": "Cloud Script Manager with Real-time Web Interface and Raw Lua API for Roblox Executors",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["roblox", "script-manager", "raw-api", "lua"],
+  "author": "Boyfinity",
+  "license": "MIT"
+}
+
