@@ -1,6 +1,5 @@
 // api/auth/login.js - POST /api/auth/login
-// Authenticates admin and returns JWT token
-import bcrypt from 'bcryptjs';
+// Authenticates admin using ADMIN_PASSWORD environment variable and returns JWT token
 import { signToken, setCorsHeaders } from '../lib/auth.js';
 
 export default async function handler(req, res) {
@@ -19,22 +18,14 @@ export default async function handler(req, res) {
             return res.status(400).json({ success: false, error: 'Password required' });
         }
 
-        const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
-        const adminPasswordPlain = process.env.ADMIN_PASSWORD;
+        const adminPassword = process.env.ADMIN_PASSWORD;
 
-        if (!adminPasswordHash && !adminPasswordPlain) {
+        if (!adminPassword) {
+            console.error('[auth/login] ADMIN_PASSWORD environment variable is not set');
             return res.status(500).json({ success: false, error: 'Admin credentials not configured' });
         }
 
-        let valid = false;
-
-        if (adminPasswordHash) {
-            // Compare against bcrypt hash (recommended)
-            valid = await bcrypt.compare(password, adminPasswordHash);
-        } else if (adminPasswordPlain) {
-            // Plain comparison fallback (less secure, use for initial setup only)
-            valid = password === adminPasswordPlain;
-        }
+        const valid = password === adminPassword;
 
         if (!valid) {
             // Intentional delay to slow down brute force

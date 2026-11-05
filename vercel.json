@@ -1,25 +1,66 @@
 {
   "version": 2,
-  "rewrites": [
+  "builds": [
     {
-      "source": "/raw",
-      "destination": "/api/raw"
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
     },
     {
-      "source": "/api/admin/scripts/:id",
-      "destination": "/api/admin/scripts/[id]"
+      "src": "*.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/raw",
+      "dest": "/api/raw.js"
     },
     {
-      "source": "/api/scripts/:id",
-      "destination": "/api/scripts/[id]"
+      "src": "/api/auth/login",
+      "dest": "/api/auth/login.js",
+      "methods": ["POST", "OPTIONS"]
     },
     {
-      "source": "/admin",
-      "destination": "/admin.html"
+      "src": "/api/auth/verify",
+      "dest": "/api/auth/verify.js",
+      "methods": ["GET", "OPTIONS"]
     },
     {
-      "source": "/login",
-      "destination": "/login.html"
+      "src": "/api/auth/logout",
+      "dest": "/api/auth/logout.js",
+      "methods": ["POST", "OPTIONS"]
+    },
+    {
+      "src": "/api/admin/scripts/([^/]+)",
+      "dest": "/api/admin/scripts/[id].js"
+    },
+    {
+      "src": "/api/admin/scripts",
+      "dest": "/api/admin/scripts/index.js"
+    },
+    {
+      "src": "/api/admin/stats",
+      "dest": "/api/admin/stats.js"
+    },
+    {
+      "src": "/api/scripts/([^/]+)",
+      "dest": "/api/scripts/[id].js"
+    },
+    {
+      "src": "/api/script",
+      "dest": "/api/script.js"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/login",
+      "dest": "/login.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
