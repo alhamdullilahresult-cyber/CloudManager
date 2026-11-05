@@ -122,6 +122,7 @@
             font-size: 13px;
             margin-top: 16px;
             display: none;
+            word-break: break-word;
         }
 
         .spinner {
@@ -198,19 +199,27 @@
                     body: JSON.stringify({ password })
                 });
 
-                const data = await res.json();
+                let data;
+                const contentType = res.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    data = await res.json();
+                } else {
+                    const text = await res.text();
+                    data = { error: `HTTP ${res.status}: ${text || res.statusText}` };
+                }
 
-                if (data.success && data.token) {
+                if (res.ok && data.success && data.token) {
                     localStorage.setItem('admin_token', data.token);
                     window.location.href = '/admin';
                 } else {
-                    errorMsg.textContent = data.error || 'Login failed. Check your password.';
+                    errorMsg.textContent = data.error || `Login failed (HTTP ${res.status})`;
                     errorMsg.style.display = 'block';
                     document.getElementById('password').value = '';
                     document.getElementById('password').focus();
                 }
             } catch (err) {
-                errorMsg.textContent = 'Network error. Please try again.';
+                console.error('Login fetch error:', err);
+                errorMsg.textContent = `Error: ${err.message || 'Network request failed'}`;
                 errorMsg.style.display = 'block';
             } finally {
                 btn.disabled = false;
@@ -220,4 +229,3 @@
     </script>
 </body>
 </html>
-
