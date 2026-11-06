@@ -1,9 +1,9 @@
 -- ============================================================
--- Boyfinity Script Hub Platform - Schema & Telemetry Migration
+-- BOYFINITY Script Hub Platform - Multi-Role & Audit Log Schema
 -- Run this in Supabase Dashboard → SQL Editor
 -- ============================================================
 
--- 1. Tabel Scripts (Manajemen Script Cloud)
+-- 1. SCRIPTS TABLE
 CREATE TABLE IF NOT EXISTS public.scripts (
     id          TEXT        PRIMARY KEY,
     name        TEXT        NOT NULL CHECK (char_length(name) BETWEEN 1 AND 100),
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.scripts (
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 2. Tabel Script History (Versi Script)
+-- 2. SCRIPT HISTORY TABLE
 CREATE TABLE IF NOT EXISTS public.script_history (
     id          BIGSERIAL   PRIMARY KEY,
     script_id   TEXT        NOT NULL REFERENCES public.scripts(id) ON DELETE CASCADE,
@@ -25,7 +25,19 @@ CREATE TABLE IF NOT EXISTS public.script_history (
     saved_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 3. Tabel Keys & HWID + Durasi & Telemetri
+-- 3. USERS / ROLES TABLE (DISCORD OAUTH2 AUTHENTICATION)
+CREATE TABLE IF NOT EXISTS public.users (
+    id              BIGSERIAL   PRIMARY KEY,
+    discord_id      TEXT        NOT NULL UNIQUE,
+    username        TEXT        NOT NULL,
+    discriminator   TEXT        DEFAULT '0',
+    avatar          TEXT        DEFAULT NULL,
+    role            TEXT        NOT NULL DEFAULT 'user' CHECK (role IN ('owner', 'admin', 'staff', 'user')),
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_login      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 4. KEYS & HWID TABLE (DURATION & TELEMETRY INCLUDED)
 CREATE TABLE IF NOT EXISTS public.keys (
     id            BIGSERIAL   PRIMARY KEY,
     key           TEXT        NOT NULL UNIQUE,
@@ -34,6 +46,10 @@ CREATE TABLE IF NOT EXISTS public.keys (
     expires_at    TIMESTAMPTZ DEFAULT NULL,
     hwid          TEXT        DEFAULT NULL,
     note          TEXT        DEFAULT '',
+    created_by    TEXT        DEFAULT 'system', -- discord_id or username
+    creator_role  TEXT        DEFAULT 'admin',  -- owner, admin, staff
+    buyer_email   TEXT        DEFAULT NULL,
+    buyer_discord TEXT        DEFAULT NULL,
     roblox_user   TEXT        DEFAULT NULL,
     executor_name TEXT        DEFAULT NULL,
     ip_address    TEXT        DEFAULT NULL,
@@ -42,23 +58,32 @@ CREATE TABLE IF NOT EXISTS public.keys (
     last_used     TIMESTAMPTZ DEFAULT NULL
 );
 
--- Tambahkan kolom jika tabel 'keys' sudah pernah dibuat sebelumnya
+-- 5. AUDIT LOGS TABLE
+CREATE TABLE IF NOT EXISTS public.audit_logs (
+    id          BIGSERIAL   PRIMARY KEY,
+    actor_id    TEXT        NOT NULL, -- discord_id or username
+    actor_name  TEXT        NOT NULL,
+    actor_role  TEXT        NOT NULL,
+    action      TEXT        NOT NULL, -- e.g. 'GENERATE_KEY', 'RESET_HWID', 'DELETE_KEY', 'CHECKOUT_PURCHASE'
+    target      TEXT        DEFAULT '',
+    details     JSONB       DEFAULT '{}'::jsonb,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Add Columns safely if tables already exist
 DO $$ 
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='duration') THEN
-        ALTER TABLE public.keys ADD COLUMN duration TEXT NOT NULL DEFAULT 'lifetime';
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='created_by') THEN
+        ALTER TABLE public.keys ADD COLUMN created_by TEXT DEFAULT 'system';
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='expires_at') THEN
-        ALTER TABLE public.keys ADD COLUMN expires_at TIMESTAMPTZ DEFAULT NULL;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='creator_role') THEN
+        ALTER TABLE public.keys ADD COLUMN creator_role TEXT DEFAULT 'admin';
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='roblox_user') THEN
-        ALTER TABLE public.keys ADD COLUMN roblox_user TEXT DEFAULT NULL;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='buyer_discord') THEN
+        ALTER TABLE public.keys ADD COLUMN buyer_discord TEXT DEFAULT NULL;
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='executor_name') THEN
-        ALTER TABLE public.keys ADD COLUMN executor_name TEXT DEFAULT NULL;
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='ip_address') THEN
-        ALTER TABLE public.keys ADD COLUMN ip_address TEXT DEFAULT NULL;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='buyer_email') THEN
+        ALTER TABLE public.keys ADD COLUMN buyer_email TEXT DEFAULT NULL;
     END IF;
 END $$;
 
@@ -66,9 +91,12 @@ END $$;
 CREATE INDEX IF NOT EXISTS idx_keys_key        ON public.keys(key);
 CREATE INDEX IF NOT EXISTS idx_keys_hwid       ON public.keys(hwid);
 CREATE INDEX IF NOT EXISTS idx_keys_status     ON public.keys(status);
-CREATE INDEX IF NOT EXISTS idx_keys_expires_at ON public.keys(expires_at);
+CREATE INDEX IF NOT EXISTS idx_users_discord   ON public.users(discord_id);
+CREATE INDEX IF NOT EXISTS idx_audit_created   ON public.audit_logs(created_at DESC);
 
 -- RLS
 ALTER TABLE public.scripts        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.script_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.keys           ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.users          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs     ENABLE ROW LEVEL SECURITY;

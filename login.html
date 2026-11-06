@@ -1,229 +1,147 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login — Boyfinity Script Manager</title>
+    <title>Portal Sign In — BOYFINITY Script Hub</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        :root {
+            --bg-base: #06050a;
+            --bg-card: #0d0b14;
+            --border: #1e192c;
+            --border-hover: #372952;
+            --accent: #9333ea;
+            --accent-glow: rgba(147, 51, 234, 0.25);
+            --accent-light: #c084fc;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --discord: #5865f2;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
         body {
-            background: #0a0812;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-image: radial-gradient(ellipse at 50% 0%, rgba(147,51,234,0.15) 0%, transparent 60%);
+            background-color: var(--bg-base); color: var(--text-primary); min-height: 100vh;
+            display: flex; align-items: center; justify-content: center; padding: 24px;
         }
 
-        .login-card {
-            background: #110d1f;
-            border: 1px solid #2a1f4a;
-            border-radius: 16px;
-            padding: 48px 40px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(147,51,234,0.1);
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.04; z-index: 9999;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        .logo {
-            text-align: center;
-            margin-bottom: 32px;
+        .ambient-glow {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(circle at 50% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 60%);
+            z-index: -1; pointer-events: none;
         }
 
-        .logo-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #9333ea, #4f46e5);
-            color: white;
-            font-weight: 800;
-            font-size: 16px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 16px rgba(147,51,234,0.4);
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+            padding: 44px 38px; width: 100%; max-width: 440px; text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px var(--accent-glow);
         }
 
-        .logo h1 {
-            color: #e9d5ff;
-            font-size: 20px;
-            font-weight: 700;
-        }
+        .logo-img { width: 56px; height: 56px; border-radius: 14px; margin-bottom: 20px; box-shadow: 0 0 20px var(--accent-glow); }
+        .title { font-size: 24px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
 
-        .logo p {
-            color: #6b5f8a;
-            font-size: 13px;
-            margin-top: 4px;
+        /* Discord OAuth2 Button */
+        .btn-discord {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            background: var(--discord); color: #fff; padding: 14px 20px; border-radius: 12px;
+            font-size: 14px; font-weight: 700; text-decoration: none; width: 100%;
+            box-shadow: 0 4px 18px rgba(88, 101, 242, 0.4); transition: all 0.25s; margin-bottom: 24px;
         }
+        .btn-discord:hover { background: #6975f5; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(88, 101, 242, 0.55); }
 
-        .form-group {
-            margin-bottom: 20px;
+        .divider {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+            color: var(--text-muted); font-size: 11px; text-transform: uppercase; font-weight: 700;
         }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-        label {
-            display: block;
-            color: #a78bfa;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
+        /* Master Owner Password Fallback */
+        .owner-box { text-align: left; }
+        .input-wrap { margin-bottom: 16px; }
+        .input-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .input-text {
+            width: 100%; background: #07060b; border: 1px solid var(--border); border-radius: 10px;
+            padding: 12px 14px; color: #fff; font-size: 14px; outline: none; transition: border-color 0.2s;
         }
+        .input-text:focus { border-color: var(--accent); }
 
-        input[type="password"] {
-            width: 100%;
-            background: #1a1030;
-            border: 1px solid #3b2b63;
-            border-radius: 8px;
-            color: #f1edfa;
-            font-size: 15px;
-            padding: 12px 16px;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+        .btn-owner {
+            width: 100%; background: #141021; border: 1px solid var(--border); color: #fff;
+            padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;
         }
+        .btn-owner:hover { background: #1c1630; border-color: var(--border-hover); }
 
-        input[type="password"]:focus {
-            border-color: #9333ea;
-            box-shadow: 0 0 0 3px rgba(147,51,234,0.2);
-        }
-
-        .btn-login {
-            width: 100%;
-            background: linear-gradient(135deg, #9333ea, #4f46e5);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 700;
-            padding: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 16px rgba(147,51,234,0.35);
-            margin-top: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-login:hover:not(:disabled) {
-            background: linear-gradient(135deg, #a855f7, #6366f1);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(147,51,234,0.5);
-        }
-
-        .btn-login:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .error-msg {
-            background: rgba(239,68,68,0.1);
-            border: 1px solid rgba(239,68,68,0.3);
-            color: #fca5a5;
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 13px;
-            margin-top: 16px;
-            display: none;
-            word-break: break-word;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .footer-note {
-            text-align: center;
-            color: #3d2f5e;
-            font-size: 12px;
-            margin-top: 24px;
-        }
+        .footer-note { font-size: 11px; color: var(--text-muted); margin-top: 26px; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div class="logo">
-            <div class="logo-badge">BOYFINITY</div>
-            <h1>Script Manager</h1>
-            <p>Admin Panel — Secure Login</p>
-        </div>
 
-        <form id="loginForm" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label for="password">Admin Password</label>
-                <input type="password" id="password" placeholder="Enter admin password..." autocomplete="current-password" required autofocus>
+    <div class="noise-overlay"></div>
+    <div class="ambient-glow"></div>
+
+    <div class="card">
+        <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
+        <h1 class="title">Sign In to BOYFINITY</h1>
+        <p class="desc">Authenticate with your Discord account to access the staff portal, view license telemetry, or manage script configurations.</p>
+
+        <!-- Discord OAuth2 Primary Button -->
+        <a href="/api/auth/discord/login" class="btn-discord">
+            <svg width="22" height="17" viewBox="0 0 127.14 96.36" fill="currentColor">
+                <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+            </svg>
+            <span>Sign In with Discord</span>
+        </a>
+
+        <div class="divider">Or Emergency Owner Pass</div>
+
+        <!-- Master Password Form -->
+        <form class="owner-box" onsubmit="handleOwnerLogin(event)">
+            <div class="input-wrap">
+                <label class="input-label">Master Password</label>
+                <input type="password" id="ownerPass" class="input-text" placeholder="Enter owner key..." required>
             </div>
-            <button type="submit" class="btn-login" id="loginBtn">
-                Sign In
-            </button>
-            <div class="error-msg" id="errorMsg"></div>
+            <button type="submit" id="btnOwner" class="btn-owner">Authenticate as Owner</button>
         </form>
 
-        <div class="footer-note">Protected area • Boyfinity Script Platform v2.0</div>
+        <div class="footer-note">
+            Role-Based Access Control • Owner / Admin / Staff
+        </div>
     </div>
 
     <script>
-        // If already logged in, redirect to admin
-        const token = localStorage.getItem('admin_token');
-        if (token) {
-            fetch('/api/auth/verify', {
-                headers: { 'Authorization': 'Bearer ' + token }
-            }).then(r => r.json()).then(d => {
-                if (d.success) window.location.href = '/admin';
-            }).catch(() => {});
-        }
-
-        async function handleLogin(e) {
+        async function handleOwnerLogin(e) {
             e.preventDefault();
-            const password = document.getElementById('password').value;
-            const btn = document.getElementById('loginBtn');
-            const errorMsg = document.getElementById('errorMsg');
-
+            const pass = document.getElementById('ownerPass').value;
+            const btn = document.getElementById('btnOwner');
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>Signing in...';
-            errorMsg.style.display = 'none';
+            btn.innerText = 'Verifying...';
 
             try {
                 const res = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password })
+                    body: JSON.stringify({ password: pass })
                 });
-
-                let data;
-                const contentType = res.headers.get('content-type') || '';
-                if (contentType.includes('application/json')) {
-                    data = await res.json();
-                } else {
-                    const text = await res.text();
-                    data = { error: `HTTP ${res.status}: ${text || res.statusText}` };
-                }
-
-                if (res.ok && data.success && data.token) {
+                const data = await res.json();
+                if (data.success && data.token) {
                     localStorage.setItem('admin_token', data.token);
                     window.location.href = '/admin';
                 } else {
-                    errorMsg.textContent = data.error || `Login failed (HTTP ${res.status})`;
-                    errorMsg.style.display = 'block';
-                    document.getElementById('password').value = '';
-                    document.getElementById('password').focus();
+                    alert(data.error || 'Authentication failed');
                 }
             } catch (err) {
-                console.error('Login fetch error:', err);
-                errorMsg.textContent = `Error: ${err.message || 'Network request failed'}`;
-                errorMsg.style.display = 'block';
+                alert('Connection error: ' + err.message);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = 'Sign In';
+                btn.innerText = 'Authenticate as Owner';
             }
         }
     </script>

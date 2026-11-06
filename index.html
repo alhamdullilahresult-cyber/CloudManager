@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BOYFINITY — Enterprise Lua Script Hub</title>
-    <meta name="description" content="Next-generation Roblox script hub platform with high performance, undetected execution, and multi-game support.">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Cloudflare Turnstile API -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <style>
         :root {
-            --bg-base: #07060a;
-            --bg-card: #0f0d16;
-            --bg-card-hover: #151220;
-            --border: #211c30;
-            --border-hover: #3b2d5a;
+            --bg-base: #06050a;
+            --bg-card: #0d0b14;
+            --bg-card-hover: #141021;
+            --border: #1e192c;
+            --border-hover: #372952;
             --accent: #9333ea;
             --accent-glow: rgba(147, 51, 234, 0.25);
             --accent-light: #c084fc;
@@ -22,7 +25,7 @@
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
             --success: #22c55e;
-            --success-glow: rgba(34, 197, 94, 0.2);
+            --discord-accent: #5865f2;
         }
 
         * {
@@ -38,32 +41,53 @@
             overflow-x: hidden;
             line-height: 1.6;
             min-height: 100vh;
+            position: relative;
         }
 
-        /* Ambient subtle grid effect */
-        .ambient-bg {
+        /* SVG Grain & Noise Overlay Texture */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            opacity: 0.04;
+            z-index: 9999;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Ambient Purple Glows */
+        .ambient-glow {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-image: 
-                radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 80% 60%, rgba(147, 51, 234, 0.05) 0%, transparent 40%);
+                radial-gradient(circle at 15% 15%, rgba(147, 51, 234, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(79, 70, 229, 0.08) 0%, transparent 50%);
             z-index: -1;
             pointer-events: none;
         }
 
-        /* ── NAVBAR ── */
-        .navbar {
+        /* ── FLOATING PILL / ISLAND NAVBAR ── */
+        .nav-wrapper {
             position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 72px;
-            background: rgba(7, 6, 10, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            top: 20px;
+            left: 0; right: 0;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+            padding: 0 20px;
+        }
+
+        .floating-pill {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 40px;
-            z-index: 1000;
+            background: rgba(13, 11, 20, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 9999px;
+            padding: 8px 10px 8px 24px;
+            width: 100%;
+            max-width: 960px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.1);
         }
 
         .logo-wrap {
@@ -73,28 +97,25 @@
             text-decoration: none;
         }
 
-        .logo-badge {
-            background: var(--accent);
-            color: #fff;
-            font-weight: 800;
-            font-size: 13px;
-            padding: 5px 12px;
+        .logo-img {
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
-            letter-spacing: 1.5px;
-            box-shadow: 0 0 16px var(--accent-glow);
+            object-fit: contain;
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
         .logo-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
-            color: var(--text-primary);
-            letter-spacing: 0.5px;
+            letter-spacing: 1.5px;
+            color: #ffffff;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 28px;
+            gap: 24px;
         }
 
         .nav-link {
@@ -106,73 +127,70 @@
         }
 
         .nav-link:hover, .nav-link.active {
-            color: var(--text-primary);
+            color: #ffffff;
         }
 
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .btn {
+        /* Distinct Primary Action: Sign In Button with Trailing Arrow */
+        .btn-signin {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
-            padding: 10px 20px;
-            border-radius: 9px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border-color: var(--border);
-            color: var(--text-primary);
-        }
-
-        .btn-outline:hover {
-            background: var(--bg-card);
-            border-color: var(--border-hover);
-        }
-
-        .btn-primary {
             background: var(--accent);
-            color: #fff;
-            box-shadow: 0 4px 18px var(--accent-glow);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 8px 18px;
+            border-radius: 9999px;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 14px var(--accent-glow);
+            transition: all 0.25s;
         }
 
-        .btn-primary:hover {
+        .btn-signin:hover {
             background: #a855f7;
             transform: translateY(-1px);
-            box-shadow: 0 6px 24px rgba(147, 51, 234, 0.4);
+            box-shadow: 0 4px 20px rgba(147, 51, 234, 0.45);
         }
 
-        /* ── HERO SECTION ── */
+        .btn-signin .arrow-icon {
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .btn-signin:hover .arrow-icon {
+            transform: translateX(3px);
+        }
+
+        /* ── HERO SECTION (ASYMMETRICAL LAYOUT) ── */
         .hero {
-            padding: 160px 24px 80px;
-            text-align: center;
-            max-width: 1000px;
+            padding: 160px 40px 80px;
+            max-width: 1180px;
             margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            align-items: center;
+            gap: 50px;
+            min-height: 80vh;
         }
 
-        .hero-pill {
+        .hero-left {
+            text-align: left;
+        }
+
+        .status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             padding: 6px 16px;
-            border-radius: 30px;
-            background: var(--bg-card);
+            border-radius: 9999px;
+            background: rgba(147, 51, 234, 0.08);
             border: 1px solid var(--border);
-            font-size: 13px;
+            font-size: 12px;
+            font-weight: 600;
             color: var(--accent-light);
             margin-bottom: 24px;
-            font-weight: 600;
         }
 
         .pulse-dot {
@@ -186,16 +204,16 @@
 
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.85); }
+            50% { opacity: 0.4; transform: scale(0.85); }
         }
 
         .hero-title {
-            font-size: 58px;
+            font-size: 64px;
             font-weight: 800;
-            letter-spacing: -1.5px;
-            line-height: 1.15;
-            margin-bottom: 20px;
-            color: var(--text-primary);
+            letter-spacing: -2px;
+            line-height: 1.1;
+            margin-bottom: 22px;
+            color: #ffffff;
         }
 
         .hero-title span {
@@ -203,153 +221,213 @@
         }
 
         .hero-desc {
-            font-size: 18px;
+            font-size: 17px;
             color: var(--text-secondary);
-            max-width: 680px;
-            margin: 0 auto 36px;
             line-height: 1.7;
+            max-width: 540px;
+            margin-bottom: 36px;
         }
 
-        .hero-btns {
+        .hero-actions {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 16px;
-            margin-bottom: 60px;
+            flex-wrap: wrap;
         }
 
-        /* ── STATS SECTION ── */
-        .stats-wrap {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            max-width: 860px;
-            margin: 0 auto 100px;
-        }
-
-        .stat-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 24px;
-            text-align: center;
+        .btn-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent);
+            color: #ffffff;
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 18px var(--accent-glow);
             transition: all 0.2s;
         }
 
-        .stat-box:hover {
-            border-color: var(--border-hover);
+        .btn-main:hover {
+            background: #a855f7;
             transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(147, 51, 234, 0.4);
         }
 
-        .stat-num {
-            font-size: 38px;
-            font-weight: 800;
-            color: var(--text-primary);
-            line-height: 1.1;
-            margin-bottom: 6px;
-        }
-
-        .stat-num.highlight {
-            color: var(--accent-light);
-        }
-
-        .stat-num.green {
-            color: #4ade80;
-        }
-
-        .stat-name {
-            font-size: 13px;
-            color: var(--text-secondary);
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: #ffffff;
+            padding: 13px 24px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
+            text-decoration: none;
+            transition: all 0.2s;
         }
 
-        /* ── SECTIONS SHARED ── */
-        .section {
-            padding: 80px 24px;
+        .btn-ghost:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+        }
+
+        /* ── DYNAMIC VISUAL FOCAL POINT (ANIMATED LOGO) ── */
+        .hero-right {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .focal-glow {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.3) 0%, transparent 70%);
+            filter: blur(40px);
+            animation: floatGlow 6s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: scale(0.9) translateY(-10px); }
+            100% { transform: scale(1.1) translateY(10px); }
+        }
+
+        .logo-hero-container {
+            position: relative;
+            z-index: 1;
+            padding: 24px;
+            border-radius: 30px;
+            background: linear-gradient(145deg, rgba(20, 16, 32, 0.6), rgba(8, 7, 14, 0.8));
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(147, 51, 234, 0.15);
+            animation: heroFloat 5s ease-in-out infinite;
+        }
+
+        @keyframes heroFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .hero-brand-img {
+            width: 280px;
+            height: 280px;
+            object-fit: contain;
+            border-radius: 20px;
+            display: block;
+        }
+
+        /* ── DISCORD CONTRAST STATS BAR ── */
+        .discord-stats-bar {
             max-width: 1100px;
-            margin: 0 auto;
+            margin: 20px auto 100px;
+            padding: 0 24px;
+        }
+
+        .discord-container {
+            background: linear-gradient(135deg, #110e26 0%, #171336 100%);
+            border: 1px solid #2d2454;
+            border-radius: 20px;
+            padding: 28px 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .discord-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .discord-icon-badge {
+            width: 52px;
+            height: 52px;
+            background: var(--discord-accent);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(88, 101, 242, 0.4);
+        }
+
+        .discord-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .discord-sub {
+            font-size: 13px;
+            color: #a5b4fc;
+        }
+
+        .discord-numbers {
+            display: flex;
+            gap: 32px;
+        }
+
+        .discord-stat-val {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .discord-stat-lbl {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        /* ── PRICING SECTION (USD CURRENCY) ── */
+        .section {
+            max-width: 1100px;
+            margin: 0 auto 120px;
+            padding: 0 24px;
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 54px;
+            margin-bottom: 50px;
         }
 
-        .section-subtitle {
-            font-size: 13px;
-            color: var(--accent-light);
+        .section-tag {
+            font-size: 12px;
             font-weight: 700;
-            text-transform: uppercase;
+            color: var(--accent-light);
             letter-spacing: 1.5px;
+            text-transform: uppercase;
             margin-bottom: 8px;
         }
 
-        .section-title {
-            font-size: 34px;
+        .section-heading {
+            font-size: 36px;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--text-primary);
+            letter-spacing: -1px;
+            color: #ffffff;
         }
 
-        /* ── CODE LOADER PREVIEW ── */
-        .loader-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 860px;
-            margin: 0 auto 90px;
-        }
-
-        .loader-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 14px;
-        }
-
-        .loader-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .code-box {
-            background: #060508;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .code-box code {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            color: var(--accent-light);
-            word-break: break-all;
-        }
-
-        /* ── PRICING SECTION ── */
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
-            align-items: stretch;
         }
 
         .pricing-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 36px 28px;
+            border-radius: 20px;
+            padding: 36px 30px;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -361,48 +439,41 @@
             transform: translateY(-4px);
         }
 
-        .pricing-card.popular {
+        .pricing-card.featured {
             border-color: var(--accent);
-            background: linear-gradient(180deg, #150f24 0%, var(--bg-card) 100%);
-            box-shadow: 0 8px 30px var(--accent-glow);
+            background: linear-gradient(180deg, #130f24 0%, var(--bg-card) 100%);
+            box-shadow: 0 10px 40px var(--accent-glow);
         }
 
-        .popular-badge {
+        .featured-tag {
             position: absolute;
             top: -12px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--accent);
-            color: #fff;
+            color: #ffffff;
             font-size: 11px;
             font-weight: 800;
             padding: 4px 14px;
-            border-radius: 20px;
+            border-radius: 9999px;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
 
-        .plan-title {
+        .plan-name {
             font-size: 18px;
             font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .plan-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            min-height: 40px;
+            margin-bottom: 8px;
         }
 
         .plan-price {
-            font-size: 42px;
+            font-size: 46px;
             font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 24px;
+            color: #ffffff;
             display: flex;
             align-items: baseline;
             gap: 6px;
+            margin-bottom: 20px;
         }
 
         .plan-price span {
@@ -413,7 +484,7 @@
 
         .plan-features {
             list-style: none;
-            margin-bottom: 32px;
+            margin-bottom: 30px;
             flex: 1;
         }
 
@@ -429,12 +500,37 @@
         .plan-features li::before {
             content: "✓";
             color: #4ade80;
-            font-weight: bold;
+            font-weight: 800;
         }
 
-        /* ── FAQ SECTION ── */
-        .faq-wrap {
-            max-width: 760px;
+        .btn-checkout {
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+            background: #141021;
+            color: #ffffff;
+        }
+
+        .pricing-card.featured .btn-checkout {
+            background: var(--accent);
+            border-color: transparent;
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        .pricing-card.featured .btn-checkout:hover {
+            background: #a855f7;
+        }
+
+        /* ── FAQ SECTION (EXACT 6 QUESTIONS) ── */
+        .faq-list {
+            max-width: 800px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -444,7 +540,7 @@
         .faq-item {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
             transition: border-color 0.2s;
         }
@@ -453,32 +549,35 @@
             border-color: var(--border-hover);
         }
 
-        .faq-q {
+        .faq-header {
             padding: 20px 24px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            cursor: pointer;
             user-select: none;
         }
 
-        .faq-q::after {
-            content: "+";
-            font-size: 18px;
+        .faq-question {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .faq-icon {
+            font-size: 16px;
             color: var(--text-muted);
             transition: transform 0.2s;
         }
 
-        .faq-item.active .faq-q::after {
+        .faq-item.open .faq-icon {
             transform: rotate(45deg);
             color: var(--accent-light);
         }
 
-        .faq-a {
+        .faq-body {
             display: none;
-            padding: 0 24px 20px;
+            padding: 0 24px 22px;
             font-size: 14px;
             color: var(--text-secondary);
             line-height: 1.7;
@@ -486,16 +585,15 @@
             margin-top: 4px;
         }
 
-        .faq-item.active .faq-a {
+        .faq-item.open .faq-body {
             display: block;
         }
 
         /* ── FOOTER ── */
         .footer {
             border-top: 1px solid var(--border);
-            padding: 50px 40px;
-            background: #050407;
-            margin-top: 100px;
+            padding: 40px 24px;
+            background: #040307;
         }
 
         .footer-inner {
@@ -508,177 +606,243 @@
             gap: 20px;
         }
 
-        .footer-text {
-            font-size: 13px;
-            color: var(--text-muted);
+        /* ── CLOUDFLARE TURNSTILE MODAL GATEWAY ── */
+        .turnstile-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 5, 10, 0.92);
+            backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .turnstile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 32px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 20px var(--accent-glow);
         }
 
         /* Responsive */
         @media (max-width: 860px) {
-            .navbar { padding: 0 20px; }
+            .hero { grid-template-columns: 1fr; text-align: center; padding-top: 130px; }
+            .hero-left { text-align: center; }
+            .hero-actions { justify-content: center; }
+            .pricing-grid { grid-template-columns: 1fr; }
             .nav-links { display: none; }
-            .hero-title { font-size: 38px; }
-            .stats-wrap, .pricing-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div class="ambient-bg"></div>
+    <div class="noise-overlay"></div>
+    <div class="ambient-glow"></div>
 
-    <!-- NAVBAR -->
-    <header class="navbar">
-        <a href="/" class="logo-wrap">
-            <span class="logo-badge">BOYFINITY</span>
-            <span class="logo-title">Script Hub</span>
-        </a>
-        <nav class="nav-links">
-            <a href="/" class="nav-link active">Home</a>
-            <a href="/games" class="nav-link">Supported Games</a>
-            <a href="/status" class="nav-link">System Status</a>
-            <a href="/get-key" class="nav-link">Get Key</a>
-        </nav>
-        <div class="nav-actions">
-            <a href="/get-key" class="btn btn-outline" style="border-color: var(--accent); color: var(--accent-light)">🔑 Get Free Key</a>
-            <a href="/login" class="btn btn-primary">Admin Portal</a>
-        </div>
-    </header>
+    <!-- FLOATING PILL NAVBAR -->
+    <div class="nav-wrapper">
+        <header class="floating-pill">
+            <a href="/" class="logo-wrap">
+                <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
+                <span class="logo-title">BOYFINITY</span>
+            </a>
+            <nav class="nav-links">
+                <a href="/" class="nav-link active">Home</a>
+                <a href="/scripts" class="nav-link">Scripts</a>
+                <a href="/status" class="nav-link">Status</a>
+                <a href="/get-key" class="nav-link">Get Key</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+            </nav>
+            <div id="navAuthArea">
+                <a href="/api/auth/discord/login" class="btn-signin">
+                    <span>SIGN IN</span>
+                    <span class="arrow-icon">→</span>
+                </a>
+            </div>
+        </header>
+    </div>
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-pill">
-            <span class="pulse-dot"></span>
-            Enterprise Security Core v3.0 • 100% Undetected
-        </div>
-        <h1 class="hero-title">
-            The Pinnacle of <span>Roblox</span> Execution Performance.
-        </h1>
-        <p class="hero-desc">
-            BOYFINITY adalah platform script hub komersial modern dengan arsitektur cloud terenkripsi, proteksi HWID otomatis, serta jaminan bypass anti-cheat terlengkap.
-        </p>
-        <div class="hero-btns">
-            <a href="/get-key" class="btn btn-primary" style="padding: 13px 30px; font-size: 15px;">🚀 Get Started (Free Key)</a>
-            <a href="/games" class="btn btn-outline" style="padding: 13px 26px; font-size: 15px;">Browse Supported Games →</a>
+    <!-- ASYMMETRICAL HERO SECTION -->
+    <main class="hero">
+        <div class="hero-left">
+            <div class="status-pill">
+                <span class="pulse-dot"></span>
+                <span>Hyperion Bypass Core v3.0 • Undetected</span>
+            </div>
+            <h1 class="hero-title">
+                The Pinnacle of <span>Roblox</span> Execution.
+            </h1>
+            <p class="hero-desc">
+                BOYFINITY delivers high-performance cloud Lua script automation for <strong>Violence District</strong> and <strong>Sniper Arena</strong> with military-grade HWID telemetry and zero ban history.
+            </p>
+            <div class="hero-actions">
+                <a href="/scripts" class="btn-main">Explore Supported Games →</a>
+                <a href="/get-key" class="btn-ghost">Get Free Key (24h)</a>
+            </div>
         </div>
 
-        <!-- STATS INTERAKTIF -->
-        <div class="stats-wrap">
-            <div class="stat-box">
-                <div class="stat-num highlight" id="statGames">25+</div>
-                <div class="stat-name">Supported Games</div>
+        <div class="hero-right">
+            <div class="focal-glow"></div>
+            <div class="logo-hero-container">
+                <img src="/assets/boyfinity.png" alt="Boyfinity Emblem" class="hero-brand-img">
             </div>
-            <div class="stat-box">
-                <div class="stat-num" id="statExec">142,850+</div>
-                <div class="stat-name">Total Executions</div>
+        </div>
+    </main>
+
+    <!-- DISCORD STATS BAR (CONTRAST CONTAINER) -->
+    <section class="discord-stats-bar">
+        <div class="discord-container">
+            <div class="discord-left">
+                <div class="discord-icon-badge">💬</div>
+                <div>
+                    <div class="discord-title">Join our Elite Discord Community</div>
+                    <div class="discord-sub">Real-time script updates, private bypasses, and 24/7 dedicated assistance.</div>
+                </div>
             </div>
-            <div class="stat-box">
-                <div class="stat-num green">100%</div>
-                <div class="stat-name">Undetected Status</div>
+            <div class="discord-numbers">
+                <div>
+                    <div class="discord-stat-val">12,400+</div>
+                    <div class="discord-stat-lbl">Active Members</div>
+                </div>
+                <div>
+                    <div class="discord-stat-val">100%</div>
+                    <div class="discord-stat-lbl">Uptime</div>
+                </div>
             </div>
+            <a href="https://discord.gg" target="_blank" class="btn-signin" style="background:#5865f2; border-color:#7983f5;">
+                <span>JOIN DISCORD</span>
+                <span class="arrow-icon">→</span>
+            </a>
         </div>
     </section>
 
-    <!-- LOADER PREVIEW CARD -->
-    <div class="loader-card">
-        <div class="loader-header">
-            <div class="loader-title">
-                <span>⚡ Universal Quick Loader (Roblox Executor)</span>
-            </div>
-            <span style="font-size:12px; color:#4ade80; font-weight:600">● Live & Ready</span>
-        </div>
-        <div class="code-box">
-            <code id="loadstringCode">loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()</code>
-            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="copyCode()">Copy</button>
-        </div>
-    </div>
-
-    <!-- PRICING SECTION -->
+    <!-- PRICING SECTION (USD) -->
     <section class="section" id="pricing">
         <div class="section-header">
-            <div class="section-subtitle">Akses Fleksibel</div>
-            <h2 class="section-title">Pilih Paket Akses Anda</h2>
+            <div class="section-tag">COMMERCIAL ACCESS</div>
+            <h2 class="section-heading">Transparent Pricing Plans</h2>
         </div>
 
         <div class="pricing-grid">
             <!-- FREE -->
             <div class="pricing-card">
-                <div class="plan-title">Free Checkpoint</div>
-                <div class="plan-desc">Akses penuh fitur script dengan menyelesaikan 1 checkpoint iklan.</div>
-                <div class="plan-price">Rp 0 <span>/ 24 Jam</span></div>
+                <div class="plan-name">Free Ad-Gate</div>
+                <div class="plan-price">$0 <span>/ 24 Hours</span></div>
                 <ul class="plan-features">
-                    <li>Semua fitur game Violence District</li>
-                    <li>Durasi 24 Jam per Key</li>
-                    <li>Dukungan Mobile & PC Executor</li>
-                    <li>Standard Anti-Cheat Bypass</li>
+                    <li>Full Violence District access</li>
+                    <li>Full Sniper Arena access</li>
+                    <li>24-hour renewable license</li>
+                    <li>Standard Anti-Cheat protection</li>
                 </ul>
-                <a href="/get-key" class="btn btn-outline" style="width: 100%;">Get Free Key →</a>
+                <a href="/get-key" class="btn-checkout">Get Free Key →</a>
             </div>
 
             <!-- MONTHLY -->
-            <div class="pricing-card popular">
-                <div class="popular-badge">Paling Populer</div>
-                <div class="plan-title">Monthly VIP</div>
-                <div class="plan-desc">Bebas checkpoint tanpa batas dengan kecepatan eksekusi instan.</div>
-                <div class="plan-price">Rp 35.000 <span>/ Bulan</span></div>
+            <div class="pricing-card featured">
+                <div class="featured-tag">MOST POPULAR</div>
+                <div class="plan-name">Monthly VIP</div>
+                <div class="plan-price">$3.50 <span>/ Month</span></div>
                 <ul class="plan-features">
-                    <li>Tanpa Checkpoint / Linkvertise</li>
-                    <li>Durasi Key Aktif 30 Hari</li>
-                    <li>Prioritas Update Fitur & Bypass</li>
-                    <li>Akses Discord VIP Role & Support</li>
-                    <li>Multi-game future updates</li>
+                    <li>No checkpoints / No ad links</li>
+                    <li>Automatic 30-day continuous key</li>
+                    <li>Priority bypass updates</li>
+                    <li>Automated Discord delivery</li>
+                    <li>Exclusive VIP Discord role</li>
                 </ul>
-                <a href="https://discord.gg" target="_blank" class="btn btn-primary" style="width: 100%;">Beli VIP (Discord)</a>
+                <button onclick="handlePurchase('monthly')" class="btn-checkout">Purchase Monthly</button>
             </div>
 
             <!-- LIFETIME -->
             <div class="pricing-card">
-                <div class="plan-title">Lifetime Enterprise</div>
-                <div class="plan-desc">Satu kali bayar untuk kepemilikan permanen seumur hidup.</div>
-                <div class="plan-price">Rp 85.000 <span>/ Selamanya</span></div>
+                <div class="plan-name">Lifetime Enterprise</div>
+                <div class="plan-price">$9.99 <span>/ Lifetime</span></div>
                 <ul class="plan-features">
-                    <li>Key Aktif Selamanya (Tanpa Expire)</li>
-                    <li>Fitur Reset HWID Otomatis</li>
-                    <li>Early Access Script Game Baru</li>
-                    <li>Private VIP Direct Channel</li>
+                    <li>Permanent lifetime access</li>
+                    <li>Instant HWID self-reset capability</li>
+                    <li>Immediate access to new game titles</li>
+                    <li>Direct priority developer support</li>
                 </ul>
-                <a href="https://discord.gg" target="_blank" class="btn btn-outline" style="width: 100%;">Beli Lifetime</a>
+                <button onclick="handlePurchase('lifetime')" class="btn-checkout">Purchase Lifetime</button>
             </div>
         </div>
     </section>
 
-    <!-- FAQ SECTION -->
+    <!-- FAQ SECTION (EXACT 6 QUESTIONS) -->
     <section class="section" id="faq">
         <div class="section-header">
-            <div class="section-subtitle">Bantuan & Informasi</div>
-            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="section-tag">HELP & SUPPORT</div>
+            <h2 class="section-heading">Frequently Asked Questions</h2>
         </div>
 
-        <div class="faq-wrap">
-            <div class="faq-item active">
-                <div class="faq-q" onclick="toggleFaq(this)">Apakah script BOYFINITY aman dari ban?</div>
-                <div class="faq-a">
-                    Ya, BOYFINITY menggunakan teknologi bypass memori aman di level client yang diperbarui secara rutin untuk memastikan status 100% Undetected oleh sistem deteksi game maupun Roblox Byfron/Hyperion.
+        <div class="faq-list">
+            <!-- 1. What is Boyfinity? -->
+            <div class="faq-item open">
+                <div class="faq-header" onclick="toggleFaq(this)">
+                    <div class="faq-question">1. What is Boyfinity?</div>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-body">
+                    Boyfinity is a premier enterprise-grade Roblox script hub providing undetected, cloud-managed Lua enhancements with built-in hardware identification (HWID) telemetry protection.
                 </div>
             </div>
 
+            <!-- 2. What platforms are supported? -->
             <div class="faq-item">
-                <div class="faq-q" onclick="toggleFaq(this)">Executor apa saja yang didukung?</div>
-                <div class="faq-a">
-                    BOYFINITY kompatibel dengan semua executor populer saat ini, baik di PC (Wave, Synapse Z, Solara, Celery) maupun Mobile Android/iOS (Delta, Fluxus, Hydrogen, Codex, Arceus X).
+                <div class="faq-header" onclick="toggleFaq(this)">
+                    <div class="faq-question">2. What platforms are supported?</div>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-body">
+                    We support both PC and Mobile executors. PC platforms include Wave, Synapse Z, Solara, and Celery. Mobile platforms include Delta, Fluxus, Hydrogen, Codex, and Arceus X on Android/iOS.
                 </div>
             </div>
 
+            <!-- 3. How do I get a license key? -->
             <div class="faq-item">
-                <div class="faq-q" onclick="toggleFaq(this)">Bagaimana cara menggunakan Key yang didapatkan?</div>
-                <div class="faq-a">
-                    Jalankan universal loader script kami di executor Anda. Masukkan Key yang Anda peroleh dari halaman "Get Key", lalu tekan tombol "Verify & Launch". HWID perangkat Anda akan terikat otomatis dan script langsung aktif.
+                <div class="faq-header" onclick="toggleFaq(this)">
+                    <div class="faq-question">3. How do I get a license key?</div>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-body">
+                    You can claim a free 24-hour key by completing our 3-step checkpoint on the "Get Key" page, or purchase an ad-free Monthly/Lifetime license for instant automated delivery.
                 </div>
             </div>
 
+            <!-- 4. What payment methods do you accept? -->
             <div class="faq-item">
-                <div class="faq-q" onclick="toggleFaq(this)">Apa yang terjadi jika saya mengganti perangkat?</div>
-                <div class="faq-a">
-                    Satu key terikat pada satu perangkat demi keamanan. Pengguna VIP dapat mengajukan reset HWID melalui admin atau Discord official kami kapan saja secara gratis.
+                <div class="faq-header" onclick="toggleFaq(this)">
+                    <div class="faq-question">4. What payment methods do you accept?</div>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-body">
+                    We accept Credit/Debit Cards, PayPal, and popular Cryptocurrencies (Bitcoin, Ethereum, USDT, Litecoin) through our automated checkout gateway and Discord ticket system.
+                </div>
+            </div>
+
+            <!-- 5. Do you offer refunds? -->
+            <div class="faq-item">
+                <div class="faq-header" onclick="toggleFaq(this)">
+                    <div class="faq-question">5. Do you offer refunds?</div>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-body">
+                    Due to the digital nature of license keys and instant HWID activation, all purchases are generally final. However, if a script becomes permanently unfixable within 48 hours of purchase, our support team will review your refund eligibility.
+                </div>
+            </div>
+
+            <!-- 6. How do I get support? -->
+            <div class="faq-item">
+                <div class="faq-header" onclick="toggleFaq(this)">
+                    <div class="faq-question">6. How do I get support?</div>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-body">
+                    Join our official Discord community and open a support ticket in the <code>#support</code> channel. Our staff and developer team are available 24/7 to resolve technical issues or HWID reset requests.
                 </div>
             </div>
         </div>
@@ -688,36 +852,101 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="logo-wrap">
-                <span class="logo-badge">BOYFINITY</span>
-                <span style="font-size:14px; color:var(--text-secondary)">© 2026 BOYFINITY Hub. All rights reserved.</span>
+                <img src="/assets/boyfinity.png" alt="BOYFINITY" style="width:24px; height:24px; border-radius:6px;">
+                <span style="font-size:13px; color:var(--text-secondary)">© 2026 BOYFINITY Script Hub. All rights reserved.</span>
             </div>
             <div style="display:flex; gap:20px;">
-                <a href="/games" class="nav-link">Games</a>
+                <a href="/scripts" class="nav-link">Scripts</a>
                 <a href="/status" class="nav-link">Status</a>
                 <a href="/get-key" class="nav-link">Get Key</a>
-                <a href="/login" class="nav-link">Owner Login</a>
+                <a href="/admin" class="nav-link">Staff Portal</a>
             </div>
         </div>
     </footer>
 
+    <!-- CLOUDFLARE TURNSTILE GATEWAY POPUP -->
+    <div class="turnstile-overlay" id="turnstileGateway">
+        <div class="turnstile-card">
+            <h3 style="font-size:18px; font-weight:800; margin-bottom:10px;">Security Verification</h3>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:20px;">Please complete the Cloudflare security verification to access BOYFINITY Hub.</p>
+            <div id="turnstileWidget" style="display:flex; justify-content:center; margin-bottom:16px;"></div>
+            <div style="font-size:11px; color:var(--text-muted)">Protected by Cloudflare Turnstile Anti-DDoS</div>
+        </div>
+    </div>
+
     <script>
-        function copyCode() {
-            const code = document.getElementById('loadstringCode').innerText;
-            navigator.clipboard.writeText(code);
-            alert("📋 Loadstring berhasil disalin ke clipboard!");
+        // Check persistent Discord Auth Session
+        async function checkSession() {
+            try {
+                const res = await fetch('/api/auth/me');
+                const data = await res.json();
+                if (data.success && data.user) {
+                    const authArea = document.getElementById('navAuthArea');
+                    authArea.innerHTML = `
+                        <a href="/admin" class="btn-signin" style="background:#1e192c; border-color:var(--accent);">
+                            <img src="${data.user.avatar || '/assets/boyfinity.png'}" style="width:18px;height:18px;border-radius:50%">
+                            <span>${data.user.username}</span>
+                        </a>
+                    `;
+                }
+            } catch (e) {}
         }
+        checkSession();
 
+        // FAQ Toggle
         function toggleFaq(el) {
-            const parent = el.parentElement;
-            parent.classList.toggle('active');
+            const item = el.parentElement;
+            item.classList.toggle('open');
         }
 
-        // Animated interactive stats counter
-        let executions = 142850;
-        setInterval(() => {
-            executions += Math.floor(Math.random() * 3) + 1;
-            document.getElementById('statExec').innerText = executions.toLocaleString() + "+";
-        }, 3000);
+        // Automated Checkout / Webhook Delivery Mock
+        async function handlePurchase(plan) {
+            const discordTag = prompt("Enter your Discord Username (e.g. jhon_doe) for instant key delivery:", "");
+            if (!discordTag) return;
+
+            const email = prompt("Enter your Email address:", `${discordTag}@user.com`);
+            
+            try {
+                const res = await fetch('/api/checkout/purchase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan, buyer_discord: discordTag, buyer_email: email })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`🎉 SUCCESS! Your ${data.duration.toUpperCase()} license key has been generated:\n\n${data.key}\n\nA copy was automatically sent to your Discord via Webhook!`);
+                } else {
+                    alert("Checkout error: " + (data.error || 'Failed to process key'));
+                }
+            } catch (err) {
+                alert("Network error: " + err.message);
+            }
+        }
+
+        // Cloudflare Turnstile Human Check Gateway
+        window.onload = function() {
+            const verified = sessionStorage.getItem('turnstile_passed');
+            if (!verified) {
+                const gateway = document.getElementById('turnstileGateway');
+                gateway.style.display = 'flex';
+
+                if (window.turnstile) {
+                    turnstile.render('#turnstileWidget', {
+                        sitekey: '0x4AAAAAAAXXXXXXXXXXXXXX', // Or test demo key 1x00000000000000000000AA
+                        callback: function(token) {
+                            sessionStorage.setItem('turnstile_passed', 'true');
+                            gateway.style.display = 'none';
+                        }
+                    });
+                } else {
+                    // Fallback pass if turnstile blocked by adblock
+                    setTimeout(() => {
+                        sessionStorage.setItem('turnstile_passed', 'true');
+                        gateway.style.display = 'none';
+                    }, 1200);
+                }
+            }
+        };
     </script>
 </body>
 </html>

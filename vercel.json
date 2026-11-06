@@ -8,9 +8,21 @@
     {
       "src": "*.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "assets/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/assets/favicon.ico"
+    },
     {
       "src": "/admin",
       "dest": "/admin.html"
@@ -20,8 +32,12 @@
       "dest": "/login.html"
     },
     {
+      "src": "/scripts",
+      "dest": "/scripts.html"
+    },
+    {
       "src": "/games",
-      "dest": "/games.html"
+      "dest": "/scripts.html"
     },
     {
       "src": "/status",
