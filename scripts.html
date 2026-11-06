@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scripts — BOYFINITY Script Hub</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-main: #08090B;
@@ -28,7 +31,13 @@
             --radius-soft: 10px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
         body {
             background-color: var(--bg-main);
             color: var(--text-primary);
@@ -38,53 +47,157 @@
             flex-direction: column;
         }
 
-        .main-wrapper { flex: 1; }
+        .main-wrapper {
+            flex: 1;
+        }
 
         .noise-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.025; z-index: 9999;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.025;
+            z-index: 9999;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         /* ── NAVBAR (8-12px SOFT ROUNDED BOX) ── */
         .nav-wrapper {
-            position: fixed; top: 18px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; padding: 0 20px;
+            position: fixed;
+            top: 18px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+            padding: 0 20px;
         }
+
         .floating-pill {
-            display: flex; align-items: center; justify-content: space-between;
-            background: rgba(13, 15, 19, 0.92); backdrop-filter: blur(14px);
-            border: 1px solid var(--border-card); border-radius: var(--radius-soft); padding: 10px 14px 10px 20px;
-            width: 100%; max-width: 980px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(13, 15, 19, 0.92);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-soft);
+            padding: 10px 14px 10px 20px;
+            width: 100%;
+            max-width: 980px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
         }
-        .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-img { width: 28px; height: 28px; border-radius: 8px; object-fit: contain; border: 1px solid var(--border-card); }
-        .logo-title { font-size: 15px; font-weight: 800; letter-spacing: 1.2px; color: var(--text-primary); }
-        .nav-links { display: flex; align-items: center; gap: 24px; }
-        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.15s; }
-        .nav-link.active, .nav-link:hover { color: var(--text-primary); }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            object-fit: contain;
+            border: 1px solid var(--border-card);
+        }
+
+        .logo-title {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            color: var(--text-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.15s;
+        }
+
+        .nav-link.active,
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
 
         .btn-signin {
-            display: inline-flex; align-items: center; gap: 8px; background: var(--accent-muted); color: var(--text-primary);
-            font-size: 12px; font-weight: 700; letter-spacing: 0.5px; padding: 8px 16px; border-radius: 8px; text-decoration: none;
-            border: 1px solid var(--accent-border); transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-muted);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            border: 1px solid var(--accent-border);
+            transition: all 0.2s;
         }
-        .btn-signin:hover { background: #41305f; border-color: #5d4686; }
 
-        .container { max-width: 1120px; margin: 110px auto 60px; padding: 0 24px; }
+        .btn-signin:hover {
+            background: #41305f;
+            border-color: #5d4686;
+        }
+
+        .container {
+            max-width: 1120px;
+            margin: 110px auto 60px;
+            padding: 0 24px;
+        }
 
         /* Page Title */
-        .page-header { text-align: left; margin-bottom: 24px; }
-        .page-title { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 4px; color: var(--text-primary); }
-        .page-desc { color: var(--text-secondary); font-size: 14px; }
+        .page-header {
+            text-align: left;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .page-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
 
         /* ── 1. SEARCH & FILTER BAR (NOW PLACED AT THE TOP) ── */
         .search-card {
-            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
-            padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;
-            gap: 16px; flex-wrap: wrap;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
         }
+
         .search-input-wrap {
-            display: flex; align-items: center; gap: 12px; flex: 1; min-width: 260px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 260px;
         }
+
         .search-svg-icon {
             color: var(--text-muted);
             display: flex;
@@ -92,94 +205,248 @@
             justify-content: center;
             flex-shrink: 0;
         }
+
         .search-input {
-            width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
-            padding: 10px 14px; color: var(--text-primary); font-size: 13px; outline: none; transition: border-color 0.15s;
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.15s;
         }
-        .search-input:focus { border-color: var(--accent-border); }
+
+        .search-input:focus {
+            border-color: var(--accent-border);
+        }
+
         .filter-buttons {
-            display: flex; align-items: center; gap: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
         .filter-btn {
-            background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
-            color: var(--text-secondary); font-size: 12px; font-weight: 600; padding: 8px 14px; cursor: pointer;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 14px;
+            cursor: pointer;
             transition: all 0.15s;
         }
-        .filter-btn.active, .filter-btn:hover {
-            color: var(--text-primary); background: var(--bg-card-hover); border-color: var(--border-hover);
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
         }
 
         /* ── 2. METRICS STATS (NOW POSITIONED DIRECTLY UNDER SEARCH / FILTER) ── */
         .overview-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 34px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 34px;
         }
+
         .metric-card {
-            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
-            padding: 16px 20px; transition: border-color 0.15s;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 10px;
+            padding: 16px 20px;
+            transition: border-color 0.15s;
         }
-        .metric-card:hover { border-color: var(--border-hover); }
-        .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-        .metric-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .metric-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .metric-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .metric-badge {
-            display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;
-            padding: 2px 7px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .badge-green { background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border); }
-        .badge-purple { background: var(--accent-muted); color: var(--accent-text); border: 1px solid var(--accent-border); }
-        .metric-value { font-size: 24px; font-weight: 800; letter-spacing: -0.6px; color: var(--text-primary); }
+
+        .badge-green {
+            background: var(--tag-green-bg);
+            color: var(--tag-green-text);
+            border: 1px solid var(--tag-green-border);
+        }
+
+        .badge-purple {
+            background: var(--accent-muted);
+            color: var(--accent-text);
+            border: 1px solid var(--accent-border);
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            color: var(--text-primary);
+        }
 
         /* ── 3. GAME CARDS (SUBTLE BORDERED CARDS) ── */
         .games-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
         }
+
         .game-card {
-            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
-            overflow: hidden; display: flex; flex-direction: column; transition: border-color 0.15s;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.15s;
         }
-        .game-card:hover { border-color: var(--border-hover); }
+
+        .game-card:hover {
+            border-color: var(--border-hover);
+        }
 
         .game-thumb {
-            height: 180px; width: 100%; object-fit: cover; background: #0b0d11; display: block;
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+            background: #0b0d11;
+            display: block;
             border-bottom: 1px solid var(--border-card);
         }
-        .game-content { padding: 22px; flex: 1; display: flex; flex-direction: column; }
-        
-        .game-meta-top {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
-        }
-        .badge-status {
-            font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
-            background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border);
-            display: inline-flex; align-items: center; gap: 5px;
-        }
-        .copy-counter {
-            font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-weight: 600;
+
+        .game-content {
+            padding: 22px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-        .game-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
-        .game-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; flex: 1; }
+        .game-meta-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .badge-status {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--tag-green-bg);
+            color: var(--tag-green-text);
+            border: 1px solid var(--tag-green-border);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .copy-counter {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .game-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .game-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex: 1;
+        }
 
         /* Loader Code Container */
         .loader-block {
-            background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
-            padding: 10px 12px; margin-bottom: 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
         }
-        .loader-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+
+        .loader-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
         .loader-code {
-            font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-secondary);
-            word-break: break-all; user-select: all; background: none; border: none; width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            word-break: break-all;
+            user-select: all;
+            background: none;
+            border: none;
+            width: 100%;
         }
 
         /* Action Row: Small Copy Button + Status Badge */
         .card-action-row {
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
+
         .btn-copy-small {
-            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-            background: var(--accent-muted); border: 1px solid var(--accent-border); color: var(--text-primary);
-            padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: var(--accent-muted);
+            border: 1px solid var(--accent-border);
+            color: var(--text-primary);
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
         }
-        .btn-copy-small:hover { background: #41305f; border-color: #5d4686; }
+
+        .btn-copy-small:hover {
+            background: #41305f;
+            border-color: #5d4686;
+        }
 
         /* ── RICH FOOTER REVAMP ── */
         .footer {
@@ -295,13 +562,25 @@
         }
 
         @media (max-width: 768px) {
-            .games-grid { grid-template-columns: 1fr; }
-            .overview-grid { grid-template-columns: 1fr; }
-            .footer-inner { grid-template-columns: 1fr; }
-            .nav-links { display: none; }
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="noise-overlay"></div>
@@ -340,12 +619,14 @@
             <div class="search-card">
                 <div class="search-input-wrap">
                     <span class="search-svg-icon">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
                     </span>
-                    <input type="text" id="gameSearchInput" class="search-input" placeholder="Search scripts by title or keyword..." onkeyup="filterGames()">
+                    <input type="text" id="gameSearchInput" class="search-input"
+                        placeholder="Search scripts by title or keyword..." onkeyup="filterGames()">
                 </div>
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="setFilter('all', this)">All Games</button>
@@ -368,7 +649,7 @@
                         <span class="metric-title">Detection Status</span>
                         <span class="metric-badge badge-purple">100%</span>
                     </div>
-                    <div class="metric-value">UNDETECTED</div>
+                    <div class="metric-value">Undetected</div>
                 </div>
             </div>
 
@@ -376,7 +657,8 @@
             <div class="games-grid" id="gamesGridContainer">
                 <!-- 1. Violence District -->
                 <div class="game-card" data-title="violence district">
-                    <img src="/assets/violencedistrict.png" alt="Violence District" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
+                    <img src="/assets/ViolenceDistrict.webp" alt="Violence District" class="game-thumb"
+                        onerror="this.src='/assets/boyfinity.png'">
                     <div class="game-content">
                         <div class="game-meta-top">
                             <span class="badge-status">● Working</span>
@@ -384,16 +666,20 @@
                         </div>
                         <h2 class="game-title">Violence District</h2>
                         <p class="game-desc">
-                            Violence District is asymmetrical horror game on Roblox where Killer is faced against 5 Survivors. Killer's main goal is to sacrifice all the survivors. Survivors' main goal is to repair 5 generators and do whatever it takes to escape.
+                            Violence District is asymmetrical horror game on Roblox where Killer is faced against 5
+                            Survivors. Killer's main goal is to sacrifice all the survivors. Survivors' main goal is to
+                            repair 5 generators and do whatever it takes to escape.
                         </p>
 
                         <div class="loader-block">
                             <div class="loader-label">Quick Loadstring</div>
-                            <input readonly class="loader-code" value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()'>
+                            <input readonly class="loader-code"
+                                value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()'>
                         </div>
 
                         <div class="card-action-row">
-                            <button class="btn-copy-small" onclick="handleCopy(this, 'vd', 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj&quot;))()')">
+                            <button class="btn-copy-small"
+                                onclick="handleCopy(this, 'vd', 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj&quot;))()')">
                                 <span>Copy</span>
                             </button>
                             <span class="badge-status">Working</span>
@@ -403,7 +689,8 @@
 
                 <!-- 2. Sniper Arena -->
                 <div class="game-card" data-title="sniper arena">
-                    <img src="/assets/sniperarena.png" alt="Sniper Arena" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
+                    <img src="/assets/SniperArena.webp" alt="Sniper Arena" class="game-thumb"
+                        onerror="this.src='/assets/boyfinity.png'">
                     <div class="game-content">
                         <div class="game-meta-top">
                             <span class="badge-status">● Working</span>
@@ -411,16 +698,20 @@
                         </div>
                         <h2 class="game-title">Sniper Arena</h2>
                         <p class="game-desc">
-                            Sniper Arena - Exciting sniper battles. Play fair. Win with skill. Skins are just cosmetic - no stat boosts, no paying to win. Join ranked matches and beat other players to earn amazing rewards! Cheating will result in a permanent ban. No second chances.
+                            Sniper Arena - Exciting sniper battles. Play fair. Win with skill. Skins are just cosmetic -
+                            no stat boosts, no paying to win. Join ranked matches and beat other players to earn amazing
+                            rewards! Cheating will result in a permanent ban. No second chances.
                         </p>
 
                         <div class="loader-block">
                             <div class="loader-label">Quick Loadstring</div>
-                            <input readonly class="loader-code" value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q"))()'>
+                            <input readonly class="loader-code"
+                                value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q"))()'>
                         </div>
 
                         <div class="card-action-row">
-                            <button class="btn-copy-small" onclick="handleCopy(this, 'sa', 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q&quot;))()')">
+                            <button class="btn-copy-small"
+                                onclick="handleCopy(this, 'sa', 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q&quot;))()')">
                                 <span>Copy</span>
                             </button>
                             <span class="badge-status">Working</span>
@@ -464,7 +755,9 @@
         </div>
 
         <div class="payment-bar">
-            <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">Supported Gateways</span>
+            <span
+                style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">Supported
+                Gateways</span>
             <div class="payment-methods">
                 <span class="payment-tag">QRIS</span>
                 <span class="payment-tag">GoPay</span>
@@ -492,12 +785,12 @@
             navigator.clipboard.writeText(text).then(() => {
                 const original = btn.innerHTML;
                 btn.innerHTML = '<span>✓ Copied</span>';
-                
+
                 copyStats[gameKey]++;
                 const counterEl = document.getElementById(`copyCount-${gameKey}`);
                 if (counterEl) counterEl.innerText = `${copyStats[gameKey].toLocaleString()} Copies`;
 
-                fetch('/api/public/games/copy', { method: 'POST' }).catch(() => {});
+                fetch('/api/public/games/copy', { method: 'POST' }).catch(() => { });
                 setTimeout(() => btn.innerHTML = original, 2000);
             });
         }
@@ -536,9 +829,10 @@
                         </a>
                     `;
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
         checkSession();
     </script>
 </body>
+
 </html>

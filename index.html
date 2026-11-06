@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,9 @@
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <!-- Cloudflare Turnstile API -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <style>
@@ -57,7 +60,10 @@
         /* Subtle Noise Texture */
         .noise-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
             opacity: 0.025;
             z-index: 9999;
@@ -68,7 +74,8 @@
         .nav-wrapper {
             position: fixed;
             top: 18px;
-            left: 0; right: 0;
+            left: 0;
+            right: 0;
             display: flex;
             justify-content: center;
             z-index: 1000;
@@ -125,7 +132,8 @@
             transition: color 0.15s;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             color: var(--text-primary);
         }
 
@@ -205,7 +213,7 @@
         }
 
         .hero-desc {
-            font-size: 19px;
+            font-size: 15px;
             color: var(--text-secondary);
             line-height: 1.65;
             max-width: 580px;
@@ -325,9 +333,12 @@
         }
 
         @keyframes cleanLogoFloat {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0px) scale(1);
             }
+
             50% {
                 transform: translateY(-12px) scale(1.02);
             }
@@ -754,20 +765,60 @@
         }
 
         @media (max-width: 900px) {
-            .hero { grid-template-columns: 1fr; text-align: center; padding-top: 130px; gap: 40px; }
-            .hero-left { text-align: center; align-items: center; }
-            .hero-title { text-align: center; font-size: 42px; }
-            .hero-desc { text-align: center; margin: 0 auto 28px; }
-            .hero-actions { justify-content: center; }
-            .hero-right { justify-content: center; }
-            .hero-clean-logo { width: 280px; height: 280px; }
-            .metrics-grid-3 { grid-template-columns: 1fr; }
-            .pricing-grid { grid-template-columns: 1fr; }
-            .footer-inner { grid-template-columns: 1fr; }
-            .nav-links { display: none; }
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding-top: 130px;
+                gap: 40px;
+            }
+
+            .hero-left {
+                text-align: center;
+                align-items: center;
+            }
+
+            .hero-title {
+                text-align: center;
+                font-size: 42px;
+            }
+
+            .hero-desc {
+                text-align: center;
+                margin: 0 auto 28px;
+            }
+
+            .hero-actions {
+                justify-content: center;
+            }
+
+            .hero-right {
+                justify-content: center;
+            }
+
+            .hero-clean-logo {
+                width: 280px;
+                height: 280px;
+            }
+
+            .metrics-grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="noise-overlay"></div>
@@ -818,14 +869,15 @@
                 <!-- 4. Main Action Buttons -->
                 <div class="hero-actions">
                     <a href="/scripts" class="btn-main">Explore Supported Games →</a>
-                    <button onclick="handleGetKeyClick(event)" class="btn-ghost">Get Free Key (24h)</button>
+                    <button onclick="handleGetKeyClick(event)" class="btn-ghost">Get Free Key</button>
                 </div>
 
                 <!-- 5. Compact Discord Pill (with Official Discord SVG Icon) -->
                 <a href="https://discord.gg" target="_blank" class="hero-discord-pill">
                     <span class="dc-icon">
                         <svg width="18" height="14" viewBox="0 0 127.14 96.36" fill="currentColor">
-                            <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+                            <path
+                                d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z" />
                         </svg>
                     </span>
                     <span class="dc-text">Join Discord</span>
@@ -859,7 +911,7 @@
                         <span class="metric-heading">Detection Rate</span>
                         <span class="metric-badge badge-purple">100%</span>
                     </div>
-                    <div class="metric-big-val">UNDETECTED</div>
+                    <div class="metric-big-val">Undetected</div>
                     <div class="metric-sub-note">Active telemetry protection</div>
                 </div>
 
@@ -900,12 +952,12 @@
                 <div class="pricing-card featured">
                     <div class="featured-tag">POPULAR</div>
                     <div class="plan-name">Monthly VIP</div>
-                    <div class="plan-price">$3.50 <span>/ Month</span></div>
+                    <div class="plan-price">$1.29 <span>/ Month</span></div>
                     <ul class="plan-features">
-                        <li>No checkpoints / No ad links</li>
-                        <li>Automatic 30-day continuous key</li>
-                        <li>Priority bypass updates</li>
-                        <li>Automated Discord delivery</li>
+                        <li>Monthly keys</li>
+                        <li>All supported games</li>
+                        <li>5x HWID reset</li>
+                        <li>priority support</li>
                         <li>Exclusive VIP Discord role</li>
                     </ul>
                     <button onclick="handlePurchaseClick('monthly')" class="btn-checkout">Purchase Now</button>
@@ -914,12 +966,13 @@
                 <!-- LIFETIME -->
                 <div class="pricing-card">
                     <div class="plan-name">Lifetime Enterprise</div>
-                    <div class="plan-price">$9.99 <span>/ Lifetime</span></div>
+                    <div class="plan-price">$5.99 <span>/ Lifetime</span></div>
                     <ul class="plan-features">
-                        <li>Permanent lifetime access</li>
-                        <li>Instant HWID self-reset capability</li>
-                        <li>Immediate access to new updates</li>
-                        <li>Direct priority developer support</li>
+                        <li>Lifetime keys</li>
+                        <li>All supported games</li>
+                        <li>Unlimited HWID reset</li>
+                        <li>priority developer support</li>
+                        <li>Exclusive Lifetime Discord role</li>
                     </ul>
                     <button onclick="handlePurchaseClick('lifetime')" class="btn-checkout">Purchase Now</button>
                 </div>
@@ -941,7 +994,9 @@
                         <span class="faq-icon">+</span>
                     </div>
                     <div class="faq-body">
-                        Boyfinity is an advanced Roblox script execution ecosystem featuring a minimalist loader and premium cloud script management. Take control of your gameplay across Windows, macOS, and mobile platforms with unmatched performance.
+                        Boyfinity is an advanced Roblox script execution ecosystem featuring a minimalist loader and
+                        premium cloud script management. Take control of your gameplay across Windows, macOS, and mobile
+                        platforms with unmatched performance.
                     </div>
                 </div>
 
@@ -952,7 +1007,8 @@
                         <span class="faq-icon">+</span>
                     </div>
                     <div class="faq-body">
-                        We support Volt, Pottasium, Wave, Real, Madium, Volcano, Velocity, and SirHurt across Windows, macOS, and Android/iOS mobile environments with native executor hooks.
+                        We support Volt, Pottasium, Wave, Real, Madium, Volcano, Velocity, and SirHurt across Windows,
+                        macOS, and Android/iOS mobile environments with native executor hooks.
                     </div>
                 </div>
 
@@ -963,7 +1019,8 @@
                         <span class="faq-icon">+</span>
                     </div>
                     <div class="faq-body">
-                        You can claim a free 24-hour key by completing our 3-step checkpoint on the "Get Key" page, or purchase an ad-free Monthly/Lifetime license with instant automated Discord delivery.
+                        You can claim a free 24-hour key by completing our 3-step checkpoint on the "Get Key" page, or
+                        purchase an ad-free Monthly/Lifetime license with instant automated Discord delivery.
                     </div>
                 </div>
 
@@ -974,7 +1031,8 @@
                         <span class="faq-icon">+</span>
                     </div>
                     <div class="faq-body">
-                        We accept Credit/Debit Cards, PayPal, QRIS, GoPay, OVO, DANA, and major Cryptocurrencies (Bitcoin, Ethereum, USDT, Litecoin).
+                        We accept Credit/Debit Cards, PayPal, QRIS, GoPay, OVO, DANA, and major Cryptocurrencies
+                        (Bitcoin, Ethereum, USDT, Litecoin).
                     </div>
                 </div>
 
@@ -985,7 +1043,9 @@
                         <span class="faq-icon">+</span>
                     </div>
                     <div class="faq-body">
-                        Due to the digital nature of license keys and instant HWID activation, all purchases are generally final. However, if a script becomes permanently unfixable within 48 hours of purchase, our support team will review your refund eligibility.
+                        Due to the digital nature of license keys and instant HWID activation, all purchases are
+                        generally final. However, if a script becomes permanently unfixable within 48 hours of purchase,
+                        our support team will review your refund eligibility.
                     </div>
                 </div>
 
@@ -996,7 +1056,9 @@
                         <span class="faq-icon">+</span>
                     </div>
                     <div class="faq-body">
-                        Join our official Discord community and open a support ticket in the <code>#support</code> channel. Our staff and developer team are available 24/7 to resolve technical issues or HWID reset requests.
+                        Join our official Discord community and open a support ticket in the <code>#support</code>
+                        channel. Our staff and developer team are available 24/7 to resolve technical issues or HWID
+                        reset requests.
                     </div>
                 </div>
             </div>
@@ -1040,7 +1102,9 @@
 
         <!-- Payment Gateway Icons Bar -->
         <div class="payment-bar">
-            <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">Supported Gateways</span>
+            <span
+                style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">Supported
+                Gateways</span>
             <div class="payment-methods">
                 <span class="payment-tag">QRIS</span>
                 <span class="payment-tag">GoPay</span>
@@ -1066,15 +1130,20 @@
     <div class="modal-overlay" id="authGateModal">
         <div class="modal-card">
             <div style="font-size:32px; margin-bottom:12px;">🔒</div>
-            <h3 style="font-size:17px; font-weight:700; margin-bottom:8px; color:var(--text-primary);">Discord Sign In Required</h3>
-            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:22px; line-height:1.6;" id="authGateMessage">
-                Please sign in with your Discord account before accessing free keys or purchasing plans. Your license will be automatically delivered to your Discord.
+            <h3 style="font-size:17px; font-weight:700; margin-bottom:8px; color:var(--text-primary);">Discord Sign In
+                Required</h3>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:22px; line-height:1.6;"
+                id="authGateMessage">
+                Please sign in with your Discord account before accessing free keys or purchasing plans. Your license
+                will be automatically delivered to your Discord.
             </p>
-            <a href="/api/auth/discord/login" class="btn-signin" style="display:flex; justify-content:center; padding:11px; margin-bottom:10px;">
+            <a href="/api/auth/discord/login" class="btn-signin"
+                style="display:flex; justify-content:center; padding:11px; margin-bottom:10px;">
                 <span>Sign In with Discord</span>
                 <span>→</span>
             </a>
-            <button onclick="closeAuthGate()" class="btn-ghost" style="width:100%; justify-content:center;">Cancel</button>
+            <button onclick="closeAuthGate()" class="btn-ghost"
+                style="width:100%; justify-content:center;">Cancel</button>
         </div>
     </div>
 
@@ -1082,8 +1151,10 @@
     <div class="modal-overlay" id="turnstileGateway">
         <div class="modal-card">
             <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">Security Verification</h3>
-            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:18px;">Please complete the Cloudflare security verification to access BOYFINITY Hub.</p>
-            <div id="turnstileWidget" style="display:flex; justify-content:center; margin-bottom:14px; min-height:65px;"></div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:18px;">Please complete the Cloudflare
+                security verification to access BOYFINITY Hub.</p>
+            <div id="turnstileWidget"
+                style="display:flex; justify-content:center; margin-bottom:14px; min-height:65px;"></div>
             <div style="font-size:11px; color:var(--text-muted)">Protected by Cloudflare Turnstile</div>
         </div>
     </div>
@@ -1107,7 +1178,7 @@
                         </a>
                     `;
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
         checkSession();
 
@@ -1160,7 +1231,7 @@
         }
 
         // Turnstile Dynamic Render
-        window.addEventListener('load', async function() {
+        window.addEventListener('load', async function () {
             const verified = sessionStorage.getItem('turnstile_passed');
             if (verified) return;
 
@@ -1184,11 +1255,11 @@
                             turnstile.render('#turnstileWidget', {
                                 sitekey: siteKey,
                                 theme: 'dark',
-                                callback: function(token) {
+                                callback: function (token) {
                                     sessionStorage.setItem('turnstile_passed', 'true');
                                     gateway.style.display = 'none';
                                 },
-                                'error-callback': function(errorCode) {
+                                'error-callback': function (errorCode) {
                                     sessionStorage.setItem('turnstile_passed', 'true');
                                     gateway.style.display = 'none';
                                 }
@@ -1209,4 +1280,5 @@
         });
     </script>
 </body>
+
 </html>
