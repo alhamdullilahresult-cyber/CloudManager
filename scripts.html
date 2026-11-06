@@ -69,31 +69,17 @@
         }
         .btn-signin:hover { background: #41305f; border-color: #5d4686; }
 
-        .container { max-width: 1120px; margin: 100px auto 60px; padding: 0 24px; }
+        .container { max-width: 1120px; margin: 110px auto 60px; padding: 0 24px; }
 
-        /* ── TOP STATS (COMPACT CARDS AT THE VERY TOP) ── */
-        .overview-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 30px;
-        }
-        .metric-card {
-            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
-            padding: 14px 18px; transition: border-color 0.15s;
-        }
-        .metric-card:hover { border-color: var(--border-hover); }
-        .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-        .metric-title { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
-        .metric-badge {
-            display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;
-            padding: 2px 7px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;
-        }
-        .badge-green { background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border); }
-        .badge-purple { background: var(--accent-muted); color: var(--accent-text); border: 1px solid var(--accent-border); }
-        .metric-value { font-size: 22px; font-weight: 700; letter-spacing: -0.6px; color: var(--text-primary); }
+        /* Page Title */
+        .page-header { text-align: left; margin-bottom: 24px; }
+        .page-title { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 4px; color: var(--text-primary); }
+        .page-desc { color: var(--text-secondary); font-size: 14px; }
 
-        /* ── SEARCH & FILTER BAR (SUBTLE BORDERED CARD WITH SLEEK SVG ICON) ── */
+        /* ── 1. SEARCH & FILTER BAR (NOW PLACED AT THE TOP) ── */
         .search-card {
             background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
-            padding: 14px 18px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;
             gap: 16px; flex-wrap: wrap;
         }
         .search-input-wrap {
@@ -108,7 +94,7 @@
         }
         .search-input {
             width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
-            padding: 9px 14px; color: var(--text-primary); font-size: 13px; outline: none; transition: border-color 0.15s;
+            padding: 10px 14px; color: var(--text-primary); font-size: 13px; outline: none; transition: border-color 0.15s;
         }
         .search-input:focus { border-color: var(--accent-border); }
         .filter-buttons {
@@ -123,12 +109,26 @@
             color: var(--text-primary); background: var(--bg-card-hover); border-color: var(--border-hover);
         }
 
-        /* Page Title */
-        .page-header { text-align: left; margin-bottom: 24px; }
-        .page-title { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 4px; color: var(--text-primary); }
-        .page-desc { color: var(--text-secondary); font-size: 14px; }
+        /* ── 2. METRICS STATS (NOW POSITIONED DIRECTLY UNDER SEARCH / FILTER) ── */
+        .overview-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 34px;
+        }
+        .metric-card {
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+            padding: 16px 20px; transition: border-color 0.15s;
+        }
+        .metric-card:hover { border-color: var(--border-hover); }
+        .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .metric-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .metric-badge {
+            display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;
+            padding: 2px 7px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+        }
+        .badge-green { background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border); }
+        .badge-purple { background: var(--accent-muted); color: var(--accent-text); border: 1px solid var(--accent-border); }
+        .metric-value { font-size: 24px; font-weight: 800; letter-spacing: -0.6px; color: var(--text-primary); }
 
-        /* ── GAME CARDS (SUBTLE BORDERED CARDS) ── */
+        /* ── 3. GAME CARDS (SUBTLE BORDERED CARDS) ── */
         .games-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
         }
@@ -331,7 +331,29 @@
         </div>
 
         <div class="container">
-            <!-- TOP COMPACT METRICS -->
+            <div class="page-header">
+                <h1 class="page-title">Scripts</h1>
+                <p class="page-desc">Cloud-hosted script automation suites for supported Roblox experiences.</p>
+            </div>
+
+            <!-- 1. SEARCH & FILTER CARD (AT THE TOP) -->
+            <div class="search-card">
+                <div class="search-input-wrap">
+                    <span class="search-svg-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </span>
+                    <input type="text" id="gameSearchInput" class="search-input" placeholder="Search scripts by title or keyword..." onkeyup="filterGames()">
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="setFilter('all', this)">All Games</button>
+                    <button class="filter-btn" onclick="setFilter('working', this)">Working</button>
+                </div>
+            </div>
+
+            <!-- 2. METRICS STATS (DIRECTLY UNDER SEARCH / FILTER) -->
             <div class="overview-grid">
                 <div class="metric-card">
                     <div class="metric-header">
@@ -350,29 +372,7 @@
                 </div>
             </div>
 
-            <div class="page-header">
-                <h1 class="page-title">Scripts</h1>
-                <p class="page-desc">Cloud-hosted script automation suites for supported Roblox experiences.</p>
-            </div>
-
-            <!-- SEARCH & FILTER CARD (MODERN SVG SEARCH ICON) -->
-            <div class="search-card">
-                <div class="search-input-wrap">
-                    <span class="search-svg-icon">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                    </span>
-                    <input type="text" id="gameSearchInput" class="search-input" placeholder="Search scripts by title or keyword..." onkeyup="filterGames()">
-                </div>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="setFilter('all', this)">All Games</button>
-                    <button class="filter-btn" onclick="setFilter('working', this)">Working</button>
-                </div>
-            </div>
-
-            <!-- STRICTLY 2 GAMES WITH REQUIRED EXACT DESCRIPTIONS -->
+            <!-- 3. STRICTLY 2 GAMES WITH REQUIRED EXACT DESCRIPTIONS -->
             <div class="games-grid" id="gamesGridContainer">
                 <!-- 1. Violence District -->
                 <div class="game-card" data-title="violence district">
