@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status — BOYFINITY Script Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #07060a;
+            --bg-card: #0f0d16;
+            --border: #211c30;
+            --border-hover: #3b2d5a;
+            --accent: #9333ea;
+            --accent-glow: rgba(147, 51, 234, 0.25);
+            --accent-light: #c084fc;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        body { background-color: var(--bg-base); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.12) 0%, transparent 50%);
+            z-index: -1; pointer-events: none;
+        }
+
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; height: 72px;
+            background: rgba(7, 6, 10, 0.85); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; z-index: 1000;
+        }
+        .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-badge { background: var(--accent); color: #fff; font-weight: 800; font-size: 13px; padding: 5px 12px; border-radius: 8px; }
+        .logo-title { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+        .nav-links { display: flex; align-items: center; gap: 28px; }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 600; }
+        .nav-link.active, .nav-link:hover { color: var(--text-primary); }
+
+        .btn {
+            display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            text-decoration: none; cursor: pointer; transition: all 0.2s; border: none;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+
+        .container { max-width: 900px; margin: 120px auto 60px; padding: 0 24px; }
+        .page-header { text-align: center; margin-bottom: 40px; }
+        .page-title { font-size: 34px; font-weight: 800; margin-bottom: 8px; }
+        .page-desc { color: var(--text-secondary); font-size: 15px; }
+
+        /* Global Status Banner */
+        .status-banner {
+            background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25);
+            border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 32px;
+        }
+        .status-left { display: flex; align-items: center; gap: 14px; }
+        .status-dot {
+            width: 12px; height: 12px; border-radius: 50%; background: var(--success);
+            box-shadow: 0 0 14px var(--success);
+        }
+
+        /* Status List */
+        .status-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+        }
+        .status-table { width: 100%; border-collapse: collapse; }
+        .status-table th {
+            text-align: left; padding: 14px 20px; font-size: 12px; color: var(--text-muted);
+            text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--border);
+            background: #09080e;
+        }
+        .status-table td { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .status-table tr:last-child td { border-bottom: none; }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 700;
+        }
+        .badge-undetected { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .badge-updating { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-detected { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+
+    <header class="navbar">
+        <a href="/" class="logo-wrap">
+            <span class="logo-badge">BOYFINITY</span>
+            <span class="logo-title">Script Hub</span>
+        </a>
+        <nav class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/games" class="nav-link">Supported Games</a>
+            <a href="/status" class="nav-link active">System Status</a>
+            <a href="/get-key" class="nav-link">Get Key</a>
+        </nav>
+        <div>
+            <a href="/get-key" class="btn btn-primary">Get Key</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Realtime System Status</h1>
+            <p class="page-desc">Pantauan langsung status deteksi anti-cheat dan ketersediaan script di jaringan BOYFINITY.</p>
+        </div>
+
+        <div class="status-banner">
+            <div class="status-left">
+                <span class="status-dot"></span>
+                <div>
+                    <div style="font-weight: 700; color: #4ade80; font-size: 15px">All Systems Operational</div>
+                    <div style="font-size: 12px; color: var(--text-secondary)">Semua script game aman dan berjalan lancar tanpa laporan banned.</div>
+                </div>
+            </div>
+            <span style="font-size: 12px; color: var(--text-muted)">Auto-updated: Realtime</span>
+        </div>
+
+        <div class="status-card">
+            <table class="status-table">
+                <thead>
+                    <tr>
+                        <th>Game Title</th>
+                        <th>Script Version</th>
+                        <th>Anti-Cheat Status</th>
+                        <th>Server Latency</th>
+                        <th>Last Checked</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: 700;">Violence District</td>
+                        <td style="font-family: monospace; color: var(--accent-light);">v3.0.2B</td>
+                        <td><span class="badge badge-undetected">● UNDETECTED</span></td>
+                        <td style="color:#4ade80">14 ms</td>
+                        <td style="color:var(--text-muted); font-size:12px">Just now</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700;">Blox Fruits</td>
+                        <td style="font-family: monospace; color: var(--accent-light);">v2.4.0</td>
+                        <td><span class="badge badge-undetected">● UNDETECTED</span></td>
+                        <td style="color:#4ade80">18 ms</td>
+                        <td style="color:var(--text-muted); font-size:12px">2 mins ago</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700;">The Strongest Battlegrounds</td>
+                        <td style="font-family: monospace; color: var(--accent-light);">v1.9.1</td>
+                        <td><span class="badge badge-undetected">● UNDETECTED</span></td>
+                        <td style="color:#4ade80">15 ms</td>
+                        <td style="color:var(--text-muted); font-size:12px">4 mins ago</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700;">Rivals (FPS)</td>
+                        <td style="font-family: monospace; color: var(--accent-light);">v1.2.0</td>
+                        <td><span class="badge badge-updating">⚡ UPDATING BYPASS</span></td>
+                        <td style="color:#fbbf24">22 ms</td>
+                        <td style="color:var(--text-muted); font-size:12px">10 mins ago</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700;">Cloud Gateway API (Vercel)</td>
+                        <td style="font-family: monospace; color: var(--accent-light);">v3.0</td>
+                        <td><span class="badge badge-undetected">● 100% ONLINE</span></td>
+                        <td style="color:#4ade80">9 ms</td>
+                        <td style="color:var(--text-muted); font-size:12px">Just now</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

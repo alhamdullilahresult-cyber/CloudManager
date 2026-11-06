@@ -1,12 +1,9 @@
 -- ============================================================
--- Boyfinity Script Manager - Supabase Schema Migration
--- Run this SQL in: Supabase Dashboard → SQL Editor
+-- Boyfinity Script Hub Platform - Schema & Telemetry Migration
+-- Run this in Supabase Dashboard → SQL Editor
 -- ============================================================
 
--- Enable UUID extension (Supabase has this by default)
--- CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
--- ── 1. SCRIPTS TABLE ──────────────────────────────────────
+-- 1. Tabel Scripts (Manajemen Script Cloud)
 CREATE TABLE IF NOT EXISTS public.scripts (
     id          TEXT        PRIMARY KEY,
     name        TEXT        NOT NULL CHECK (char_length(name) BETWEEN 1 AND 100),
@@ -18,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.scripts (
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- ── 2. SCRIPT HISTORY TABLE ──────────────────────────────
+-- 2. Tabel Script History (Versi Script)
 CREATE TABLE IF NOT EXISTS public.script_history (
     id          BIGSERIAL   PRIMARY KEY,
     script_id   TEXT        NOT NULL REFERENCES public.scripts(id) ON DELETE CASCADE,
@@ -28,50 +25,50 @@ CREATE TABLE IF NOT EXISTS public.script_history (
     saved_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- ── 3. KEYS & HWID TABLE (KEY SYSTEM) ────────────────────
+-- 3. Tabel Keys & HWID + Durasi & Telemetri
 CREATE TABLE IF NOT EXISTS public.keys (
     id            BIGSERIAL   PRIMARY KEY,
     key           TEXT        NOT NULL UNIQUE,
     status        TEXT        NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'used', 'revoked', 'expired')),
+    duration      TEXT        NOT NULL DEFAULT 'lifetime', -- '1d', '3d', '7d', '30d', '365d', 'lifetime'
+    expires_at    TIMESTAMPTZ DEFAULT NULL,
     hwid          TEXT        DEFAULT NULL,
     note          TEXT        DEFAULT '',
+    roblox_user   TEXT        DEFAULT NULL,
+    executor_name TEXT        DEFAULT NULL,
+    ip_address    TEXT        DEFAULT NULL,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     registered_at TIMESTAMPTZ DEFAULT NULL,
     last_used     TIMESTAMPTZ DEFAULT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_keys_key    ON public.keys(key);
-CREATE INDEX IF NOT EXISTS idx_keys_hwid   ON public.keys(hwid);
-CREATE INDEX IF NOT EXISTS idx_keys_status ON public.keys(status);
+-- Tambahkan kolom jika tabel 'keys' sudah pernah dibuat sebelumnya
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='duration') THEN
+        ALTER TABLE public.keys ADD COLUMN duration TEXT NOT NULL DEFAULT 'lifetime';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='expires_at') THEN
+        ALTER TABLE public.keys ADD COLUMN expires_at TIMESTAMPTZ DEFAULT NULL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='roblox_user') THEN
+        ALTER TABLE public.keys ADD COLUMN roblox_user TEXT DEFAULT NULL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='executor_name') THEN
+        ALTER TABLE public.keys ADD COLUMN executor_name TEXT DEFAULT NULL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='ip_address') THEN
+        ALTER TABLE public.keys ADD COLUMN ip_address TEXT DEFAULT NULL;
+    END IF;
+END $$;
 
-ALTER TABLE public.keys ENABLE ROW LEVEL SECURITY;
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_keys_key        ON public.keys(key);
+CREATE INDEX IF NOT EXISTS idx_keys_hwid       ON public.keys(hwid);
+CREATE INDEX IF NOT EXISTS idx_keys_status     ON public.keys(status);
+CREATE INDEX IF NOT EXISTS idx_keys_expires_at ON public.keys(expires_at);
 
--- ── 3. INDEXES ───────────────────────────────────────────
-CREATE INDEX IF NOT EXISTS idx_scripts_active     ON public.scripts(active);
-CREATE INDEX IF NOT EXISTS idx_scripts_updated_at ON public.scripts(updated_at DESC);
-CREATE INDEX IF NOT EXISTS idx_history_script_id  ON public.script_history(script_id);
-CREATE INDEX IF NOT EXISTS idx_history_version    ON public.script_history(script_id, version DESC);
-
--- ── 4. ROW LEVEL SECURITY ────────────────────────────────
--- Enable RLS (backend uses Service Role Key which bypasses RLS)
+-- RLS
 ALTER TABLE public.scripts        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.script_history ENABLE ROW LEVEL SECURITY;
-
--- No public policies = only Service Role Key can access
--- (This is intentional; frontend never touches DB directly)
-
--- ── 5. SAMPLE DATA (optional, delete after testing) ──────
--- INSERT INTO public.scripts (id, name, description, code, active, version)
--- VALUES (
---     'boyfinity-vd-main',
---     'Boyfinity VD Main Script',
---     'Main script for Boyfinity Violence District',
---     '-- Boyfinity VD Main Script\nprint("[Boyfinity] Loaded!")',
---     true,
---     1
--- );
-
--- ── 6. VERIFY ────────────────────────────────────────────
-SELECT table_name FROM information_schema.tables
-WHERE table_schema = 'public' AND table_name IN ('scripts', 'script_history');
-
+ALTER TABLE public.keys           ENABLE ROW LEVEL SECURITY;

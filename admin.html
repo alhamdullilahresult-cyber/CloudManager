@@ -512,10 +512,10 @@
                         <tr>
                             <th>Key (BOY∞-XXXX)</th>
                             <th>Status</th>
+                            <th>Duration / Expire</th>
+                            <th>Roblox User</th>
+                            <th>Executor</th>
                             <th>Bound HWID</th>
-                            <th>Note / User</th>
-                            <th>Created</th>
-                            <th>Last Used</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -669,12 +669,24 @@ end</pre>
                 <div class="form-hint">Format otomatis sesuai standar sistem Boyfinity.</div>
             </div>
             <div class="form-group">
+                <label>Pilih Durasi Key</label>
+                <select class="form-input" id="keyDuration">
+                    <option value="1d">1 Hari (24 Jam)</option>
+                    <option value="3d">3 Hari</option>
+                    <option value="7d">7 Hari (1 Minggu)</option>
+                    <option value="30d">1 Bulan (30 Hari)</option>
+                    <option value="365d">1 Tahun</option>
+                    <option value="lifetime" selected>Lifetime (Permanen)</option>
+                </select>
+                <div class="form-hint">Hitungan aktif dimulai saat user pertama kali memverifikasi key di Roblox.</div>
+            </div>
+            <div class="form-group">
                 <label>Note / User Label (Opsional)</label>
                 <input type="text" class="form-input" id="keyNote" placeholder="Contoh: VIP Member - Jhon">
             </div>
             <div class="form-group">
                 <label>Jumlah Key</label>
-                <input type="number" class="form-input" id="keyCount" value="1" min="1" max="20">
+                <input type="number" class="form-input" id="keyCount" value="1" min="1" max="50">
             </div>
         </div>
         <div class="modal-footer">
@@ -682,6 +694,63 @@ end</pre>
             <button class="btn btn-primary" id="btnGenKey" onclick="generateKeySubmit()">
                 <span>🔑</span> Buat Key
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ KEY DETAIL TELEMETRY MODAL ═══ -->
+<div class="modal-overlay" id="telemetryModal">
+    <div class="modal" style="max-width:550px">
+        <div class="modal-header">
+            <div class="modal-title">Telemetri & Informasi User</div>
+            <button class="modal-close" onclick="closeTelemetryModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px">
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:700;margin-bottom:6px">Access Key</div>
+                <div id="teleKey" style="font-family:monospace;font-size:15px;font-weight:800;color:#c084fc"></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+                    <div style="font-size:11px;color:var(--text3)">Roblox Username</div>
+                    <div id="teleUser" style="font-size:14px;font-weight:700;color:var(--text);margin-top:4px">—</div>
+                </div>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+                    <div style="font-size:11px;color:var(--text3)">Executor Client</div>
+                    <div id="teleExec" style="font-size:14px;font-weight:700;color:var(--text2);margin-top:4px">—</div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+                    <div style="font-size:11px;color:var(--text3)">Durasi / Status</div>
+                    <div id="teleDuration" style="font-size:13px;font-weight:600;color:#86efac;margin-top:4px">—</div>
+                </div>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+                    <div style="font-size:11px;color:var(--text3)">IP Address</div>
+                    <div id="teleIp" style="font-family:monospace;font-size:13px;font-weight:600;color:var(--text);margin-top:4px">—</div>
+                </div>
+            </div>
+
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:14px">
+                <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Device HWID</div>
+                <div id="teleHwid" style="font-family:monospace;font-size:12px;color:#cbd5e1;word-break:break-all">—</div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+                    <div style="font-size:11px;color:var(--text3)">Waktu Aktivasi</div>
+                    <div id="teleActivated" style="font-size:12px;color:var(--text);margin-top:4px">—</div>
+                </div>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+                    <div style="font-size:11px;color:var(--text3)">Terakhir Terlihat (Last Seen)</div>
+                    <div id="teleLastSeen" style="font-size:12px;color:var(--text);margin-top:4px">—</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeTelemetryModal()">Tutup</button>
         </div>
     </div>
 </div>
@@ -1155,11 +1224,22 @@ function renderKeys(keys) {
             statusBadge = '<span class="badge" style="background:rgba(59,130,246,0.15);color:#93c5fd;border:1px solid rgba(59,130,246,0.3)">🔒 Bound</span>';
         } else if (k.status === 'revoked') {
             statusBadge = '<span class="badge badge-inactive">✖ Revoked</span>';
+        } else if (k.status === 'expired') {
+            statusBadge = '<span class="badge badge-inactive" style="background:rgba(239,68,68,0.2);color:#f87171">⏰ Expired</span>';
         }
 
         const hwidDisplay = k.hwid 
-            ? `<span style="font-family:monospace;font-size:11px;color:#cbd5e1;background:var(--surface2);padding:2px 6px;border-radius:4px" title="${escHtml(k.hwid)}">${escHtml(k.hwid.slice(0, 16))}...</span>`
+            ? `<span style="font-family:monospace;font-size:11px;color:#cbd5e1;background:var(--surface2);padding:2px 6px;border-radius:4px" title="${escHtml(k.hwid)}">${escHtml(k.hwid.slice(0, 14))}...</span>`
             : `<span style="color:var(--text3);font-size:12px">Belum Terikat</span>`;
+
+        let durLabel = k.duration ? k.duration.toUpperCase() : 'LIFETIME';
+        if (durLabel === '1D') durLabel = '1 Hari';
+        if (durLabel === '3D') durLabel = '3 Hari';
+        if (durLabel === '7D') durLabel = '7 Hari';
+        if (durLabel === '30D') durLabel = '1 Bulan';
+        if (durLabel === '365D') durLabel = '1 Tahun';
+
+        const expireSub = k.expires_at ? `<div style="font-size:10px;color:var(--text3)">Exp: ${new Date(k.expires_at).toLocaleDateString()}</div>` : '';
 
         return `
             <tr>
@@ -1170,13 +1250,17 @@ function renderKeys(keys) {
                     </div>
                 </td>
                 <td>${statusBadge}</td>
+                <td>
+                    <span style="font-size:12px;font-weight:600;color:var(--text2)">${durLabel}</span>
+                    ${expireSub}
+                </td>
+                <td style="font-size:13px;font-weight:600;color:${k.roblox_user ? '#f1f5f9' : 'var(--text3)'}">${escHtml(k.roblox_user || '—')}</td>
+                <td style="font-size:12px;color:var(--text3)">${escHtml(k.executor_name || '—')}</td>
                 <td>${hwidDisplay}</td>
-                <td style="color:var(--text2);font-size:12px">${escHtml(k.note || '—')}</td>
-                <td style="color:var(--text3);font-size:12px">${new Date(k.created_at).toLocaleDateString()}</td>
-                <td style="color:var(--text3);font-size:12px">${k.last_used ? new Date(k.last_used).toLocaleDateString() : '—'}</td>
                 <td>
                     <div class="action-btns">
-                        ${k.hwid ? `<button class="btn btn-sm btn-warning" style="background:rgba(245,158,11,0.1);color:#fcd34d;border-color:rgba(245,158,11,0.3)" onclick="resetKeyHwid('${k.id || k.key}')">🔄 Reset HWID</button>` : ''}
+                        <button class="btn btn-sm" style="background:rgba(147,51,234,0.15);border-color:rgba(147,51,234,0.3);color:#c084fc" onclick="openTelemetryModal('${k.id || k.key}')">ℹ️ Detail</button>
+                        ${k.hwid ? `<button class="btn btn-sm btn-warning" style="background:rgba(245,158,11,0.1);color:#fcd34d;border-color:rgba(245,158,11,0.3)" onclick="resetKeyHwid('${k.id || k.key}')">🔄 Reset</button>` : ''}
                         <button class="btn btn-sm btn-danger" onclick="deleteKey('${k.id || k.key}')">🗑 Hapus</button>
                     </div>
                 </td>
@@ -1205,9 +1289,30 @@ function closeKeyModal() {
     document.getElementById('keyModal').classList.remove('open');
 }
 
+function openTelemetryModal(idOrKey) {
+    const k = allKeys.find(x => (x.id == idOrKey || x.key == idOrKey));
+    if (!k) return;
+
+    document.getElementById('teleKey').textContent = k.key;
+    document.getElementById('teleUser').textContent = k.roblox_user || 'Belum Login';
+    document.getElementById('teleExec').textContent = k.executor_name || '—';
+    document.getElementById('teleDuration').textContent = (k.duration ? k.duration.toUpperCase() : 'LIFETIME') + ' (' + k.status.toUpperCase() + ')';
+    document.getElementById('teleIp').textContent = k.ip_address || '—';
+    document.getElementById('teleHwid').textContent = k.hwid || 'Belum Terikat';
+    document.getElementById('teleActivated').textContent = k.registered_at ? new Date(k.registered_at).toLocaleString() : 'Belum Pernah';
+    document.getElementById('teleLastSeen').textContent = k.last_used ? new Date(k.last_used).toLocaleString() : '—';
+
+    document.getElementById('telemetryModal').classList.add('open');
+}
+
+function closeTelemetryModal() {
+    document.getElementById('telemetryModal').classList.remove('open');
+}
+
 async function generateKeySubmit() {
     const note = document.getElementById('keyNote').value.trim();
     const count = parseInt(document.getElementById('keyCount').value, 10) || 1;
+    const duration = document.getElementById('keyDuration').value || 'lifetime';
     const btn = document.getElementById('btnGenKey');
 
     btn.disabled = true;
@@ -1216,12 +1321,12 @@ async function generateKeySubmit() {
     try {
         const res = await apiFetch('/api/admin/keys', {
             method: 'POST',
-            body: JSON.stringify({ note, count })
+            body: JSON.stringify({ note, count, duration })
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
 
-        toast(`✅ Berhasil membuat ${data.keys.length} Key baru!`, 'success');
+        toast(`✅ Berhasil membuat ${data.keys.length} Key baru (${duration})!`, 'success');
         closeKeyModal();
         loadKeys();
     } catch (err) {

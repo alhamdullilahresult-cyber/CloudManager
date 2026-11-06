@@ -20,6 +20,18 @@
       "dest": "/login.html"
     },
     {
+      "src": "/games",
+      "dest": "/games.html"
+    },
+    {
+      "src": "/status",
+      "dest": "/status.html"
+    },
+    {
+      "src": "/get-key",
+      "dest": "/get-key.html"
+    },
+    {
       "src": "/raw",
       "dest": "/api/index.js"
     },

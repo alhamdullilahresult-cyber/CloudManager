@@ -1,5 +1,5 @@
-// api/index.js - Unified Serverless Router for Boyfinity Cloud Script Platform
-// Single Serverless Function consolidating all endpoints to satisfy Vercel Hobby plan limits (max 12 functions).
+// api/index.js - Unified Serverless Router for Boyfinity Commercial Script Hub
+// Single Serverless Function consolidating all endpoints to satisfy Vercel Hobby plan limits (1 Serverless Function).
 import { supabase } from './lib/supabase.js';
 import { requireAuth, setCorsHeaders, signToken } from './lib/auth.js';
 import { generateScriptId } from './lib/utils.js';
@@ -15,6 +15,34 @@ function generateBoyfinityKey() {
         return b;
     };
     return `BOY∞-${genBlock()}-${genBlock()}-${genBlock()}`;
+}
+
+// Menghitung tanggal kadaluarsa berdasarkan durasi yang dipilih
+function calculateExpiration(durationStr, startDate = new Date()) {
+    if (!durationStr || durationStr === 'lifetime') return null;
+    const date = new Date(startDate);
+    switch (durationStr) {
+        case '1d':
+            date.setDate(date.getDate() + 1);
+            break;
+        case '3d':
+            date.setDate(date.getDate() + 3);
+            break;
+        case '7d':
+            date.setDate(date.getDate() + 7);
+            break;
+        case '30d':
+        case '1m':
+            date.setDate(date.getDate() + 30);
+            break;
+        case '365d':
+        case '1y':
+            date.setFullYear(date.getFullYear() + 1);
+            break;
+        default:
+            return null;
+    }
+    return date.toISOString();
 }
 
 export default async function handler(req, res) {
@@ -118,13 +146,17 @@ export default async function handler(req, res) {
         }
 
         // ─────────────────────────────────────────────────────────────
-        // 3. PUBLIC: POST /api/verify -> Verifikasi Key & HWID (Roblox)
+        // 3. PUBLIC: POST /api/verify -> Verifikasi Key, Expire & Telemetri
         // ─────────────────────────────────────────────────────────────
         if (pathname === '/api/verify') {
             if (method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
             
             const key = (body.key || '').trim();
             const hwid = (body.hwid || '').trim();
+            const robloxUser = (body.roblox_user || body.username || '').trim();
+            const executorName = (body.executor || body.executor_name || '').trim();
+
+            const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
 
             if (!key || !hwid) {
                 return res.status(400).json({ success: false, error: 'Key dan HWID diperlukan' });
@@ -140,26 +172,85 @@ export default async function handler(req, res) {
                 return res.status(404).json({ success: false, error: 'Key tidak ditemukan atau tidak valid' });
             }
 
-            if (keyRecord.status === 'revoked' || keyRecord.status === 'expired') {
-                return res.status(403).json({ success: false, error: 'Key ini telah dinonaktifkan atau kadaluarsa' });
+            if (keyRecord.status === 'revoked') {
+                return res.status(403).json({ success: false, error: 'Key ini telah dicabut oleh Administrator' });
             }
 
-            const now = new Date().toISOString();
+            const now = new Date();
+
+            // Cek masa aktif / kedaluwarsa jika key sudah memiliki expires_at
+            if (keyRecord.expires_at) {
+                const expireDate = new Date(keyRecord.expires_at);
+                if (now > expireDate) {
+                    // Update status menjadi expired jika belum
+                    if (keyRecord.status !== 'expired') {
+                        await supabase.from('keys').update({ status: 'expired' }).eq('key', key);
+                    }
+                    return res.status(403).json({ 
+                        success: false, 
+                        error: 'Key ini sudah kadaluarsa (Expired: ' + expireDate.toLocaleDateString() + '). Silakan dapatkan key baru.' 
+                    });
+                }
+            }
+
+            // KASUS 1: Key pertama kali diaktifkan / diikat ke HWID
             if (!keyRecord.hwid) {
-                // Ikat HWID pertama kali
-                await supabase
-                    .from('keys')
-                    .update({ hwid, status: 'used', last_used: now, registered_at: keyRecord.registered_at || now })
-                    .eq('key', key);
+                const nowIso = now.toISOString();
+                // Hitung tanggal kedaluwarsa terhitung dari saat registrasi pertama jika duration berbatas waktu
+                let calculatedExpiry = keyRecord.expires_at;
+                if (!calculatedExpiry && keyRecord.duration && keyRecord.duration !== 'lifetime') {
+                    calculatedExpiry = calculateExpiration(keyRecord.duration, now);
+                }
 
-                return res.status(200).json({ success: true, message: 'Verifikasi berhasil! Perangkat didaftarkan.', bound: true });
+                const updatePayload = {
+                    hwid: hwid,
+                    status: 'used',
+                    roblox_user: robloxUser || 'UnknownPlayer',
+                    executor_name: executorName || 'GenericExecutor',
+                    ip_address: ip,
+                    registered_at: keyRecord.registered_at || nowIso,
+                    last_used: nowIso
+                };
+
+                if (calculatedExpiry) {
+                    updatePayload.expires_at = calculatedExpiry;
+                }
+
+                await supabase.from('keys').update(updatePayload).eq('key', key);
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Verifikasi berhasil! Perangkat dan identitas berhasil didaftarkan.',
+                    bound: true,
+                    duration: keyRecord.duration || 'lifetime',
+                    expires_at: calculatedExpiry
+                });
             }
 
+            // KASUS 2: HWID Cocok (Login Ulang)
             if (keyRecord.hwid === hwid) {
-                await supabase.from('keys').update({ last_used: now }).eq('key', key);
-                return res.status(200).json({ success: true, message: 'Verifikasi berhasil! Selamat datang kembali.', bound: true });
+                const nowIso = now.toISOString();
+                const updatePayload = {
+                    last_used: nowIso,
+                    ip_address: ip
+                };
+                if (robloxUser) updatePayload.roblox_user = robloxUser;
+                if (executorName) updatePayload.executor_name = executorName;
+
+                await supabase.from('keys').update(updatePayload).eq('key', key);
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Selamat datang kembali, ' + (robloxUser || 'User') + '!',
+                    bound: true,
+                    expires_at: keyRecord.expires_at
+                });
             } else {
-                return res.status(403).json({ success: false, error: 'HWID Mismatch! Key ini sudah terikat pada perangkat lain.' });
+                // KASUS 3: HWID Berbeda (Ditolak)
+                return res.status(403).json({
+                    success: false,
+                    error: 'HWID Mismatch! Key ini sudah terikat secara permanen pada perangkat lain.'
+                });
             }
         }
 
@@ -206,9 +297,20 @@ export default async function handler(req, res) {
             const totalUpdates = (versionData || []).reduce((acc, s) => acc + (s.version || 1), 0);
             const { data: lastUpdated } = await supabase.from('scripts').select('name, updated_at').order('updated_at', { ascending: false }).limit(1).maybeSingle();
 
+            const { count: totalKeys } = await supabase.from('keys').select('id', { count: 'exact', head: true });
+            const { count: boundKeys } = await supabase.from('keys').select('id', { count: 'exact', head: true }).not('hwid', 'is', null);
+
             return res.status(200).json({
                 success: true,
-                stats: { total: total || 0, active: active || 0, inactive: (total || 0) - (active || 0), totalUpdates, lastUpdated: lastUpdated || null }
+                stats: { 
+                    total: total || 0, 
+                    active: active || 0, 
+                    inactive: (total || 0) - (active || 0), 
+                    totalUpdates, 
+                    lastUpdated: lastUpdated || null,
+                    totalKeys: totalKeys || 0,
+                    boundKeys: boundKeys || 0
+                }
             });
         }
 
@@ -322,10 +424,16 @@ export default async function handler(req, res) {
                 if (body.action === 'reset_hwid') {
                     updatePayload.hwid = null;
                     updatePayload.status = 'active';
+                    updatePayload.roblox_user = null;
+                    updatePayload.executor_name = null;
+                    updatePayload.ip_address = null;
                 } else {
                     if (body.status !== undefined) updatePayload.status = body.status;
                     if (body.note !== undefined) updatePayload.note = body.note;
-                    if (body.hwid !== undefined) updatePayload.hwid = body.hwid || null;
+                    if (body.duration !== undefined) {
+                        updatePayload.duration = body.duration;
+                        updatePayload.expires_at = calculateExpiration(body.duration, new Date());
+                    }
                 }
 
                 const { data, error } = await supabase.from('keys').update(updatePayload).or(`id.eq.${keyParam},key.eq.${keyParam}`).select().maybeSingle();
@@ -340,7 +448,7 @@ export default async function handler(req, res) {
         }
 
         // ─────────────────────────────────────────────────────────────
-        // 9. PROTECTED ADMIN: /api/admin/keys (GET all & POST batch)
+        // 9. PROTECTED ADMIN: /api/admin/keys (GET all & POST batch with duration)
         // ─────────────────────────────────────────────────────────────
         if (pathname === '/api/admin/keys') {
             const admin = requireAuth(req, res);
@@ -354,17 +462,24 @@ export default async function handler(req, res) {
 
             if (method === 'POST') {
                 const note = (body.note || '').trim();
-                const count = Math.min(Math.max(parseInt(body.count, 10) || 1, 1), 20);
+                const count = Math.min(Math.max(parseInt(body.count, 10) || 1, 1), 50);
+                const duration = body.duration || 'lifetime'; // '1d', '3d', '7d', '30d', '365d', 'lifetime'
                 const newKeys = [];
-                const now = new Date().toISOString();
+                const now = new Date();
+                const nowIso = now.toISOString();
 
                 for (let i = 0; i < count; i++) {
                     newKeys.push({
                         key: generateBoyfinityKey(),
                         status: 'active',
+                        duration: duration,
+                        expires_at: null, // Dihitung saat aktivasi pertama atau bisa langsung diset
                         hwid: null,
                         note: note || 'Generated by Admin',
-                        created_at: now,
+                        roblox_user: null,
+                        executor_name: null,
+                        ip_address: null,
+                        created_at: nowIso,
                         registered_at: null,
                         last_used: null
                     });

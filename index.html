@@ -1,109 +1,723 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boyfinity Script Manager</title>
+    <title>BOYFINITY — Enterprise Lua Script Hub</title>
+    <meta name="description" content="Next-generation Roblox script hub platform with high performance, undetected execution, and multi-game support.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-base: #07060a;
+            --bg-card: #0f0d16;
+            --bg-card-hover: #151220;
+            --border: #211c30;
+            --border-hover: #3b2d5a;
+            --accent: #9333ea;
+            --accent-glow: rgba(147, 51, 234, 0.25);
+            --accent-light: #c084fc;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --success: #22c55e;
+            --success-glow: rgba(34, 197, 94, 0.2);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         }
 
         body {
-            background: #09070f;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
             min-height: 100vh;
+        }
+
+        /* Ambient subtle grid effect */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 60%, rgba(147, 51, 234, 0.05) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 72px;
+            background: rgba(7, 6, 10, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            background-image: radial-gradient(ellipse at 50% -20%, rgba(147, 51, 234, 0.2) 0%, transparent 60%);
-            color: #f1edfa;
-            padding: 24px;
-            text-align: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 1000;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
         }
 
         .logo-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #9333ea, #4f46e5);
-            color: white;
+            background: var(--accent);
+            color: #fff;
             font-weight: 800;
+            font-size: 13px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            letter-spacing: 1.5px;
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .logo-title {
             font-size: 18px;
-            padding: 10px 22px;
-            border-radius: 10px;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            box-shadow: 0 6px 24px rgba(147, 51, 234, 0.5);
-        }
-
-        h1 {
-            font-size: 28px;
             font-weight: 800;
-            margin-bottom: 10px;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
         }
 
-        p {
-            color: #6b5f8a;
-            font-size: 15px;
-            max-width: 400px;
-            line-height: 1.6;
-            margin-bottom: 32px;
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
         }
 
-        .btn-cta {
-            background: linear-gradient(135deg, #9333ea, #4f46e5);
-            color: white;
-            border: none;
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-card);
+            border-color: var(--border-hover);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 18px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            background: #a855f7;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(147, 51, 234, 0.4);
+        }
+
+        /* ── HERO SECTION ── */
+        .hero {
+            padding: 160px 24px 80px;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--accent-light);
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+        .hero-title {
+            font-size: 58px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .hero-title span {
+            color: var(--accent-light);
+        }
+
+        .hero-desc {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+
+        .hero-btns {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 60px;
+        }
+
+        /* ── STATS SECTION ── */
+        .stats-wrap {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 860px;
+            margin: 0 auto 100px;
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .stat-box:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .stat-num {
+            font-size: 38px;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+
+        .stat-num.highlight {
+            color: var(--accent-light);
+        }
+
+        .stat-num.green {
+            color: #4ade80;
+        }
+
+        .stat-name {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        /* ── SECTIONS SHARED ── */
+        .section {
+            padding: 80px 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 54px;
+        }
+
+        .section-subtitle {
+            font-size: 13px;
+            color: var(--accent-light);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+        }
+
+        /* ── CODE LOADER PREVIEW ── */
+        .loader-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 860px;
+            margin: 0 auto 90px;
+        }
+
+        .loader-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .loader-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-box {
+            background: #060508;
+            border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 14px 32px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .code-box code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent-light);
+            word-break: break-all;
+        }
+
+        /* ── PRICING SECTION ── */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 36px 28px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: all 0.25s;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+        }
+
+        .pricing-card.popular {
+            border-color: var(--accent);
+            background: linear-gradient(180deg, #150f24 0%, var(--bg-card) 100%);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .plan-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .plan-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            min-height: 40px;
+        }
+
+        .plan-price {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .plan-price span {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 32px;
+            flex: 1;
+        }
+
+        .plan-features li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .plan-features li::before {
+            content: "✓";
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        /* ── FAQ SECTION ── */
+        .faq-wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .faq-item:hover {
+            border-color: var(--border-hover);
+        }
+
+        .faq-q {
+            padding: 20px 24px;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            text-decoration: none;
-            box-shadow: 0 4px 16px rgba(147, 51, 234, 0.4);
-            transition: all 0.2s;
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
         }
 
-        .btn-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(147, 51, 234, 0.6);
+        .faq-q::after {
+            content: "+";
+            font-size: 18px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
         }
 
-        .footnote {
-            font-size: 12px;
-            color: #3d2f5e;
-            margin-top: 24px;
+        .faq-item.active .faq-q::after {
+            transform: rotate(45deg);
+            color: var(--accent-light);
         }
 
-        code {
-            background: #18112e;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-family: monospace;
-            color: #a78bfa;
+        .faq-a {
+            display: none;
+            padding: 0 24px 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            margin-top: 4px;
+        }
+
+        .faq-item.active .faq-a {
+            display: block;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 50px 40px;
+            background: #050407;
+            margin-top: 100px;
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 860px) {
+            .navbar { padding: 0 20px; }
+            .nav-links { display: none; }
+            .hero-title { font-size: 38px; }
+            .stats-wrap, .pricing-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-
 <body>
-    <div>
-        <div class="logo-badge">BOYFINITY</div>
-        <h1>Script Manager Platform</h1>
-        <p>Cloud-based Lua Script Management with Admin Dashboard and Public API for Roblox Executors.</p>
-        <a href="/login" class="btn-cta">Admin Dashboard →</a>
-        <div class="footnote">
-            Public API: <code>/api/scripts/{id}</code> → returns plain text Lua
+
+    <div class="ambient-bg"></div>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <a href="/" class="logo-wrap">
+            <span class="logo-badge">BOYFINITY</span>
+            <span class="logo-title">Script Hub</span>
+        </a>
+        <nav class="nav-links">
+            <a href="/" class="nav-link active">Home</a>
+            <a href="/games" class="nav-link">Supported Games</a>
+            <a href="/status" class="nav-link">System Status</a>
+            <a href="/get-key" class="nav-link">Get Key</a>
+        </nav>
+        <div class="nav-actions">
+            <a href="/get-key" class="btn btn-outline" style="border-color: var(--accent); color: var(--accent-light)">🔑 Get Free Key</a>
+            <a href="/login" class="btn btn-primary">Admin Portal</a>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-pill">
+            <span class="pulse-dot"></span>
+            Enterprise Security Core v3.0 • 100% Undetected
+        </div>
+        <h1 class="hero-title">
+            The Pinnacle of <span>Roblox</span> Execution Performance.
+        </h1>
+        <p class="hero-desc">
+            BOYFINITY adalah platform script hub komersial modern dengan arsitektur cloud terenkripsi, proteksi HWID otomatis, serta jaminan bypass anti-cheat terlengkap.
+        </p>
+        <div class="hero-btns">
+            <a href="/get-key" class="btn btn-primary" style="padding: 13px 30px; font-size: 15px;">🚀 Get Started (Free Key)</a>
+            <a href="/games" class="btn btn-outline" style="padding: 13px 26px; font-size: 15px;">Browse Supported Games →</a>
+        </div>
+
+        <!-- STATS INTERAKTIF -->
+        <div class="stats-wrap">
+            <div class="stat-box">
+                <div class="stat-num highlight" id="statGames">25+</div>
+                <div class="stat-name">Supported Games</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="statExec">142,850+</div>
+                <div class="stat-name">Total Executions</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num green">100%</div>
+                <div class="stat-name">Undetected Status</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOADER PREVIEW CARD -->
+    <div class="loader-card">
+        <div class="loader-header">
+            <div class="loader-title">
+                <span>⚡ Universal Quick Loader (Roblox Executor)</span>
+            </div>
+            <span style="font-size:12px; color:#4ade80; font-weight:600">● Live & Ready</span>
+        </div>
+        <div class="code-box">
+            <code id="loadstringCode">loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()</code>
+            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="copyCode()">Copy</button>
         </div>
     </div>
+
+    <!-- PRICING SECTION -->
+    <section class="section" id="pricing">
+        <div class="section-header">
+            <div class="section-subtitle">Akses Fleksibel</div>
+            <h2 class="section-title">Pilih Paket Akses Anda</h2>
+        </div>
+
+        <div class="pricing-grid">
+            <!-- FREE -->
+            <div class="pricing-card">
+                <div class="plan-title">Free Checkpoint</div>
+                <div class="plan-desc">Akses penuh fitur script dengan menyelesaikan 1 checkpoint iklan.</div>
+                <div class="plan-price">Rp 0 <span>/ 24 Jam</span></div>
+                <ul class="plan-features">
+                    <li>Semua fitur game Violence District</li>
+                    <li>Durasi 24 Jam per Key</li>
+                    <li>Dukungan Mobile & PC Executor</li>
+                    <li>Standard Anti-Cheat Bypass</li>
+                </ul>
+                <a href="/get-key" class="btn btn-outline" style="width: 100%;">Get Free Key →</a>
+            </div>
+
+            <!-- MONTHLY -->
+            <div class="pricing-card popular">
+                <div class="popular-badge">Paling Populer</div>
+                <div class="plan-title">Monthly VIP</div>
+                <div class="plan-desc">Bebas checkpoint tanpa batas dengan kecepatan eksekusi instan.</div>
+                <div class="plan-price">Rp 35.000 <span>/ Bulan</span></div>
+                <ul class="plan-features">
+                    <li>Tanpa Checkpoint / Linkvertise</li>
+                    <li>Durasi Key Aktif 30 Hari</li>
+                    <li>Prioritas Update Fitur & Bypass</li>
+                    <li>Akses Discord VIP Role & Support</li>
+                    <li>Multi-game future updates</li>
+                </ul>
+                <a href="https://discord.gg" target="_blank" class="btn btn-primary" style="width: 100%;">Beli VIP (Discord)</a>
+            </div>
+
+            <!-- LIFETIME -->
+            <div class="pricing-card">
+                <div class="plan-title">Lifetime Enterprise</div>
+                <div class="plan-desc">Satu kali bayar untuk kepemilikan permanen seumur hidup.</div>
+                <div class="plan-price">Rp 85.000 <span>/ Selamanya</span></div>
+                <ul class="plan-features">
+                    <li>Key Aktif Selamanya (Tanpa Expire)</li>
+                    <li>Fitur Reset HWID Otomatis</li>
+                    <li>Early Access Script Game Baru</li>
+                    <li>Private VIP Direct Channel</li>
+                </ul>
+                <a href="https://discord.gg" target="_blank" class="btn btn-outline" style="width: 100%;">Beli Lifetime</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section class="section" id="faq">
+        <div class="section-header">
+            <div class="section-subtitle">Bantuan & Informasi</div>
+            <h2 class="section-title">Frequently Asked Questions</h2>
+        </div>
+
+        <div class="faq-wrap">
+            <div class="faq-item active">
+                <div class="faq-q" onclick="toggleFaq(this)">Apakah script BOYFINITY aman dari ban?</div>
+                <div class="faq-a">
+                    Ya, BOYFINITY menggunakan teknologi bypass memori aman di level client yang diperbarui secara rutin untuk memastikan status 100% Undetected oleh sistem deteksi game maupun Roblox Byfron/Hyperion.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">Executor apa saja yang didukung?</div>
+                <div class="faq-a">
+                    BOYFINITY kompatibel dengan semua executor populer saat ini, baik di PC (Wave, Synapse Z, Solara, Celery) maupun Mobile Android/iOS (Delta, Fluxus, Hydrogen, Codex, Arceus X).
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">Bagaimana cara menggunakan Key yang didapatkan?</div>
+                <div class="faq-a">
+                    Jalankan universal loader script kami di executor Anda. Masukkan Key yang Anda peroleh dari halaman "Get Key", lalu tekan tombol "Verify & Launch". HWID perangkat Anda akan terikat otomatis dan script langsung aktif.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">Apa yang terjadi jika saya mengganti perangkat?</div>
+                <div class="faq-a">
+                    Satu key terikat pada satu perangkat demi keamanan. Pengguna VIP dapat mengajukan reset HWID melalui admin atau Discord official kami kapan saja secara gratis.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="logo-wrap">
+                <span class="logo-badge">BOYFINITY</span>
+                <span style="font-size:14px; color:var(--text-secondary)">© 2026 BOYFINITY Hub. All rights reserved.</span>
+            </div>
+            <div style="display:flex; gap:20px;">
+                <a href="/games" class="nav-link">Games</a>
+                <a href="/status" class="nav-link">Status</a>
+                <a href="/get-key" class="nav-link">Get Key</a>
+                <a href="/login" class="nav-link">Owner Login</a>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        // If token exists, go straight to admin
-        const token = localStorage.getItem('admin_token');
-        if (token) window.location.href = '/admin';
+        function copyCode() {
+            const code = document.getElementById('loadstringCode').innerText;
+            navigator.clipboard.writeText(code);
+            alert("📋 Loadstring berhasil disalin ke clipboard!");
+        }
+
+        function toggleFaq(el) {
+            const parent = el.parentElement;
+            parent.classList.toggle('active');
+        }
+
+        // Animated interactive stats counter
+        let executions = 142850;
+        setInterval(() => {
+            executions += Math.floor(Math.random() * 3) + 1;
+            document.getElementById('statExec').innerText = executions.toLocaleString() + "+";
+        }, 3000);
     </script>
 </body>
-
 </html>
