@@ -29,7 +29,7 @@
             --tag-green-bg: rgba(34, 197, 94, 0.12);
             --tag-green-text: #4ade80;
             --tag-green-border: rgba(34, 197, 94, 0.25);
-            --radius-card: 10px;
+            --radius-soft: 10px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
@@ -87,7 +87,7 @@
         .page { display: none; flex: 1; overflow-y: auto; padding: 24px 28px; }
         .page.active { display: block; }
 
-        /* Overview Metrics Header & Grid (Reference Image Style) */
+        /* Overview Metrics Header & Grid */
         .overview-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; letter-spacing: -0.3px; }
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
         .metric-card {
@@ -107,7 +107,7 @@
         .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
         /* Tables & Buttons */
-        .table-wrap { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; overflow: hidden; }
+        .table-wrap { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; overflow: hidden; margin-bottom: 24px; }
         .scripts-table { width: 100%; border-collapse: collapse; }
         .scripts-table th {
             text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 700; color: var(--text-muted);
@@ -130,6 +130,12 @@
         .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family:'JetBrains Mono', monospace; }
         .badge-active { background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border); }
         .badge-inactive { background: #261318; color: #fca5a5; border: 1px solid #451b22; }
+
+        /* Card Container Box */
+        .box-card {
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+            padding: 20px; margin-bottom: 20px;
+        }
 
         /* Modals */
         .modal-overlay {
@@ -174,7 +180,10 @@
                 <span>🔑</span> Key Management
             </div>
             <div class="nav-item" onclick="showPage('scripts')" id="nav-scripts">
-                <span>📜</span> Scripts & Cloud
+                <span>📜</span> Cloud Scripts & Games
+            </div>
+            <div class="nav-item" onclick="showPage('staff')" id="nav-staff">
+                <span>👥</span> Staff Management
             </div>
             <div class="nav-item" onclick="showPage('audit')" id="nav-audit">
                 <span>🛡️</span> Audit Logs
@@ -207,7 +216,7 @@
             </div>
         </div>
 
-        <!-- PAGE: KEYS -->
+        <!-- PAGE 1: KEYS -->
         <div class="page active" id="page-keys">
             <div class="overview-title">Overview Metrics</div>
             <div class="stats-grid">
@@ -257,12 +266,28 @@
             </div>
         </div>
 
-        <!-- PAGE: SCRIPTS (ADMIN & OWNER ONLY) -->
+        <!-- PAGE 2: CLOUD SCRIPTS & GAME CARDS (ADMIN & OWNER ONLY) -->
         <div class="page" id="page-scripts">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
-                <h2 style="font-size:16px; font-weight:700">Cloud Lua Script Storage</h2>
+                <h2 style="font-size:16px; font-weight:700">Cloud Lua Scripts & Public Game Cards</h2>
                 <button class="btn btn-primary" onclick="openScriptModal()">+ New Script</button>
             </div>
+            
+            <div class="box-card">
+                <div style="font-size:14px; font-weight:700; margin-bottom:6px;">Current Active Games on Website</div>
+                <div style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">Both games below are synced live with the frontend Scripts catalog:</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div style="background:var(--bg-secondary); border:1px solid var(--border-card); border-radius:8px; padding:12px;">
+                        <strong style="color:var(--text-primary); font-size:13px;">1. Violence District</strong>
+                        <p style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Asymmetrical horror game suite • v3.4.1 • Status: Working</p>
+                    </div>
+                    <div style="background:var(--bg-secondary); border:1px solid var(--border-card); border-radius:8px; padding:12px;">
+                        <strong style="color:var(--text-primary); font-size:13px;">2. Sniper Arena</strong>
+                        <p style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Exciting sniper battles suite • v2.1.0 • Status: Working</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="table-wrap">
                 <table class="scripts-table">
                     <thead>
@@ -281,7 +306,48 @@
             </div>
         </div>
 
-        <!-- PAGE: AUDIT LOGS (ADMIN & OWNER ONLY) -->
+        <!-- PAGE 3: STAFF MANAGEMENT (OWNER ONLY) -->
+        <div class="page" id="page-staff">
+            <div style="margin-bottom:16px">
+                <h2 style="font-size:16px; font-weight:700">Staff Appointment & Management</h2>
+                <p style="font-size:12px; color:var(--text-secondary);">Register a Discord ID as Staff to grant restricted key generation access (max 7 days, max 5 keys at once).</p>
+            </div>
+
+            <!-- Appoint Staff Form -->
+            <div class="box-card" id="staffAddBox">
+                <h3 style="font-size:13px; font-weight:700; margin-bottom:12px;">Appoint New Staff Member</h3>
+                <div style="display:grid; grid-template-columns:1.5fr 1.5fr auto; gap:10px; align-items:flex-end;">
+                    <div class="form-group" style="margin-bottom:0">
+                        <label>Discord User ID (Snowflake)</label>
+                        <input type="text" id="newStaffDiscordId" class="form-input" placeholder="e.g. 1080297706695692348" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <label>Staff Label / Note</label>
+                        <input type="text" id="newStaffUsername" class="form-input" placeholder="e.g. Moderator John">
+                    </div>
+                    <button class="btn btn-primary" onclick="submitAppointStaff()" style="height:36px;">Appoint as Staff</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="scripts-table">
+                    <thead>
+                        <tr>
+                            <th>Discord ID</th>
+                            <th>Username / Label</th>
+                            <th>Role</th>
+                            <th>Appointed At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffTbody">
+                        <tr><td colspan="5" style="text-align:center;padding:24px">Loading staff list...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PAGE 4: AUDIT LOGS (ADMIN & OWNER ONLY) -->
         <div class="page" id="page-audit">
             <div style="margin-bottom:16px">
                 <h2 style="font-size:16px; font-weight:700">Staff & System Audit Trail</h2>
@@ -404,7 +470,6 @@
     let CURRENT_USER = null;
     let ALL_KEYS = [];
 
-    // Session Check
     async function initAuth() {
         try {
             const res = await fetch('/api/auth/me');
@@ -418,14 +483,19 @@
             document.getElementById('sidebarRole').innerText = CURRENT_USER.role.toUpperCase();
             if (CURRENT_USER.avatar) document.getElementById('sidebarAvatar').src = CURRENT_USER.avatar;
 
-            // Role specific UI restrictions
+            // Restrict UI for Staff
             if (CURRENT_USER.role === 'staff') {
                 document.getElementById('nav-scripts').style.display = 'none';
+                document.getElementById('nav-staff').style.display = 'none';
                 document.getElementById('nav-audit').style.display = 'none';
                 document.getElementById('opt365').disabled = true;
                 document.getElementById('optLifetime').disabled = true;
                 document.getElementById('keyDuration').value = '7d';
                 document.getElementById('keyCount').max = 5;
+            }
+
+            if (CURRENT_USER.role !== 'owner') {
+                document.getElementById('nav-staff').style.display = 'none';
             }
 
             loadKeys();
@@ -443,6 +513,7 @@
 
         if (name === 'keys') loadKeys();
         if (name === 'scripts') loadScripts();
+        if (name === 'staff') loadStaff();
         if (name === 'audit') loadAuditLogs();
     }
 
@@ -502,6 +573,79 @@
         } catch (e) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#fca5a5">Failed to load keys</td></tr>`;
         }
+    }
+
+    async function loadStaff() {
+        const tbody = document.getElementById('staffTbody');
+        try {
+            const res = await fetch('/api/admin/staff');
+            const data = await res.json();
+            const staff = data.staff || [];
+
+            if (staff.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)">No staff appointed yet. Input a Discord ID above to appoint.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = staff.map(s => `
+                <tr>
+                    <td style="font-family:'JetBrains Mono'; font-weight:700; color:var(--text-primary)">${s.discord_id}</td>
+                    <td style="font-weight:600">${s.username}</td>
+                    <td><span class="badge" style="background:var(--accent-muted); color:var(--accent-text); border:1px solid var(--accent-border)">STAFF</span></td>
+                    <td style="font-size:12px; color:var(--text-muted)">${new Date(s.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="revokeStaff('${s.discord_id}')">Revoke Staff</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#fca5a5">Failed to load staff list</td></tr>`;
+        }
+    }
+
+    async function submitAppointStaff() {
+        const discordId = document.getElementById('newStaffDiscordId').value.trim();
+        const username = document.getElementById('newStaffUsername').value.trim();
+
+        if (!discordId) {
+            alert('Please enter a valid Discord User ID');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/admin/staff', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ discord_id: discordId, username })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`✅ Successfully appointed Discord ID ${discordId} as Staff!`);
+                document.getElementById('newStaffDiscordId').value = '';
+                document.getElementById('newStaffUsername').value = '';
+                loadStaff();
+            } else {
+                alert(data.error || 'Failed to appoint staff');
+            }
+        } catch (e) {
+            alert('Error: ' + e.message);
+        }
+    }
+
+    async function revokeStaff(discordId) {
+        if (!confirm(`Revoke Staff permissions for Discord ID ${discordId}?`)) return;
+        try {
+            const res = await fetch('/api/admin/staff', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ discord_id: discordId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Staff permissions revoked.');
+                loadStaff();
+            }
+        } catch (e) { alert(e.message); }
     }
 
     async function loadAuditLogs() {

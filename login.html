@@ -23,7 +23,7 @@
             --accent-tag: #6B4FA0;
             --accent-text: #D2C4ED;
             --discord: #5865f2;
-            --radius-card: 10px;
+            --radius-soft: 10px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
@@ -38,7 +38,7 @@
         }
 
         .card {
-            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-soft);
             padding: 36px 32px; width: 100%; max-width: 420px; text-align: center;
         }
 
@@ -46,7 +46,7 @@
         .title { font-size: 20px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.4px; color: var(--text-primary); }
         .desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
 
-        /* Discord OAuth2 Button */
+        /* Discord OAuth2 Button (8-12px rounded) */
         .btn-discord {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             background: #181c2c; border: 1px solid #2d365b; color: #cdd6f9; padding: 11px 18px; border-radius: 8px;
@@ -87,7 +87,7 @@
     <div class="card">
         <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
         <h1 class="title">Sign In to BOYFINITY</h1>
-        <p class="desc">Authenticate with your Discord account to access the staff portal and manage licenses.</p>
+        <p class="desc">Authenticate with your Discord account to access scripts, claim keys, or manage portal features.</p>
 
         <!-- Discord OAuth2 Primary Button -->
         <a href="/api/auth/discord/login" class="btn-discord">
@@ -97,9 +97,8 @@
             <span>Sign In with Discord</span>
         </a>
 
-        <div class="divider">or emergency master key</div>
+        <div class="divider">or emergency master login</div>
 
-        <!-- Master Owner Password Fallback -->
         <form id="ownerLoginForm" class="owner-box" onsubmit="handleOwnerLogin(event)">
             <div class="input-wrap">
                 <label class="input-label" for="ownerPassword">Master Password</label>
@@ -108,7 +107,7 @@
             <button type="submit" class="btn-owner" id="btnOwnerSubmit">Login as Master Owner</button>
         </form>
 
-        <p class="footer-note">Role elevation (Owner/Admin/Staff) is assigned based on verified Discord User IDs.</p>
+        <p class="footer-note">Permissions (Owner/Admin/Staff) are tied to your Discord User ID.</p>
     </div>
 
     <script>
@@ -120,7 +119,7 @@
             btn.disabled = true;
 
             try {
-                const res = await fetch('/api/admin/login', {
+                const res = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: pw })

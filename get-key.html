@@ -25,28 +25,34 @@
             --tag-green-bg: rgba(34, 197, 94, 0.12);
             --tag-green-text: #4ade80;
             --tag-green-border: rgba(34, 197, 94, 0.25);
-            --radius-card: 10px;
+            --radius-soft: 10px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+        body {
+            background-color: var(--bg-main); color: var(--text-primary); line-height: 1.6; min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        .main-wrapper { flex: 1; }
 
         .noise-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.025; z-index: 9999;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
+        /* ── NAVBAR (8-12px SOFT ROUNDED BOX) ── */
         .nav-wrapper {
             position: fixed; top: 18px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; padding: 0 20px;
         }
         .floating-pill {
             display: flex; align-items: center; justify-content: space-between;
-            background: rgba(13, 15, 19, 0.88); backdrop-filter: blur(14px);
-            border: 1px solid var(--border-card); border-radius: 9999px; padding: 8px 10px 8px 22px;
-            width: 100%; max-width: 980px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+            background: rgba(13, 15, 19, 0.92); backdrop-filter: blur(14px);
+            border: 1px solid var(--border-card); border-radius: var(--radius-soft); padding: 10px 14px 10px 20px;
+            width: 100%; max-width: 980px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
         }
         .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-img { width: 30px; height: 30px; border-radius: 8px; object-fit: contain; border: 1px solid var(--border-card); }
+        .logo-img { width: 28px; height: 28px; border-radius: 8px; object-fit: contain; border: 1px solid var(--border-card); }
         .logo-title { font-size: 15px; font-weight: 800; letter-spacing: 1.2px; color: var(--text-primary); }
         .nav-links { display: flex; align-items: center; gap: 24px; }
         .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.15s; }
@@ -54,7 +60,7 @@
 
         .btn-signin {
             display: inline-flex; align-items: center; gap: 8px; background: var(--accent-muted); color: var(--text-primary);
-            font-size: 12px; font-weight: 700; letter-spacing: 0.5px; padding: 8px 16px; border-radius: 9999px; text-decoration: none;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.5px; padding: 8px 16px; border-radius: 8px; text-decoration: none;
             border: 1px solid var(--accent-border); transition: all 0.2s;
         }
         .btn-signin:hover { background: #41305f; border-color: #5d4686; }
@@ -102,14 +108,121 @@
             margin: 10px 0; word-break: break-all;
         }
 
+        /* ── RICH FOOTER REVAMP ── */
         .footer {
-            border-top: 1px solid var(--border-card); padding: 32px 24px; background: var(--bg-secondary); margin-top: 80px;
+            border-top: 1px solid var(--border-card);
+            padding: 48px 24px 28px;
+            background: var(--bg-secondary);
+            margin-top: auto;
         }
+
         .footer-inner {
-            max-width: 680px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+            max-width: 1120px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 36px;
+            margin-bottom: 36px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-logo-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 0 16px rgba(107, 79, 160, 0.25);
+        }
+
+        .footer-brand-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            max-width: 380px;
+            line-height: 1.6;
+        }
+
+        .footer-col h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 14px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .payment-bar {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .payment-methods {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .payment-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #141720;
+            border: 1px solid var(--border-card);
+            color: var(--text-secondary);
+        }
+
+        .footer-bottom-row {
+            max-width: 1120px;
+            margin: 16px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         @media (max-width: 768px) {
+            .footer-inner { grid-template-columns: 1fr; }
             .nav-links { display: none; }
         }
     </style>
@@ -118,99 +231,141 @@
 
     <div class="noise-overlay"></div>
 
-    <div class="nav-wrapper">
-        <header class="floating-pill">
-            <a href="/" class="logo-wrap">
-                <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
-                <span class="logo-title">BOYFINITY</span>
-            </a>
-            <nav class="nav-links">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/scripts" class="nav-link">Scripts</a>
-                <a href="/status" class="nav-link">Status</a>
-                <a href="/get-key" class="nav-link active">Get Key</a>
-                <a href="/#faq" class="nav-link">FAQ</a>
-            </nav>
-            <div id="navAuthArea">
-                <a href="/api/auth/discord/login" class="btn-signin">
-                    <span>SIGN IN</span>
-                    <span>→</span>
+    <div class="main-wrapper">
+        <div class="nav-wrapper">
+            <header class="floating-pill">
+                <a href="/" class="logo-wrap">
+                    <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
+                    <span class="logo-title">BOYFINITY</span>
                 </a>
-            </div>
-        </header>
-    </div>
+                <nav class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/scripts" class="nav-link">Scripts</a>
+                    <a href="/get-key" class="nav-link active">Get Key</a>
+                    <a href="/#pricing" class="nav-link">Pricing</a>
+                    <a href="/#faq" class="nav-link">FAQ</a>
+                </nav>
+                <div id="navAuthArea">
+                    <a href="/api/auth/discord/login" class="btn-signin">
+                        <span>SIGN IN</span>
+                        <span>→</span>
+                    </a>
+                </div>
+            </header>
+        </div>
 
-    <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1 class="title">Get Free 24h License Key</h1>
-                <p class="desc">Complete the short 3-step verification to generate an authentic 24-hour BOYFINITY access key.</p>
-            </div>
-
-            <div class="step-list">
-                <!-- Step 1 -->
-                <div class="step-item">
-                    <div class="step-left">
-                        <div class="step-badge">1</div>
-                        <div>
-                            <div class="step-title">Subscribe YouTube Channel</div>
-                            <div class="step-desc">Support the creators to unlock checkpoint access</div>
-                        </div>
-                    </div>
-                    <a href="https://youtube.com" target="_blank" class="btn btn-yt" onclick="markStep(1)">Subscribe</a>
+        <div class="container">
+            <div class="card">
+                <div class="header">
+                    <h1 class="title">Get Free 24h License Key</h1>
+                    <p class="desc">Complete the short 3-step verification to generate an authentic 24-hour BOYFINITY access key.</p>
                 </div>
 
-                <!-- Step 2 -->
-                <div class="step-item">
-                    <div class="step-left">
-                        <div class="step-badge">2</div>
-                        <div>
-                            <div class="step-title">Join Discord Community</div>
-                            <div class="step-desc">Access fast bypass updates and status announcements</div>
+                <div class="step-list">
+                    <!-- Step 1 -->
+                    <div class="step-item">
+                        <div class="step-left">
+                            <div class="step-badge">1</div>
+                            <div>
+                                <div class="step-title">Subscribe YouTube Channel</div>
+                                <div class="step-desc">Support the creators to unlock checkpoint access</div>
+                            </div>
                         </div>
+                        <a href="https://youtube.com" target="_blank" class="btn btn-yt" onclick="markStep(1)">Subscribe</a>
                     </div>
-                    <a href="https://discord.gg" target="_blank" class="btn btn-dc" onclick="markStep(2)">Join Discord</a>
+
+                    <!-- Step 2 -->
+                    <div class="step-item">
+                        <div class="step-left">
+                            <div class="step-badge">2</div>
+                            <div>
+                                <div class="step-title">Join Discord Community</div>
+                                <div class="step-desc">Access fast bypass updates and status announcements</div>
+                            </div>
+                        </div>
+                        <a href="https://discord.gg" target="_blank" class="btn btn-dc" onclick="markStep(2)">Join Discord</a>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-item">
+                        <div class="step-left">
+                            <div class="step-badge">3</div>
+                            <div>
+                                <div class="step-title">Complete Ad Checkpoint</div>
+                                <div class="step-desc">Short 15-second sponsor gateway via LootLabs / Linkvertise</div>
+                            </div>
+                        </div>
+                        <button id="btnStep3" class="btn btn-primary" onclick="startCheckpoint()" disabled style="opacity:0.5; cursor:not-allowed;">Locked</button>
+                    </div>
                 </div>
 
-                <!-- Step 3 -->
-                <div class="step-item">
-                    <div class="step-left">
-                        <div class="step-badge">3</div>
-                        <div>
-                            <div class="step-title">Complete Ad Checkpoint</div>
-                            <div class="step-desc">Short 15-second sponsor gateway via LootLabs / Linkvertise</div>
-                        </div>
-                    </div>
-                    <button id="btnStep3" class="btn btn-primary" onclick="startCheckpoint()" disabled style="opacity:0.5; cursor:not-allowed;">Locked</button>
+                <div id="keyBoxWrap" class="key-box-wrap">
+                    <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Your Generated Key (24 Hours)</div>
+                    <div class="key-display" id="generatedKeyDisplay">BOY∞-XXXX-XXXX-XXXX</div>
+                    <button class="btn btn-primary" onclick="copyKey()" id="btnCopyKey" style="width:100%;">Copy Key</button>
                 </div>
-            </div>
-
-            <div id="keyBoxWrap" class="key-box-wrap">
-                <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Your Generated Key (24 Hours)</div>
-                <div class="key-display" id="generatedKeyDisplay">BOY∞-XXXX-XXXX-XXXX</div>
-                <button class="btn btn-primary" onclick="copyKey()" id="btnCopyKey" style="width:100%;">Copy Key</button>
             </div>
         </div>
     </div>
 
+    <!-- RICH FOOTER REVAMP -->
     <footer class="footer">
         <div class="footer-inner">
-            <div class="logo-wrap">
-                <img src="/assets/boyfinity.png" alt="BOYFINITY" style="width:22px; height:22px; border-radius:6px;">
-                <span style="font-size:12px; color:var(--text-secondary)">© 2026 BOYFINITY Script Hub. All rights reserved.</span>
+            <div class="footer-brand">
+                <div class="footer-logo-row">
+                    <img src="/assets/boyfinity.png" alt="BOYFINITY" class="footer-logo-img">
+                    <span style="font-size:16px; font-weight:800; letter-spacing:1px; color:#fff;">BOYFINITY</span>
+                </div>
+                <p class="footer-brand-desc">
+                    Elevate your experience with exclusive scripts, only found here.
+                </p>
             </div>
-            <div style="display:flex; gap:18px;">
-                <a href="/scripts" class="nav-link">Scripts</a>
-                <a href="/status" class="nav-link">Status</a>
-                <a href="/get-key" class="nav-link">Get Key</a>
-                <a href="/admin" class="nav-link">Staff Portal</a>
+
+            <div class="footer-col">
+                <h4>Community</h4>
+                <ul class="footer-links">
+                    <li><a href="https://discord.gg" target="_blank">Discord Server</a></li>
+                    <li><a href="https://github.com" target="_blank">GitHub Repository</a></li>
+                    <li><a href="/scripts">Supported Scripts</a></li>
+                </ul>
             </div>
+
+            <div class="footer-col">
+                <h4>Legal & Support</h4>
+                <ul class="footer-links">
+                    <li><a href="/#faq">Terms of Service</a></li>
+                    <li><a href="/#faq">Privacy Policy</a></li>
+                    <li><a href="/#faq">FAQ & Support</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="payment-bar">
+            <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">Supported Gateways</span>
+            <div class="payment-methods">
+                <span class="payment-tag">QRIS</span>
+                <span class="payment-tag">GoPay</span>
+                <span class="payment-tag">OVO</span>
+                <span class="payment-tag">DANA</span>
+                <span class="payment-tag">VISA / MC</span>
+                <span class="payment-tag">PayPal</span>
+                <span class="payment-tag">BTC</span>
+                <span class="payment-tag">ETH</span>
+                <span class="payment-tag">USDT</span>
+                <span class="payment-tag">LTC</span>
+            </div>
+        </div>
+
+        <div class="footer-bottom-row">
+            <span>© 2026 BOYFINITY Script Hub. All rights reserved.</span>
+            <span>made by @boinihboss</span>
         </div>
     </footer>
 
     <script>
         let step1Done = false;
         let step2Done = false;
+        let CURRENT_USER = null;
 
         function markStep(step) {
             if (step === 1) step1Done = true;
@@ -231,11 +386,10 @@
             btn.disabled = true;
 
             try {
-                // Generate genuine 1-day key from API
                 const res = await fetch('/api/checkout/purchase', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan: '1day', buyer_discord: 'Checkpoint_User', buyer_email: 'free_checkpoint@user.com' })
+                    body: JSON.stringify({ plan: '1day' })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -243,9 +397,13 @@
                     document.getElementById('generatedKeyDisplay').innerText = data.key;
                     btn.innerText = 'Key Generated!';
                 } else {
-                    alert('Error generating key: ' + (data.error || 'Server error'));
-                    btn.innerText = 'Retry Checkpoint';
-                    btn.disabled = false;
+                    alert('Error: ' + (data.error || 'Please sign in first'));
+                    if (res.status === 401) {
+                        window.location.href = '/login';
+                    } else {
+                        btn.innerText = 'Retry Checkpoint';
+                        btn.disabled = false;
+                    }
                 }
             } catch (e) {
                 alert('Connection error: ' + e.message);
@@ -267,15 +425,22 @@
                 const res = await fetch('/api/auth/me');
                 const data = await res.json();
                 if (data.success && data.user) {
+                    CURRENT_USER = data.user;
                     const authArea = document.getElementById('navAuthArea');
+                    const isStaffOrAdmin = data.user.role === 'admin' || data.user.role === 'owner' || data.user.role === 'staff';
                     authArea.innerHTML = `
-                        <a href="/admin" class="btn-signin" style="background:var(--bg-secondary); border-color:var(--border-card);">
-                            <img src="${data.user.avatar || '/assets/boyfinity.png'}" style="width:16px;height:16px;border-radius:50%">
+                        <a href="${isStaffOrAdmin ? '/admin' : '#'}" class="btn-signin" style="background:var(--bg-secondary); border-color:var(--border-card);">
+                            <img src="${data.user.avatar || '/assets/boyfinity.png'}" style="width:16px;height:16px;border-radius:4px">
                             <span>${data.user.username}</span>
                         </a>
                     `;
+                } else {
+                    // Force redirect if accessed directly without auth
+                    window.location.href = '/login';
                 }
-            } catch (e) {}
+            } catch (e) {
+                window.location.href = '/login';
+            }
         }
         checkSession();
     </script>

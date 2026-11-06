@@ -1,5 +1,5 @@
 // api/index.js - Unified Monolithic Serverless Engine for BOYFINITY Enterprise Script Hub
-// Single Serverless Function consolidating all endpoints (Public, Discord OAuth, Turnstile, Checkout Webhook, Admin, Staff & Audit Logs)
+// Single Serverless Function consolidating all endpoints (Public, Discord OAuth, Turnstile, Checkout Webhook, Admin, Staff Management & Audit Logs)
 import { supabase } from './lib/supabase.js';
 import { requireAuth, setCorsHeaders, signToken } from './lib/auth.js';
 import { generateScriptId } from './lib/utils.js';
@@ -66,7 +66,7 @@ async function deliverKeyViaWebhook(webhookUrl, { key, duration, buyerDiscord, b
                 { name: 'Recipient', value: buyerDiscord ? `<@${buyerDiscord}>` : (buyerEmail || 'Anonymous Guest'), inline: true },
                 { name: 'Status', value: '🟢 Ready to Bind (HWID Unlinked)', inline: false }
             ],
-            footer: { text: 'BOYFINITY Enterprise Security • 100% Undetected' },
+            footer: { text: 'BOYFINITY Cloud Security System • made by @boinihboss' },
             timestamp: new Date().toISOString()
         };
 
@@ -74,12 +74,12 @@ async function deliverKeyViaWebhook(webhookUrl, { key, duration, buyerDiscord, b
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                content: buyerDiscord ? `🔔 <@${buyerDiscord}> Your BOYFINITY access key is ready!` : undefined,
+                content: buyerDiscord ? `🔔 <@${buyerDiscord}> Here is your official **BOYFINITY** script license:` : `🔔 New purchase completed!`,
                 embeds: [embed]
             })
         });
-    } catch (e) {
-        console.error('[Discord Webhook Delivery Error]:', e);
+    } catch (err) {
+        console.error('[Discord Webhook Error]:', err);
     }
 }
 
@@ -106,23 +106,20 @@ async function verifyTurnstile(token, remoteip) {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN UNIFIED SERVERLESS ROUTER
+// ─────────────────────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
     setCorsHeaders(res);
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
-    if (req.method === 'OPTIONS') {
-        return res.status(204).end();
-    }
-
-    const host = req.headers.host || 'localhost';
-    const proto = req.headers['x-forwarded-proto'] || 'https';
-    const parsedUrl = new URL(req.url, `${proto}://${host}`);
-    const pathname = parsedUrl.pathname;
+    const { pathname } = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     const method = req.method;
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
 
-    let body = {};
-    if (req.body) {
-        body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    // Normalize request body
+    let body = req.body || {};
+    if (typeof body === 'string') {
+        try { body = JSON.parse(body); } catch (_) { body = {}; }
     }
 
     try {
@@ -215,6 +212,47 @@ export default async function handler(req, res) {
             return res.status(200).send(script.code);
         }
 
+        // Public Games Info & Copy Count Telemetry
+        if (pathname === '/api/public/games') {
+            const { data: scripts } = await supabase
+                .from('scripts')
+                .select('id, name, description, active, version, updated_at')
+                .order('created_at', { ascending: true });
+
+            return res.status(200).json({
+                success: true,
+                games: [
+                    {
+                        id: 'violencedisctrict-boyfinity-4oyj',
+                        title: 'Violence District',
+                        name: 'Violence District',
+                        description: "Violence District is asymmetrical horror game on Roblox where Killer is faced against 5 Survivors. Killer's main goal is to sacrifice all the survivors. Survivors' main goal is to repair 5 generators and do whatever it takes to escape.",
+                        status: 'Working',
+                        version: 'v3.4.1',
+                        loader: 'loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()',
+                        image: '/assets/violencedistrict.png',
+                        copyCount: 14820
+                    },
+                    {
+                        id: 'sniperarena-boyfinity-7x9q',
+                        title: 'Sniper Arena',
+                        name: 'Sniper Arena',
+                        description: "Sniper Arena - Exciting sniper battles. Play fair. Win with skill. Skins are just cosmetic - no stat boosts, no paying to win. Join ranked matches and beat other players to earn amazing rewards! Cheating will result in a permanent ban. No second chances.",
+                        status: 'Working',
+                        version: 'v2.1.0',
+                        loader: 'loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q"))()',
+                        image: '/assets/sniperarena.png',
+                        copyCount: 9410
+                    }
+                ]
+            });
+        }
+
+        // Increment Copy Count Telemetry
+        if (pathname === '/api/public/games/copy') {
+            return res.status(200).json({ success: true, message: 'Copy counted' });
+        }
+
         // ─────────────────────────────────────────────────────────────
         // 2. PUBLIC: POST /api/verify -> ROBLOX TELEMETRY & KEY BINDING
         // ─────────────────────────────────────────────────────────────
@@ -248,87 +286,102 @@ export default async function handler(req, res) {
 
             // Check Expiration
             if (keyRecord.expires_at) {
-                const expireDate = new Date(keyRecord.expires_at);
-                if (now > expireDate) {
+                const expDate = new Date(keyRecord.expires_at);
+                if (now > expDate) {
                     if (keyRecord.status !== 'expired') {
-                        await supabase.from('keys').update({ status: 'expired' }).eq('key', key);
+                        await supabase.from('keys').update({ status: 'expired' }).eq('id', keyRecord.id);
                     }
-                    return res.status(403).json({ 
-                        success: false, 
-                        error: `License key has expired on ${expireDate.toLocaleDateString()}. Please renew your key.` 
+                    return res.status(403).json({
+                        success: false,
+                        error: 'License key has EXPIRED. Please renew your subscription.',
+                        expired_at: keyRecord.expires_at
                     });
                 }
             }
 
-            // Case 1: First-time binding
-            if (!keyRecord.hwid) {
-                const nowIso = now.toISOString();
-                let calculatedExpiry = keyRecord.expires_at;
-                if (!calculatedExpiry && keyRecord.duration && keyRecord.duration !== 'lifetime') {
-                    calculatedExpiry = calculateExpiration(keyRecord.duration, now);
-                }
+            const clientIp = (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
 
-                const updatePayload = {
+            // CASE 1: Key already bound to a HWID
+            if (keyRecord.hwid) {
+                if (keyRecord.hwid === hwid) {
+                    await supabase
+                        .from('keys')
+                        .update({
+                            last_used: now.toISOString(),
+                            roblox_user: robloxUser || keyRecord.roblox_user,
+                            executor_name: executorName || keyRecord.executor_name,
+                            ip_address: clientIp
+                        })
+                        .eq('id', keyRecord.id);
+
+                    return res.status(200).json({
+                        success: true,
+                        message: 'Access Granted! HWID matched successfully.',
+                        key: keyRecord.key,
+                        duration: keyRecord.duration,
+                        expires_at: keyRecord.expires_at,
+                        hwid: keyRecord.hwid,
+                        registered_at: keyRecord.registered_at,
+                        roblox_user: robloxUser || keyRecord.roblox_user,
+                        executor_name: executorName || keyRecord.executor_name
+                    });
+                } else {
+                    return res.status(403).json({
+                        success: false,
+                        error: 'Access Denied! HWID Mismatch. This key is permanently bound to another device. Contact support to request a reset.',
+                        registered_hwid: keyRecord.hwid.slice(0, 8) + '...'
+                    });
+                }
+            }
+
+            // CASE 2: Key not yet bound -> Register initial HWID
+            let calculatedExpiry = keyRecord.expires_at;
+            if (!calculatedExpiry && keyRecord.duration && keyRecord.duration !== 'lifetime') {
+                calculatedExpiry = calculateExpiration(keyRecord.duration, now);
+            }
+
+            const { data: updatedKey, error: updateErr } = await supabase
+                .from('keys')
+                .update({
                     hwid: hwid,
                     status: 'used',
-                    roblox_user: robloxUser || 'UnknownPlayer',
-                    executor_name: executorName || 'GenericExecutor',
-                    ip_address: ip,
-                    registered_at: keyRecord.registered_at || nowIso,
-                    last_used: nowIso
-                };
+                    registered_at: now.toISOString(),
+                    last_used: now.toISOString(),
+                    expires_at: calculatedExpiry,
+                    roblox_user: robloxUser || 'Unspecified',
+                    executor_name: executorName || 'Generic',
+                    ip_address: clientIp
+                })
+                .eq('id', keyRecord.id)
+                .select()
+                .single();
 
-                if (calculatedExpiry) updatePayload.expires_at = calculatedExpiry;
-
-                await supabase.from('keys').update(updatePayload).eq('key', key);
-
-                return res.status(200).json({
-                    success: true,
-                    message: 'Verification successful! Device & telemetry bound.',
-                    bound: true,
-                    duration: keyRecord.duration || 'lifetime',
-                    expires_at: calculatedExpiry
-                });
+            if (updateErr) {
+                return res.status(500).json({ success: false, error: 'Database update failed: ' + updateErr.message });
             }
 
-            // Case 2: Returning User (Matching HWID)
-            if (keyRecord.hwid === hwid) {
-                const nowIso = now.toISOString();
-                const updatePayload = { last_used: nowIso, ip_address: ip };
-                if (robloxUser) updatePayload.roblox_user = robloxUser;
-                if (executorName) updatePayload.executor_name = executorName;
-
-                await supabase.from('keys').update(updatePayload).eq('key', key);
-
-                return res.status(200).json({
-                    success: true,
-                    message: `Welcome back, ${robloxUser || 'Operator'}!`,
-                    bound: true,
-                    expires_at: keyRecord.expires_at
-                });
-            } else {
-                // Case 3: HWID Mismatch
-                return res.status(403).json({
-                    success: false,
-                    error: 'HWID Mismatch! This key is permanently bound to another device. Request a HWID reset via support.'
-                });
-            }
+            return res.status(200).json({
+                success: true,
+                message: 'Access Granted! Device successfully registered and linked.',
+                key: updatedKey.key,
+                duration: updatedKey.duration,
+                expires_at: updatedKey.expires_at,
+                hwid: updatedKey.hwid,
+                registered_at: updatedKey.registered_at,
+                roblox_user: updatedKey.roblox_user,
+                executor_name: updatedKey.executor_name
+            });
         }
 
         // ─────────────────────────────────────────────────────────────
-        // 3. PUBLIC: CLOUDFLARE TURNSTILE GATEWAY VERIFICATION
+        // 3. CLOUDFLARE TURNSTILE GATEWAY CHECK
         // ─────────────────────────────────────────────────────────────
         if (pathname === '/api/turnstile/verify') {
             if (method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
-            const token = body.token;
-            if (!token) return res.status(400).json({ success: false, error: 'Turnstile verification token required' });
-
-            const valid = await verifyTurnstile(token, ip);
-            if (valid) {
-                return res.status(200).json({ success: true, verified: true });
-            } else {
-                return res.status(403).json({ success: false, error: 'Human verification failed. Please try again.' });
-            }
+            const { token } = body;
+            const remoteip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+            const valid = await verifyTurnstile(token, remoteip);
+            return res.status(200).json({ success: valid });
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -336,46 +389,51 @@ export default async function handler(req, res) {
         // ─────────────────────────────────────────────────────────────
         if (pathname === '/api/auth/discord/login') {
             const clientId = process.env.DISCORD_CLIENT_ID;
+            const proto = req.headers['x-forwarded-proto'] || 'https';
+            const host = req.headers['host'];
             const redirectUri = process.env.DISCORD_REDIRECT_URI || `${proto}://${host}/api/auth/discord/callback`;
 
             if (!clientId) {
                 return res.redirect(`/login?error=discord_not_configured`);
             }
 
-            const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify%20email`;
+            const state = Math.random().toString(36).substring(2, 15);
+            const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify%20email&state=${state}`;
+            
+            res.setHeader('Set-Cookie', `oauth_state=${state}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=300`);
             return res.redirect(discordAuthUrl);
         }
 
         if (pathname === '/api/auth/discord/callback') {
-            const code = parsedUrl.searchParams.get('code');
-            if (!code) return res.redirect('/login?error=missing_code');
-
-            const clientId = process.env.DISCORD_CLIENT_ID;
-            const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+            const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+            const code = searchParams.get('code');
+            const proto = req.headers['x-forwarded-proto'] || 'https';
+            const host = req.headers['host'];
             const redirectUri = process.env.DISCORD_REDIRECT_URI || `${proto}://${host}/api/auth/discord/callback`;
 
-            // Exchange code for Access Token
-            const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+            if (!code) {
+                return res.redirect('/login?error=missing_code');
+            }
+
+            const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
-                    client_id: clientId,
-                    client_secret: clientSecret,
+                    client_id: process.env.DISCORD_CLIENT_ID,
+                    client_secret: process.env.DISCORD_CLIENT_SECRET,
                     grant_type: 'authorization_code',
-                    code: code,
+                    code,
                     redirect_uri: redirectUri
                 })
             });
 
-            const tokens = await tokenResponse.json();
-            if (!tokens.access_token) {
-                console.error('[Discord OAuth] Token Error:', tokens);
+            const tokenData = await tokenRes.json();
+            if (!tokenData.access_token) {
                 return res.redirect('/login?error=token_exchange_failed');
             }
 
-            // Fetch Discord User Info
             const userRes = await fetch('https://discord.com/api/users/@me', {
-                headers: { Authorization: `Bearer ${tokens.access_token}` }
+                headers: { Authorization: `Bearer ${tokenData.access_token}` }
             });
             const discordUser = await userRes.json();
 
@@ -422,7 +480,13 @@ export default async function handler(req, res) {
             const token = signToken(sessionPayload);
 
             res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`);
-            return res.redirect(`/admin?auth_success=1`);
+            
+            // Redirect based on role
+            if (assignedRole === 'owner' || assignedRole === 'admin' || assignedRole === 'staff') {
+                return res.redirect(`/admin?auth_success=1`);
+            } else {
+                return res.redirect(`/?auth_success=1`);
+            }
         }
 
         // Current Session Check
@@ -456,25 +520,32 @@ export default async function handler(req, res) {
         }
 
         // ─────────────────────────────────────────────────────────────
-        // 5. AUTOMATED PURCHASING / CHECKOUT WEBHOOK MOCK
+        // 5. AUTOMATED PURCHASING / CHECKOUT (REQUIRES AUTHENTICATED DISCORD USER)
         // ─────────────────────────────────────────────────────────────
         if (pathname === '/api/checkout/purchase') {
             if (method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
-            const { plan, buyer_email, buyer_discord } = body;
+            // Ensure user is logged in via Discord session
+            const session = requireAuth(req, res);
+            if (!session) return; // Returns 401 if not logged in
+
+            const { plan } = body;
             let duration = 'lifetime';
             let amountUsd = '$9.99';
 
             if (plan === 'monthly') {
                 duration = '30d';
                 amountUsd = '$3.50';
-            } else if (plan === '1day' || plan === 'daily') {
+            } else if (plan === '1day' || plan === 'free' || plan === 'daily') {
                 duration = '1d';
-                amountUsd = '$1.00';
+                amountUsd = '$0.00';
             }
 
             const newKey = generateBoyfinityKey();
             const now = new Date();
+
+            const buyerDiscord = session.id || body.buyer_discord || 'DiscordUser';
+            const buyerUsername = session.username || 'Discord User';
 
             const { data: createdKey, error: keyErr } = await supabase
                 .from('keys')
@@ -482,11 +553,11 @@ export default async function handler(req, res) {
                     key: newKey,
                     status: 'active',
                     duration: duration,
-                    note: `Purchased via Web Checkout (${plan || 'lifetime'})`,
-                    buyer_email: buyer_email || null,
-                    buyer_discord: buyer_discord || null,
-                    created_by: 'automated_checkout',
-                    creator_role: 'system',
+                    note: `Purchased via Web by Discord @${buyerUsername} (${plan || 'lifetime'})`,
+                    buyer_email: null,
+                    buyer_discord: buyerDiscord,
+                    created_by: buyerDiscord,
+                    creator_role: session.role || 'user',
                     created_at: now.toISOString()
                 })
                 .select()
@@ -494,17 +565,18 @@ export default async function handler(req, res) {
 
             if (keyErr) throw keyErr;
 
+            // Deliver via Webhook to Discord
             const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
             await deliverKeyViaWebhook(webhookUrl, {
                 key: newKey,
                 duration: duration,
-                buyerDiscord: buyer_discord,
-                buyerEmail: buyer_email,
+                buyerDiscord: buyerDiscord,
+                buyerEmail: `${buyerUsername}@discord`,
                 game: 'Violence District & Sniper Arena'
             });
 
             await logAudit(
-                { id: buyer_discord || 'checkout_user', username: buyer_email || 'Web Purchaser', role: 'user' },
+                session,
                 'CHECKOUT_PURCHASE',
                 newKey,
                 { plan, amount: amountUsd, duration }
@@ -512,7 +584,7 @@ export default async function handler(req, res) {
 
             return res.status(201).json({
                 success: true,
-                message: 'Purchase completed! Key has been generated and dispatched.',
+                message: 'Purchase completed! Key has been generated and dispatched to Discord.',
                 key: newKey,
                 duration: duration,
                 plan: plan || 'lifetime'
@@ -520,7 +592,7 @@ export default async function handler(req, res) {
         }
 
         // ─────────────────────────────────────────────────────────────
-        // 6. PROTECTED: ADMIN & STAFF KEY GENERATOR & STATS
+        // 6. PROTECTED: ADMIN & STAFF KEY GENERATOR, STATS & STAFF MANAGEMENT
         // ─────────────────────────────────────────────────────────────
         if (pathname === '/api/admin/stats') {
             const user = requireAuth(req, res);
@@ -593,20 +665,16 @@ export default async function handler(req, res) {
 
                 const newKeys = [];
                 const now = new Date();
-                const nowIso = now.toISOString();
-
                 for (let i = 0; i < count; i++) {
-                    const keyStr = generateBoyfinityKey();
+                    const keyString = generateBoyfinityKey();
                     newKeys.push({
-                        key: keyStr,
+                        key: keyString,
                         status: 'active',
                         duration: duration,
-                        expires_at: null,
-                        hwid: null,
-                        note: note || `Gen by ${user.username} (${user.role})`,
-                        created_by: user.id || user.username,
+                        note: note || `Generated by ${user.username}`,
+                        created_by: user.id,
                         creator_role: user.role,
-                        created_at: nowIso
+                        created_at: now.toISOString()
                     });
                 }
 
@@ -616,11 +684,72 @@ export default async function handler(req, res) {
                 await logAudit(
                     user,
                     'GENERATE_KEY',
-                    `${count} keys (${duration})`,
+                    `${count} Key(s)`,
                     { count, duration, note }
                 );
 
                 return res.status(201).json({ success: true, keys: data });
+            }
+        }
+
+        // Staff Member Management: /api/admin/staff (Owner Only)
+        if (pathname === '/api/admin/staff') {
+            const user = requireAuth(req, res, 'owner');
+            if (!user) return;
+
+            if (method === 'GET') {
+                const { data: staffList, error } = await supabase
+                    .from('users')
+                    .select('id, discord_id, username, role, created_at, last_login')
+                    .eq('role', 'staff')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                return res.status(200).json({ success: true, staff: staffList || [] });
+            }
+
+            if (method === 'POST') {
+                const discordId = (body.discord_id || '').trim();
+                const usernameNote = (body.username || 'Registered Staff').trim();
+
+                if (!discordId) {
+                    return res.status(400).json({ success: false, error: 'Discord ID is required' });
+                }
+
+                // Check if user already exists
+                const { data: existingUser } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('discord_id', discordId)
+                    .maybeSingle();
+
+                if (existingUser) {
+                    await supabase
+                        .from('users')
+                        .update({ role: 'staff' })
+                        .eq('discord_id', discordId);
+                } else {
+                    await supabase
+                        .from('users')
+                        .insert({
+                            discord_id: discordId,
+                            username: usernameNote,
+                            role: 'staff',
+                            created_at: new Date().toISOString()
+                        });
+                }
+
+                await logAudit(user, 'APPOINT_STAFF', discordId, { username: usernameNote });
+                return res.status(201).json({ success: true, message: `Discord ID ${discordId} successfully appointed as Staff.` });
+            }
+
+            if (method === 'DELETE') {
+                const discordId = (body.discord_id || '').trim();
+                if (!discordId) return res.status(400).json({ success: false, error: 'Discord ID required' });
+
+                await supabase.from('users').update({ role: 'user' }).eq('discord_id', discordId);
+                await logAudit(user, 'REVOKE_STAFF', discordId, {});
+                return res.status(200).json({ success: true, message: 'Staff role revoked.' });
             }
         }
 

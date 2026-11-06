@@ -41,7 +41,7 @@
     },
     {
       "src": "/status",
-      "dest": "/status.html"
+      "dest": "/scripts.html"
     },
     {
       "src": "/get-key",

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOYFINITY — Enterprise Lua Script Hub</title>
+    <title>BOYFINITY — Elevate Your Gameplay</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,7 +29,7 @@
             --tag-green-bg: rgba(34, 197, 94, 0.12);
             --tag-green-text: #4ade80;
             --tag-green-border: rgba(34, 197, 94, 0.25);
-            --radius-card: 10px;
+            --radius-soft: 10px;
         }
 
         * {
@@ -45,10 +45,16 @@
             overflow-x: hidden;
             line-height: 1.6;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             position: relative;
         }
 
-        /* Subtle Noise Overlay */
+        .main-wrapper {
+            flex: 1;
+        }
+
+        /* Subtle Noise Texture */
         .noise-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -58,7 +64,7 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* ── FLOATING PILL NAVBAR ── */
+        /* ── NAVBAR (8-12px SOFT ROUNDED BOX) ── */
         .nav-wrapper {
             position: fixed;
             top: 18px;
@@ -73,14 +79,14 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(13, 15, 19, 0.88);
+            background: rgba(13, 15, 19, 0.92);
             backdrop-filter: blur(14px);
             border: 1px solid var(--border-card);
-            border-radius: 9999px;
-            padding: 8px 10px 8px 22px;
+            border-radius: var(--radius-soft);
+            padding: 10px 14px 10px 20px;
             width: 100%;
             max-width: 980px;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
         }
 
         .logo-wrap {
@@ -91,8 +97,8 @@
         }
 
         .logo-img {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border-radius: 8px;
             object-fit: contain;
             border: 1px solid var(--border-card);
@@ -133,7 +139,7 @@
             font-weight: 700;
             letter-spacing: 0.5px;
             padding: 8px 16px;
-            border-radius: 9999px;
+            border-radius: 8px;
             text-decoration: none;
             border: 1px solid var(--accent-border);
             transition: all 0.2s;
@@ -144,25 +150,15 @@
             border-color: #5d4686;
         }
 
-        .btn-signin .arrow-icon {
-            font-size: 11px;
-            transition: transform 0.2s;
-        }
-
-        .btn-signin:hover .arrow-icon {
-            transform: translateX(3px);
-        }
-
         /* ── HERO SECTION ── */
         .hero {
-            padding: 150px 32px 60px;
+            padding: 140px 32px 40px;
             max-width: 1120px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
             align-items: center;
             gap: 48px;
-            min-height: 74vh;
         }
 
         .hero-left {
@@ -173,30 +169,30 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 8px;
             background: var(--bg-card);
             border: 1px solid var(--border-card);
             font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 22px;
+            font-weight: 700;
+            color: var(--accent-text);
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
         }
 
-        .pulse-dot {
-            width: 7px;
-            height: 7px;
-            background: #4ade80;
-            border-radius: 50%;
+        .status-badge .spark {
+            color: #c084fc;
         }
 
+        /* Heading 5xl (approx 48-52px), Left-aligned */
         .hero-title {
-            font-size: 54px;
+            font-size: 48px;
             font-weight: 800;
             letter-spacing: -1.5px;
-            line-height: 1.12;
-            margin-bottom: 20px;
+            line-height: 1.15;
+            margin-bottom: 18px;
             color: var(--text-primary);
+            text-align: left;
         }
 
         .hero-title span {
@@ -209,6 +205,7 @@
             line-height: 1.7;
             max-width: 520px;
             margin-bottom: 32px;
+            text-align: left;
         }
 
         .hero-actions {
@@ -225,7 +222,7 @@
             background: var(--text-primary);
             color: var(--bg-main);
             padding: 11px 22px;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 700;
             text-decoration: none;
@@ -245,10 +242,11 @@
             border: 1px solid var(--border-card);
             color: var(--text-primary);
             padding: 11px 20px;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             text-decoration: none;
+            cursor: pointer;
             transition: all 0.15s;
         }
 
@@ -257,7 +255,7 @@
             border-color: var(--border-hover);
         }
 
-        /* Subtle Hero Focal Box */
+        /* Floating Logo Animation in Hero */
         .hero-right {
             display: flex;
             justify-content: center;
@@ -272,50 +270,46 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: heroLogoFloat 4.5s ease-in-out infinite;
+        }
+
+        @keyframes heroLogoFloat {
+            0%, 100% {
+                transform: translateY(0px);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            }
+            50% {
+                transform: translateY(-10px);
+                box-shadow: 0 18px 45px rgba(52, 38, 77, 0.35);
+            }
         }
 
         .hero-brand-img {
-            width: 260px;
-            height: 260px;
+            width: 240px;
+            height: 240px;
             object-fit: contain;
             border-radius: 10px;
             display: block;
         }
 
-        /* ── OVERVIEW METRICS SECTION (MATCHING REFERENCE IMAGE) ── */
+        /* ── METRICS SECTION (BELOW HERO, COMPACT & SUBTLE) ── */
         .metrics-section {
             max-width: 1120px;
-            margin: 10px auto 60px;
+            margin: 20px auto 70px;
             padding: 0 24px;
-        }
-
-        .section-sub-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .section-sub-header h3 {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
         }
 
         .overview-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 16px;
-            margin-bottom: 24px;
         }
 
         .metric-card {
             background: var(--bg-card);
             border: 1px solid var(--border-card);
             border-radius: 10px;
-            padding: 18px 20px;
-            position: relative;
+            padding: 16px 20px;
             transition: border-color 0.15s;
         }
 
@@ -327,7 +321,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .metric-title {
@@ -359,14 +353,8 @@
             border: 1px solid var(--accent-border);
         }
 
-        .metric-body {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-        }
-
         .metric-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.8px;
             color: var(--text-primary);
@@ -389,30 +377,30 @@
             background: var(--bg-secondary);
             border: 1px solid var(--border-card);
             border-radius: 10px;
-            padding: 22px 28px;
+            padding: 20px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 18px;
+            gap: 16px;
         }
 
         .discord-left {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         }
 
         .discord-icon-badge {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             background: #191B22;
             border: 1px solid var(--border-card);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
         }
 
         .discord-title {
@@ -426,7 +414,7 @@
             color: var(--text-secondary);
         }
 
-        /* ── PRICING SECTION ── */
+        /* ── PRICING SECTION (PREMIUM ACCESS) ── */
         .section {
             max-width: 1120px;
             margin: 0 auto 80px;
@@ -463,7 +451,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border-card);
             border-radius: 10px;
-            padding: 26px 24px;
+            padding: 26px 22px;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -502,7 +490,7 @@
         }
 
         .plan-price {
-            font-size: 36px;
+            font-size: 34px;
             font-weight: 800;
             color: var(--text-primary);
             letter-spacing: -1px;
@@ -630,16 +618,83 @@
             display: block;
         }
 
-        /* ── FOOTER ── */
+        /* ── RICH FOOTER REVAMP ── */
         .footer {
             border-top: 1px solid var(--border-card);
-            padding: 32px 24px;
+            padding: 48px 24px 28px;
             background: var(--bg-secondary);
+            margin-top: auto;
         }
 
         .footer-inner {
             max-width: 1120px;
             margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 36px;
+            margin-bottom: 36px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-logo-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 0 16px rgba(107, 79, 160, 0.25);
+        }
+
+        .footer-brand-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            max-width: 380px;
+            line-height: 1.6;
+        }
+
+        .footer-col h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 14px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Payment Icons Bar */
+        .payment-bar {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -647,25 +702,57 @@
             gap: 16px;
         }
 
-        /* ── CLOUDFLARE TURNSTILE OVERLAY ── */
-        .turnstile-overlay {
+        .payment-methods {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .payment-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #141720;
+            border: 1px solid var(--border-card);
+            color: var(--text-secondary);
+            letter-spacing: 0.4px;
+        }
+
+        .footer-bottom-row {
+            max-width: 1120px;
+            margin: 16px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* ── MODALS (AUTH REQUIRED / TURNSTILE) ── */
+        .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(8, 9, 11, 0.94);
+            background: rgba(8, 9, 11, 0.92);
             backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 10000;
+            padding: 20px;
         }
 
-        .turnstile-card {
+        .modal-card {
             background: var(--bg-card);
             border: 1px solid var(--border-card);
             border-radius: 10px;
             padding: 32px 28px;
             max-width: 420px;
-            width: 90%;
+            width: 100%;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
         }
@@ -673,9 +760,12 @@
         @media (max-width: 860px) {
             .hero { grid-template-columns: 1fr; text-align: center; padding-top: 120px; }
             .hero-left { text-align: center; }
+            .hero-title { text-align: center; font-size: 38px; }
+            .hero-desc { text-align: center; margin: 0 auto 28px; }
             .hero-actions { justify-content: center; }
             .overview-grid { grid-template-columns: 1fr; }
             .pricing-grid { grid-template-columns: 1fr; }
+            .footer-inner { grid-template-columns: 1fr; }
             .nav-links { display: none; }
         }
     </style>
@@ -684,253 +774,304 @@
 
     <div class="noise-overlay"></div>
 
-    <!-- FLOATING PILL NAVBAR -->
-    <div class="nav-wrapper">
-        <header class="floating-pill">
-            <a href="/" class="logo-wrap">
-                <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
-                <span class="logo-title">BOYFINITY</span>
-            </a>
-            <nav class="nav-links">
-                <a href="/" class="nav-link active">Home</a>
-                <a href="/scripts" class="nav-link">Scripts</a>
-                <a href="/status" class="nav-link">Status</a>
-                <a href="/get-key" class="nav-link">Get Key</a>
-                <a href="#faq" class="nav-link">FAQ</a>
-            </nav>
-            <div id="navAuthArea">
-                <a href="/api/auth/discord/login" class="btn-signin">
-                    <span>SIGN IN</span>
-                    <span class="arrow-icon">→</span>
+    <div class="main-wrapper">
+        <!-- FLOATING NAVBAR (8-12px SUBTLE BORDERED BOX) -->
+        <div class="nav-wrapper">
+            <header class="floating-pill">
+                <a href="/" class="logo-wrap">
+                    <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
+                    <span class="logo-title">BOYFINITY</span>
+                </a>
+                <nav class="nav-links">
+                    <a href="/" class="nav-link active">Home</a>
+                    <a href="/scripts" class="nav-link">Scripts</a>
+                    <a href="/get-key" class="nav-link" onclick="handleGetKeyClick(event)">Get Key</a>
+                    <a href="#pricing" class="nav-link">Pricing</a>
+                    <a href="#faq" class="nav-link">FAQ</a>
+                </nav>
+                <div id="navAuthArea">
+                    <a href="/api/auth/discord/login" class="btn-signin">
+                        <span>SIGN IN</span>
+                        <span>→</span>
+                    </a>
+                </div>
+            </header>
+        </div>
+
+        <!-- HERO SECTION -->
+        <main class="hero">
+            <div class="hero-left">
+                <div class="status-badge">
+                    <span class="spark">✦</span>
+                    <span>Feel Without Limits</span>
+                </div>
+                <h1 class="hero-title">
+                    Elevate Your Gameplay with <span>Premium Scripts.</span>
+                </h1>
+                <p class="hero-desc">
+                    Elevate your experience with exclusive scripts, only found here.
+                </p>
+                <div class="hero-actions">
+                    <a href="/scripts" class="btn-main">Explore Supported Games →</a>
+                    <button onclick="handleGetKeyClick(event)" class="btn-ghost">Get Free Key (24h)</button>
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <div class="logo-card-wrap">
+                    <img src="/assets/boyfinity.png" alt="Boyfinity Emblem" class="hero-brand-img">
+                </div>
+            </div>
+        </main>
+
+        <!-- COMPACT METRICS SECTION (BELOW HERO) -->
+        <section class="metrics-section">
+            <div class="overview-grid">
+                <!-- Card 1: Supported Games (Just number) -->
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Supported Games</span>
+                        <span class="metric-badge badge-green">↗ 2</span>
+                    </div>
+                    <div class="metric-value">2</div>
+                    <div class="metric-sub">Roblox official suites</div>
+                </div>
+
+                <!-- Card 2: Undetected Status -->
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Detection Rate</span>
+                        <span class="metric-badge badge-purple">100%</span>
+                    </div>
+                    <div class="metric-value">UNDETECTED</div>
+                    <div class="metric-sub">Active telemetry protection</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DISCORD CONTRAST BAR -->
+        <section class="discord-bar-wrap">
+            <div class="discord-box">
+                <div class="discord-left">
+                    <div class="discord-icon-badge">💬</div>
+                    <div>
+                        <div class="discord-title">Join our Discord Community</div>
+                        <div class="discord-sub">Real-time script updates, private bypasses, and 24/7 dedicated assistance.</div>
+                    </div>
+                </div>
+                <a href="https://discord.gg" target="_blank" class="btn-signin">
+                    <span>JOIN DISCORD</span>
+                    <span>→</span>
                 </a>
             </div>
-        </header>
+        </section>
+
+        <!-- PRICING SECTION -->
+        <section class="section" id="pricing">
+            <div class="section-header">
+                <div class="section-tag">PREMIUM ACCESS</div>
+                <h2 class="section-heading">Pick your plan</h2>
+            </div>
+
+            <div class="pricing-grid">
+                <!-- FREE -->
+                <div class="pricing-card">
+                    <div class="plan-name">Free</div>
+                    <div class="plan-price">$0 <span>/ 24 Hours</span></div>
+                    <ul class="plan-features">
+                        <li>Free keys via ads</li>
+                        <li>Free script access</li>
+                        <li>Community support</li>
+                        <li>No HWID reset</li>
+                    </ul>
+                    <button onclick="handleGetKeyClick(event)" class="btn-checkout">Get Free Key →</button>
+                </div>
+
+                <!-- MONTHLY -->
+                <div class="pricing-card featured">
+                    <div class="featured-tag">POPULAR</div>
+                    <div class="plan-name">Monthly VIP</div>
+                    <div class="plan-price">$3.50 <span>/ Month</span></div>
+                    <ul class="plan-features">
+                        <li>No checkpoints / No ad links</li>
+                        <li>Automatic 30-day continuous key</li>
+                        <li>Priority bypass updates</li>
+                        <li>Automated Discord delivery</li>
+                        <li>Exclusive VIP Discord role</li>
+                    </ul>
+                    <button onclick="handlePurchaseClick('monthly')" class="btn-checkout">Purchase Now</button>
+                </div>
+
+                <!-- LIFETIME -->
+                <div class="pricing-card">
+                    <div class="plan-name">Lifetime Enterprise</div>
+                    <div class="plan-price">$9.99 <span>/ Lifetime</span></div>
+                    <ul class="plan-features">
+                        <li>Permanent lifetime access</li>
+                        <li>Instant HWID self-reset capability</li>
+                        <li>Immediate access to new updates</li>
+                        <li>Direct priority developer support</li>
+                    </ul>
+                    <button onclick="handlePurchaseClick('lifetime')" class="btn-checkout">Purchase Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ SECTION (EXACT QUESTIONS & ANSWERS) -->
+        <section class="section" id="faq">
+            <div class="section-header">
+                <div class="section-tag">HELP & SUPPORT</div>
+                <h2 class="section-heading">Frequently Asked Questions</h2>
+            </div>
+
+            <div class="faq-list">
+                <!-- 1. What is Boyfinity? -->
+                <div class="faq-item open">
+                    <div class="faq-header" onclick="toggleFaq(this)">
+                        <div class="faq-question">1. What is Boyfinity?</div>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-body">
+                        Boyfinity is an advanced Roblox script execution ecosystem featuring a minimalist loader and premium cloud script management. Take control of your gameplay across Windows, macOS, and mobile platforms with unmatched performance.
+                    </div>
+                </div>
+
+                <!-- 2. What platforms are supported? -->
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFaq(this)">
+                        <div class="faq-question">2. What platforms are supported?</div>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-body">
+                        We support Volt, Pottasium, Wave, Real, Madium, Volcano, Velocity, and SirHurt across Windows, macOS, and Android/iOS mobile environments with native executor hooks.
+                    </div>
+                </div>
+
+                <!-- 3. How do I get a license key? -->
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFaq(this)">
+                        <div class="faq-question">3. How do I get a license key?</div>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-body">
+                        You can claim a free 24-hour key by completing our 3-step checkpoint on the "Get Key" page, or purchase an ad-free Monthly/Lifetime license with instant automated Discord delivery.
+                    </div>
+                </div>
+
+                <!-- 4. What payment methods do you accept? -->
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFaq(this)">
+                        <div class="faq-question">4. What payment methods do you accept?</div>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-body">
+                        We accept Credit/Debit Cards, PayPal, QRIS, GoPay, OVO, DANA, and major Cryptocurrencies (Bitcoin, Ethereum, USDT, Litecoin).
+                    </div>
+                </div>
+
+                <!-- 5. Do you offer refunds? -->
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFaq(this)">
+                        <div class="faq-question">5. Do you offer refunds?</div>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-body">
+                        Due to the digital nature of license keys and instant HWID activation, all purchases are generally final. However, if a script becomes permanently unfixable within 48 hours of purchase, our support team will review your refund eligibility.
+                    </div>
+                </div>
+
+                <!-- 6. How do I get support? -->
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFaq(this)">
+                        <div class="faq-question">6. How do I get support?</div>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-body">
+                        Join our official Discord community and open a support ticket in the <code>#support</code> channel. Our staff and developer team are available 24/7 to resolve technical issues or HWID reset requests.
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- HERO SECTION -->
-    <main class="hero">
-        <div class="hero-left">
-            <div class="status-badge">
-                <span class="pulse-dot"></span>
-                <span>Hyperion Bypass v3.0 • Undetected</span>
-            </div>
-            <h1 class="hero-title">
-                The Pinnacle of <span>Roblox</span> Execution.
-            </h1>
-            <p class="hero-desc">
-                High-performance cloud Lua script automation for <strong>Violence District</strong> and <strong>Sniper Arena</strong> with military-grade HWID telemetry and zero ban history.
-            </p>
-            <div class="hero-actions">
-                <a href="/scripts" class="btn-main">Explore Supported Games →</a>
-                <a href="/get-key" class="btn-ghost">Get Free Key (24h)</a>
-            </div>
-        </div>
-
-        <div class="hero-right">
-            <div class="logo-card-wrap">
-                <img src="/assets/boyfinity.png" alt="Boyfinity Emblem" class="hero-brand-img">
-            </div>
-        </div>
-    </main>
-
-    <!-- OVERVIEW METRICS (IMAGE REFERENCE STYLE) -->
-    <section class="metrics-section">
-        <div class="section-sub-header">
-            <h3>Overview Metrics</h3>
-        </div>
-        <div class="overview-grid">
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Active License Keys</span>
-                    <span class="metric-badge badge-green">↗ 231</span>
-                </div>
-                <div class="metric-body">
-                    <div class="metric-value">2,847</div>
-                </div>
-                <div class="metric-sub">vs last month</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Registered HWIDs</span>
-                    <span class="metric-badge badge-green">↗ 21</span>
-                </div>
-                <div class="metric-body">
-                    <div class="metric-value">1,942</div>
-                </div>
-                <div class="metric-sub">vs last month</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Bypass Reliability</span>
-                    <span class="metric-badge badge-purple">100%</span>
-                </div>
-                <div class="metric-body">
-                    <div class="metric-value">0 Bans</div>
-                </div>
-                <div class="metric-sub">Hyperion 2026 verified</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- DISCORD STATS BAR -->
-    <section class="discord-bar-wrap">
-        <div class="discord-box">
-            <div class="discord-left">
-                <div class="discord-icon-badge">💬</div>
-                <div>
-                    <div class="discord-title">Join our Discord Community</div>
-                    <div class="discord-sub">Real-time script updates, private bypasses, and 24/7 dedicated assistance.</div>
-                </div>
-            </div>
-            <a href="https://discord.gg" target="_blank" class="btn-signin">
-                <span>JOIN DISCORD</span>
-                <span class="arrow-icon">→</span>
-            </a>
-        </div>
-    </section>
-
-    <!-- PRICING SECTION (USD) -->
-    <section class="section" id="pricing">
-        <div class="section-header">
-            <div class="section-tag">COMMERCIAL ACCESS</div>
-            <h2 class="section-heading">Transparent Pricing Plans</h2>
-        </div>
-
-        <div class="pricing-grid">
-            <!-- FREE -->
-            <div class="pricing-card">
-                <div class="plan-name">Free Ad-Gate</div>
-                <div class="plan-price">$0 <span>/ 24 Hours</span></div>
-                <ul class="plan-features">
-                    <li>Violence District access</li>
-                    <li>Sniper Arena access</li>
-                    <li>24-hour renewable key</li>
-                    <li>Anti-Cheat bypass included</li>
-                </ul>
-                <a href="/get-key" class="btn-checkout">Get Free Key →</a>
-            </div>
-
-            <!-- MONTHLY -->
-            <div class="pricing-card featured">
-                <div class="featured-tag">POPULAR</div>
-                <div class="plan-name">Monthly VIP</div>
-                <div class="plan-price">$3.50 <span>/ Month</span></div>
-                <ul class="plan-features">
-                    <li>No checkpoints / No ad links</li>
-                    <li>Automatic 30-day continuous key</li>
-                    <li>Priority bypass updates</li>
-                    <li>Automated Discord delivery</li>
-                    <li>Exclusive VIP Discord role</li>
-                </ul>
-                <button onclick="handlePurchase('monthly')" class="btn-checkout">Purchase Monthly</button>
-            </div>
-
-            <!-- LIFETIME -->
-            <div class="pricing-card">
-                <div class="plan-name">Lifetime Enterprise</div>
-                <div class="plan-price">$9.99 <span>/ Lifetime</span></div>
-                <ul class="plan-features">
-                    <li>Permanent lifetime access</li>
-                    <li>Instant HWID self-reset capability</li>
-                    <li>Immediate access to new updates</li>
-                    <li>Direct priority developer support</li>
-                </ul>
-                <button onclick="handlePurchase('lifetime')" class="btn-checkout">Purchase Lifetime</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ SECTION (EXACT 6 QUESTIONS) -->
-    <section class="section" id="faq">
-        <div class="section-header">
-            <div class="section-tag">HELP & SUPPORT</div>
-            <h2 class="section-heading">Frequently Asked Questions</h2>
-        </div>
-
-        <div class="faq-list">
-            <div class="faq-item open">
-                <div class="faq-header" onclick="toggleFaq(this)">
-                    <div class="faq-question">1. What is Boyfinity?</div>
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-body">
-                    Boyfinity is a premier enterprise-grade Roblox script hub providing undetected, cloud-managed Lua enhancements with built-in hardware identification (HWID) telemetry protection.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-header" onclick="toggleFaq(this)">
-                    <div class="faq-question">2. What platforms are supported?</div>
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-body">
-                    We support both PC and Mobile executors. PC platforms include Wave, Synapse Z, Solara, and Celery. Mobile platforms include Delta, Fluxus, Hydrogen, Codex, and Arceus X on Android/iOS.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-header" onclick="toggleFaq(this)">
-                    <div class="faq-question">3. How do I get a license key?</div>
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-body">
-                    You can claim a free 24-hour key by completing our 3-step checkpoint on the "Get Key" page, or purchase an ad-free Monthly/Lifetime license for instant automated delivery.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-header" onclick="toggleFaq(this)">
-                    <div class="faq-question">4. What payment methods do you accept?</div>
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-body">
-                    We accept Credit/Debit Cards, PayPal, and popular Cryptocurrencies (Bitcoin, Ethereum, USDT, Litecoin) through our automated checkout gateway and Discord ticket system.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-header" onclick="toggleFaq(this)">
-                    <div class="faq-question">5. Do you offer refunds?</div>
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-body">
-                    Due to the digital nature of license keys and instant HWID activation, all purchases are generally final. However, if a script becomes permanently unfixable within 48 hours of purchase, our support team will review your refund eligibility.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-header" onclick="toggleFaq(this)">
-                    <div class="faq-question">6. How do I get support?</div>
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-body">
-                    Join our official Discord community and open a support ticket in the <code>#support</code> channel. Our staff and developer team are available 24/7 to resolve technical issues or HWID reset requests.
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
+    <!-- RICH REVAMPED FOOTER -->
     <footer class="footer">
         <div class="footer-inner">
-            <div class="logo-wrap">
-                <img src="/assets/boyfinity.png" alt="BOYFINITY" style="width:22px; height:22px; border-radius:6px;">
-                <span style="font-size:12px; color:var(--text-secondary)">© 2026 BOYFINITY Script Hub. All rights reserved.</span>
+            <!-- Brand Column -->
+            <div class="footer-brand">
+                <div class="footer-logo-row">
+                    <img src="/assets/boyfinity.png" alt="BOYFINITY" class="footer-logo-img">
+                    <span style="font-size:16px; font-weight:800; letter-spacing:1px; color:#fff;">BOYFINITY</span>
+                </div>
+                <p class="footer-brand-desc">
+                    Elevate your experience with exclusive scripts, only found here.
+                </p>
             </div>
-            <div style="display:flex; gap:18px;">
-                <a href="/scripts" class="nav-link">Scripts</a>
-                <a href="/status" class="nav-link">Status</a>
-                <a href="/get-key" class="nav-link">Get Key</a>
-                <a href="/admin" class="nav-link">Staff Portal</a>
+
+            <!-- Community & Social -->
+            <div class="footer-col">
+                <h4>Community</h4>
+                <ul class="footer-links">
+                    <li><a href="https://discord.gg" target="_blank">Discord Server</a></li>
+                    <li><a href="https://github.com" target="_blank">GitHub Repository</a></li>
+                    <li><a href="/scripts">Supported Scripts</a></li>
+                </ul>
             </div>
+
+            <!-- Legal & Support -->
+            <div class="footer-col">
+                <h4>Legal & Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#faq">Terms of Service</a></li>
+                    <li><a href="#faq">Privacy Policy</a></li>
+                    <li><a href="#faq">FAQ & Support</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Payment Gateway Icons Bar -->
+        <div class="payment-bar">
+            <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">Supported Gateways</span>
+            <div class="payment-methods">
+                <span class="payment-tag">QRIS</span>
+                <span class="payment-tag">GoPay</span>
+                <span class="payment-tag">OVO</span>
+                <span class="payment-tag">DANA</span>
+                <span class="payment-tag">VISA / MC</span>
+                <span class="payment-tag">PayPal</span>
+                <span class="payment-tag">BTC</span>
+                <span class="payment-tag">ETH</span>
+                <span class="payment-tag">USDT</span>
+                <span class="payment-tag">LTC</span>
+            </div>
+        </div>
+
+        <!-- Watermark Bottom Row -->
+        <div class="footer-bottom-row">
+            <span>© 2026 BOYFINITY Script Hub. All rights reserved.</span>
+            <span>made by @boinihboss</span>
         </div>
     </footer>
 
-    <!-- CLOUDFLARE TURNSTILE GATEWAY POPUP -->
-    <div class="turnstile-overlay" id="turnstileGateway">
-        <div class="turnstile-card">
+    <!-- DISCORD LOGIN REQUIRED POPUP -->
+    <div class="modal-overlay" id="authGateModal">
+        <div class="modal-card">
+            <div style="font-size:32px; margin-bottom:12px;">🔒</div>
+            <h3 style="font-size:17px; font-weight:700; margin-bottom:8px; color:var(--text-primary);">Discord Sign In Required</h3>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:22px; line-height:1.6;" id="authGateMessage">
+                Please sign in with your Discord account before accessing free keys or purchasing plans. Your license will be automatically delivered to your Discord.
+            </p>
+            <a href="/api/auth/discord/login" class="btn-signin" style="display:flex; justify-content:center; padding:11px; margin-bottom:10px;">
+                <span>Sign In with Discord</span>
+                <span>→</span>
+            </a>
+            <button onclick="closeAuthGate()" class="btn-ghost" style="width:100%; justify-content:center;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- CLOUDFLARE TURNSTILE OVERLAY -->
+    <div class="modal-overlay" id="turnstileGateway">
+        <div class="modal-card">
             <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">Security Verification</h3>
             <p style="font-size:13px; color:var(--text-secondary); margin-bottom:18px;">Please complete the Cloudflare security verification to access BOYFINITY Hub.</p>
             <div id="turnstileWidget" style="display:flex; justify-content:center; margin-bottom:14px; min-height:65px;"></div>
@@ -939,16 +1080,20 @@
     </div>
 
     <script>
-        // Check persistent Discord Auth Session
+        let LOGGED_IN_USER = null;
+
+        // Session Detection
         async function checkSession() {
             try {
                 const res = await fetch('/api/auth/me');
                 const data = await res.json();
                 if (data.success && data.user) {
+                    LOGGED_IN_USER = data.user;
                     const authArea = document.getElementById('navAuthArea');
+                    const isStaffOrAdmin = data.user.role === 'admin' || data.user.role === 'owner' || data.user.role === 'staff';
                     authArea.innerHTML = `
-                        <a href="/admin" class="btn-signin" style="background:var(--bg-secondary); border-color:var(--border-card);">
-                            <img src="${data.user.avatar || '/assets/boyfinity.png'}" style="width:16px;height:16px;border-radius:50%">
+                        <a href="${isStaffOrAdmin ? '/admin' : '#'}" class="btn-signin" style="background:var(--bg-secondary); border-color:var(--border-card);">
+                            <img src="${data.user.avatar || '/assets/boyfinity.png'}" style="width:16px;height:16px;border-radius:4px">
                             <span>${data.user.username}</span>
                         </a>
                     `;
@@ -963,22 +1108,36 @@
             item.classList.toggle('open');
         }
 
-        // Automated Checkout / Webhook Delivery Mock
-        async function handlePurchase(plan) {
-            const discordTag = prompt("Enter your Discord Username (e.g. jhon_doe) for instant key delivery:", "");
-            if (!discordTag) return;
+        // Gate: Get Free Key
+        function handleGetKeyClick(e) {
+            if (!LOGGED_IN_USER) {
+                if (e) e.preventDefault();
+                document.getElementById('authGateMessage').innerText = "Please sign in with Discord before claiming your free 24-hour key so we can securely tie your session.";
+                document.getElementById('authGateModal').style.display = 'flex';
+                return false;
+            }
+            window.location.href = '/get-key';
+        }
 
-            const email = prompt("Enter your Email address:", `${discordTag}@user.com`);
-            
+        // Gate: Purchase
+        async function handlePurchaseClick(plan) {
+            if (!LOGGED_IN_USER) {
+                document.getElementById('authGateMessage').innerText = "You must be signed in with Discord to purchase a license. Your key will be dispatched directly to your Discord account.";
+                document.getElementById('authGateModal').style.display = 'flex';
+                return;
+            }
+
+            if (!confirm(`Confirm purchase for ${plan.toUpperCase()} plan? Your key will be generated and delivered to your Discord.`)) return;
+
             try {
                 const res = await fetch('/api/checkout/purchase', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan, buyer_discord: discordTag, buyer_email: email })
+                    body: JSON.stringify({ plan, buyer_discord: LOGGED_IN_USER.id })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert(`🎉 SUCCESS! Your ${data.duration.toUpperCase()} license key has been generated:\n\n${data.key}\n\nA copy was automatically sent to your Discord via Webhook!`);
+                    alert(`🎉 SUCCESS! Your ${data.duration.toUpperCase()} license key has been generated:\n\n${data.key}\n\nA copy was automatically delivered to your Discord via Webhook!`);
                 } else {
                     alert("Checkout error: " + (data.error || 'Failed to process key'));
                 }
@@ -987,7 +1146,11 @@
             }
         }
 
-        // Dynamic Cloudflare Turnstile Verification Gateway
+        function closeAuthGate() {
+            document.getElementById('authGateModal').style.display = 'none';
+        }
+
+        // Turnstile Dynamic Render
         window.addEventListener('load', async function() {
             const verified = sessionStorage.getItem('turnstile_passed');
             if (verified) return;
@@ -995,12 +1158,10 @@
             const gateway = document.getElementById('turnstileGateway');
 
             try {
-                // Fetch dynamic sitekey from backend config
                 const res = await fetch('/api/config');
                 const config = await res.json();
                 const siteKey = config.turnstileSiteKey;
 
-                // If no sitekey is configured in Vercel environment, bypass gracefully
                 if (!siteKey || siteKey.trim() === '') {
                     sessionStorage.setItem('turnstile_passed', 'true');
                     return;
@@ -1019,14 +1180,11 @@
                                     gateway.style.display = 'none';
                                 },
                                 'error-callback': function(errorCode) {
-                                    console.warn('[Turnstile Notice]:', errorCode);
-                                    // Gracefully allow access if sitekey has domain mismatch or network block
                                     sessionStorage.setItem('turnstile_passed', 'true');
                                     gateway.style.display = 'none';
                                 }
                             });
                         } catch (err) {
-                            console.warn('[Turnstile Render Err]:', err);
                             sessionStorage.setItem('turnstile_passed', 'true');
                             gateway.style.display = 'none';
                         }
@@ -1036,7 +1194,6 @@
                 }
                 renderWidget();
             } catch (e) {
-                // Network or config error: bypass silently
                 sessionStorage.setItem('turnstile_passed', 'true');
                 gateway.style.display = 'none';
             }

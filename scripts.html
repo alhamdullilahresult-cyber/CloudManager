@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supported Scripts — BOYFINITY Script Hub</title>
+    <title>Scripts — BOYFINITY Script Hub</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -25,29 +25,38 @@
             --tag-green-bg: rgba(34, 197, 94, 0.12);
             --tag-green-text: #4ade80;
             --tag-green-border: rgba(34, 197, 94, 0.25);
-            --radius-card: 10px;
+            --radius-soft: 10px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-wrapper { flex: 1; }
 
         .noise-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.025; z-index: 9999;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* Floating Pill Navbar */
+        /* ── NAVBAR (8-12px SOFT ROUNDED BOX) ── */
         .nav-wrapper {
             position: fixed; top: 18px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; padding: 0 20px;
         }
         .floating-pill {
             display: flex; align-items: center; justify-content: space-between;
-            background: rgba(13, 15, 19, 0.88); backdrop-filter: blur(14px);
-            border: 1px solid var(--border-card); border-radius: 9999px; padding: 8px 10px 8px 22px;
-            width: 100%; max-width: 980px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+            background: rgba(13, 15, 19, 0.92); backdrop-filter: blur(14px);
+            border: 1px solid var(--border-card); border-radius: var(--radius-soft); padding: 10px 14px 10px 20px;
+            width: 100%; max-width: 980px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
         }
         .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-img { width: 30px; height: 30px; border-radius: 8px; object-fit: contain; border: 1px solid var(--border-card); }
+        .logo-img { width: 28px; height: 28px; border-radius: 8px; object-fit: contain; border: 1px solid var(--border-card); }
         .logo-title { font-size: 15px; font-weight: 800; letter-spacing: 1.2px; color: var(--text-primary); }
         .nav-links { display: flex; align-items: center; gap: 24px; }
         .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.15s; }
@@ -55,45 +64,64 @@
 
         .btn-signin {
             display: inline-flex; align-items: center; gap: 8px; background: var(--accent-muted); color: var(--text-primary);
-            font-size: 12px; font-weight: 700; letter-spacing: 0.5px; padding: 8px 16px; border-radius: 9999px; text-decoration: none;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.5px; padding: 8px 16px; border-radius: 8px; text-decoration: none;
             border: 1px solid var(--accent-border); transition: all 0.2s;
         }
         .btn-signin:hover { background: #41305f; border-color: #5d4686; }
 
-        .container { max-width: 1120px; margin: 110px auto 60px; padding: 0 24px; }
+        .container { max-width: 1120px; margin: 100px auto 60px; padding: 0 24px; }
 
-        /* Overview Metrics (Subtle Bordered Cards) */
-        .section-sub-header {
-            display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
-        }
-        .section-sub-header h3 { font-size: 15px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
-
+        /* ── TOP STATS (COMPACT CARDS AT THE VERY TOP) ── */
         .overview-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 30px;
         }
         .metric-card {
             background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
-            padding: 18px 20px; transition: border-color 0.15s;
+            padding: 14px 18px; transition: border-color 0.15s;
         }
         .metric-card:hover { border-color: var(--border-hover); }
-        .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .metric-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+        .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .metric-title { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
         .metric-badge {
             display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;
             padding: 2px 7px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;
         }
         .badge-green { background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border); }
         .badge-purple { background: var(--accent-muted); color: var(--accent-text); border: 1px solid var(--accent-border); }
-        .metric-body { display: flex; align-items: baseline; justify-content: space-between; }
-        .metric-value { font-size: 28px; font-weight: 700; letter-spacing: -0.8px; color: var(--text-primary); }
-        .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .metric-value { font-size: 22px; font-weight: 700; letter-spacing: -0.6px; color: var(--text-primary); }
 
-        /* Page Header */
-        .page-header { text-align: left; margin-bottom: 28px; }
-        .page-title { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 6px; color: var(--text-primary); }
+        /* ── SEARCH & FILTER BAR (SUBTLE BORDERED CARD) ── */
+        .search-card {
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+            padding: 14px 18px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between;
+            gap: 16px; flex-wrap: wrap;
+        }
+        .search-input-wrap {
+            display: flex; align-items: center; gap: 10px; flex: 1; min-width: 260px;
+        }
+        .search-input {
+            width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
+            padding: 9px 14px; color: var(--text-primary); font-size: 13px; outline: none; transition: border-color 0.15s;
+        }
+        .search-input:focus { border-color: var(--accent-border); }
+        .filter-buttons {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .filter-btn {
+            background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
+            color: var(--text-secondary); font-size: 12px; font-weight: 600; padding: 8px 14px; cursor: pointer;
+            transition: all 0.15s;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            color: var(--text-primary); background: var(--bg-card-hover); border-color: var(--border-hover);
+        }
+
+        /* Page Title */
+        .page-header { text-align: left; margin-bottom: 24px; }
+        .page-title { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 4px; color: var(--text-primary); }
         .page-desc { color: var(--text-secondary); font-size: 14px; }
 
-        /* Scripts Grid - STRICTLY 2 GAMES */
+        /* ── GAME CARDS (SUBTLE BORDERED CARDS) ── */
         .games-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
         }
@@ -104,46 +132,165 @@
         .game-card:hover { border-color: var(--border-hover); }
 
         .game-thumb {
-            height: 190px; width: 100%; object-fit: cover; background: #0b0d11; display: block;
+            height: 180px; width: 100%; object-fit: cover; background: #0b0d11; display: block;
             border-bottom: 1px solid var(--border-card);
         }
         .game-content { padding: 22px; flex: 1; display: flex; flex-direction: column; }
-        .game-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .game-status {
+        
+        .game-meta-top {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+        }
+        .badge-status {
             font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
             background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border);
+            display: inline-flex; align-items: center; gap: 5px;
         }
-        .game-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary); }
+        .copy-counter {
+            font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-weight: 600;
+        }
+
+        .game-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
         .game-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; flex: 1; }
 
-        /* Code loader block */
+        /* Loader Code Container */
         .loader-block {
             background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
-            padding: 12px 14px; margin-bottom: 18px;
+            padding: 10px 12px; margin-bottom: 14px;
         }
-        .loader-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+        .loader-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
         .loader-code {
             font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-secondary);
             word-break: break-all; user-select: all; background: none; border: none; width: 100%;
         }
 
-        .btn-copy {
-            width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: var(--bg-secondary); border: 1px solid var(--border-card); color: var(--text-primary);
-            padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+        /* Action Row: Small Copy Button + Status Badge */
+        .card-action-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
         }
-        .btn-copy:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
+        .btn-copy-small {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            background: var(--accent-muted); border: 1px solid var(--accent-border); color: var(--text-primary);
+            padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+        }
+        .btn-copy-small:hover { background: #41305f; border-color: #5d4686; }
 
+        /* ── RICH FOOTER REVAMP ── */
         .footer {
-            border-top: 1px solid var(--border-card); padding: 32px 24px; background: var(--bg-secondary); margin-top: 80px;
+            border-top: 1px solid var(--border-card);
+            padding: 48px 24px 28px;
+            background: var(--bg-secondary);
+            margin-top: auto;
         }
+
         .footer-inner {
-            max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+            max-width: 1120px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 36px;
+            margin-bottom: 36px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-logo-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 0 16px rgba(107, 79, 160, 0.25);
+        }
+
+        .footer-brand-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            max-width: 380px;
+            line-height: 1.6;
+        }
+
+        .footer-col h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 14px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .payment-bar {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .payment-methods {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .payment-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #141720;
+            border: 1px solid var(--border-card);
+            color: var(--text-secondary);
+        }
+
+        .footer-bottom-row {
+            max-width: 1120px;
+            margin: 16px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         @media (max-width: 768px) {
             .games-grid { grid-template-columns: 1fr; }
             .overview-grid { grid-template-columns: 1fr; }
+            .footer-inner { grid-template-columns: 1fr; }
             .nav-links { display: none; }
         }
     </style>
@@ -152,149 +299,216 @@
 
     <div class="noise-overlay"></div>
 
-    <!-- FLOATING PILL NAVBAR -->
-    <div class="nav-wrapper">
-        <header class="floating-pill">
-            <a href="/" class="logo-wrap">
-                <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
-                <span class="logo-title">BOYFINITY</span>
-            </a>
-            <nav class="nav-links">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/scripts" class="nav-link active">Scripts</a>
-                <a href="/status" class="nav-link">Status</a>
-                <a href="/get-key" class="nav-link">Get Key</a>
-                <a href="/#faq" class="nav-link">FAQ</a>
-            </nav>
-            <div id="navAuthArea">
-                <a href="/api/auth/discord/login" class="btn-signin">
-                    <span>SIGN IN</span>
-                    <span>→</span>
+    <div class="main-wrapper">
+        <!-- FLOATING NAVBAR (8-12px SOFT ROUNDED BOX) -->
+        <div class="nav-wrapper">
+            <header class="floating-pill">
+                <a href="/" class="logo-wrap">
+                    <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
+                    <span class="logo-title">BOYFINITY</span>
                 </a>
+                <nav class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/scripts" class="nav-link active">Scripts</a>
+                    <a href="/get-key" class="nav-link">Get Key</a>
+                    <a href="/#pricing" class="nav-link">Pricing</a>
+                    <a href="/#faq" class="nav-link">FAQ</a>
+                </nav>
+                <div id="navAuthArea">
+                    <a href="/api/auth/discord/login" class="btn-signin">
+                        <span>SIGN IN</span>
+                        <span>→</span>
+                    </a>
+                </div>
+            </header>
+        </div>
+
+        <div class="container">
+            <!-- TOP COMPACT METRICS -->
+            <div class="overview-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Supported Games</span>
+                        <span class="metric-badge badge-green">↗ 2</span>
+                    </div>
+                    <div class="metric-value">2</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Detection Status</span>
+                        <span class="metric-badge badge-purple">100%</span>
+                    </div>
+                    <div class="metric-value">UNDETECTED</div>
+                </div>
             </div>
-        </header>
+
+            <div class="page-header">
+                <h1 class="page-title">Scripts</h1>
+                <p class="page-desc">Cloud-hosted script automation suites for supported Roblox experiences.</p>
+            </div>
+
+            <!-- SEARCH & FILTER CARD -->
+            <div class="search-card">
+                <div class="search-input-wrap">
+                    <span>🔍</span>
+                    <input type="text" id="gameSearchInput" class="search-input" placeholder="Search scripts by title or feature..." onkeyup="filterGames()">
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="setFilter('all', this)">All Games</button>
+                    <button class="filter-btn" onclick="setFilter('working', this)">Working</button>
+                </div>
+            </div>
+
+            <!-- STRICTLY 2 GAMES WITH REQUIRED EXACT DESCRIPTIONS -->
+            <div class="games-grid" id="gamesGridContainer">
+                <!-- 1. Violence District -->
+                <div class="game-card" data-title="violence district">
+                    <img src="/assets/violencedistrict.png" alt="Violence District" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
+                    <div class="game-content">
+                        <div class="game-meta-top">
+                            <span class="badge-status">● Working</span>
+                            <span class="copy-counter" id="copyCount-vd">14,820 Copies</span>
+                        </div>
+                        <h2 class="game-title">Violence District</h2>
+                        <p class="game-desc">
+                            Violence District is asymmetrical horror game on Roblox where Killer is faced against 5 Survivors. Killer's main goal is to sacrifice all the survivors. Survivors' main goal is to repair 5 generators and do whatever it takes to escape.
+                        </p>
+
+                        <div class="loader-block">
+                            <div class="loader-label">Quick Loadstring</div>
+                            <input readonly class="loader-code" value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()'>
+                        </div>
+
+                        <div class="card-action-row">
+                            <button class="btn-copy-small" onclick="handleCopy(this, 'vd', 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj&quot;))()')">
+                                <span>Copy</span>
+                            </button>
+                            <span class="badge-status">Working</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Sniper Arena -->
+                <div class="game-card" data-title="sniper arena">
+                    <img src="/assets/sniperarena.png" alt="Sniper Arena" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
+                    <div class="game-content">
+                        <div class="game-meta-top">
+                            <span class="badge-status">● Working</span>
+                            <span class="copy-counter" id="copyCount-sa">9,410 Copies</span>
+                        </div>
+                        <h2 class="game-title">Sniper Arena</h2>
+                        <p class="game-desc">
+                            Sniper Arena - Exciting sniper battles. Play fair. Win with skill. Skins are just cosmetic - no stat boosts, no paying to win. Join ranked matches and beat other players to earn amazing rewards! Cheating will result in a permanent ban. No second chances.
+                        </p>
+
+                        <div class="loader-block">
+                            <div class="loader-label">Quick Loadstring</div>
+                            <input readonly class="loader-code" value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q"))()'>
+                        </div>
+
+                        <div class="card-action-row">
+                            <button class="btn-copy-small" onclick="handleCopy(this, 'sa', 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q&quot;))()')">
+                                <span>Copy</span>
+                            </button>
+                            <span class="badge-status">Working</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="container">
-        <!-- TOP OVERVIEW METRICS (IMAGE REFERENCE STYLE) -->
-        <div class="section-sub-header">
-            <h3>Overview Metrics</h3>
-        </div>
-        <div class="overview-grid">
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Active Script Suites</span>
-                    <span class="metric-badge badge-green">↗ 2</span>
-                </div>
-                <div class="metric-body">
-                    <div class="metric-value">2 Games</div>
-                </div>
-                <div class="metric-sub">Violence District & Sniper Arena</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Total Executions</span>
-                    <span class="metric-badge badge-green">↗ 231</span>
-                </div>
-                <div class="metric-body">
-                    <div class="metric-value">48,290</div>
-                </div>
-                <div class="metric-sub">verified game sessions</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Detection Rate</span>
-                    <span class="metric-badge badge-purple">100%</span>
-                </div>
-                <div class="metric-body">
-                    <div class="metric-value">0 Bans</div>
-                </div>
-                <div class="metric-sub">Hyperion 2026 protection</div>
-            </div>
-        </div>
-
-        <div class="page-header">
-            <h1 class="page-title">Supported Games</h1>
-            <p class="page-desc">Official cloud-hosted script suites for supported Roblox experiences.</p>
-        </div>
-
-        <!-- STRICTLY 2 GAMES -->
-        <div class="games-grid">
-            <!-- 1. Violence District -->
-            <div class="game-card">
-                <img src="/assets/violencedistrict.png" alt="Violence District" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
-                <div class="game-content">
-                    <div class="game-top">
-                        <span class="game-status">● Undetected</span>
-                        <span style="font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono';">v3.4.1</span>
-                    </div>
-                    <h2 class="game-title">Violence District</h2>
-                    <p class="game-desc">
-                        Full-spectrum automation suite featuring Silent Aim, Rage ESP, Kill Aura, Instant Reload, and Auto-Parry module with low telemetry footprint.
-                    </p>
-
-                    <div class="loader-block">
-                        <div class="loader-label">Quick Loadstring (Requires Key)</div>
-                        <input readonly class="loader-code" value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()'>
-                    </div>
-
-                    <button class="btn-copy" onclick="copyLoader(this, 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj&quot;))()')">
-                        <span>Copy Loadstring</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 2. Sniper Arena -->
-            <div class="game-card">
-                <img src="/assets/sniperarena.png" alt="Sniper Arena" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
-                <div class="game-content">
-                    <div class="game-top">
-                        <span class="game-status">● Undetected</span>
-                        <span style="font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono';">v2.1.0</span>
-                    </div>
-                    <h2 class="game-title">Sniper Arena</h2>
-                    <p class="game-desc">
-                        Precision enhancement suite equipped with Velocity Prediction Box, Bone Hitbox Expansion, Bullet Tracer Lines, and Wall-Bang penetration assist.
-                    </p>
-
-                    <div class="loader-block">
-                        <div class="loader-label">Quick Loadstring (Requires Key)</div>
-                        <input readonly class="loader-code" value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q"))()'>
-                    </div>
-
-                    <button class="btn-copy" onclick="copyLoader(this, 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q&quot;))()')">
-                        <span>Copy Loadstring</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- FOOTER -->
+    <!-- RICH FOOTER REVAMP -->
     <footer class="footer">
         <div class="footer-inner">
-            <div class="logo-wrap">
-                <img src="/assets/boyfinity.png" alt="BOYFINITY" style="width:22px; height:22px; border-radius:6px;">
-                <span style="font-size:12px; color:var(--text-secondary)">© 2026 BOYFINITY Script Hub. All rights reserved.</span>
+            <div class="footer-brand">
+                <div class="footer-logo-row">
+                    <img src="/assets/boyfinity.png" alt="BOYFINITY" class="footer-logo-img">
+                    <span style="font-size:16px; font-weight:800; letter-spacing:1px; color:#fff;">BOYFINITY</span>
+                </div>
+                <p class="footer-brand-desc">
+                    Elevate your experience with exclusive scripts, only found here.
+                </p>
             </div>
-            <div style="display:flex; gap:18px;">
-                <a href="/scripts" class="nav-link">Scripts</a>
-                <a href="/status" class="nav-link">Status</a>
-                <a href="/get-key" class="nav-link">Get Key</a>
-                <a href="/admin" class="nav-link">Staff Portal</a>
+
+            <div class="footer-col">
+                <h4>Community</h4>
+                <ul class="footer-links">
+                    <li><a href="https://discord.gg" target="_blank">Discord Server</a></li>
+                    <li><a href="https://github.com" target="_blank">GitHub Repository</a></li>
+                    <li><a href="/scripts">Supported Scripts</a></li>
+                </ul>
             </div>
+
+            <div class="footer-col">
+                <h4>Legal & Support</h4>
+                <ul class="footer-links">
+                    <li><a href="/#faq">Terms of Service</a></li>
+                    <li><a href="/#faq">Privacy Policy</a></li>
+                    <li><a href="/#faq">FAQ & Support</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="payment-bar">
+            <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">Supported Gateways</span>
+            <div class="payment-methods">
+                <span class="payment-tag">QRIS</span>
+                <span class="payment-tag">GoPay</span>
+                <span class="payment-tag">OVO</span>
+                <span class="payment-tag">DANA</span>
+                <span class="payment-tag">VISA / MC</span>
+                <span class="payment-tag">PayPal</span>
+                <span class="payment-tag">BTC</span>
+                <span class="payment-tag">ETH</span>
+                <span class="payment-tag">USDT</span>
+                <span class="payment-tag">LTC</span>
+            </div>
+        </div>
+
+        <div class="footer-bottom-row">
+            <span>© 2026 BOYFINITY Script Hub. All rights reserved.</span>
+            <span>made by @boinihboss</span>
         </div>
     </footer>
 
     <script>
-        function copyLoader(btn, text) {
+        let copyStats = { vd: 14820, sa: 9410 };
+
+        function handleCopy(btn, gameKey, text) {
             navigator.clipboard.writeText(text).then(() => {
                 const original = btn.innerHTML;
-                btn.innerHTML = '<span>✓ Copied to Clipboard</span>';
+                btn.innerHTML = '<span>✓ Copied</span>';
+                
+                // Increment visual counter
+                copyStats[gameKey]++;
+                const counterEl = document.getElementById(`copyCount-${gameKey}`);
+                if (counterEl) counterEl.innerText = `${copyStats[gameKey].toLocaleString()} Copies`;
+
+                fetch('/api/public/games/copy', { method: 'POST' }).catch(() => {});
                 setTimeout(() => btn.innerHTML = original, 2000);
             });
+        }
+
+        function filterGames() {
+            const query = document.getElementById('gameSearchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const text = card.innerText.toLowerCase();
+                if (title.includes(query) || text.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function setFilter(type, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterGames();
         }
 
         async function checkSession() {
@@ -303,9 +517,10 @@
                 const data = await res.json();
                 if (data.success && data.user) {
                     const authArea = document.getElementById('navAuthArea');
+                    const isStaffOrAdmin = data.user.role === 'admin' || data.user.role === 'owner' || data.user.role === 'staff';
                     authArea.innerHTML = `
-                        <a href="/admin" class="btn-signin" style="background:var(--bg-secondary); border-color:var(--border-card);">
-                            <img src="${data.user.avatar || '/assets/boyfinity.png'}" style="width:16px;height:16px;border-radius:50%">
+                        <a href="${isStaffOrAdmin ? '/admin' : '#'}" class="btn-signin" style="background:var(--bg-secondary); border-color:var(--border-card);">
+                            <img src="${data.user.avatar || '/assets/boyfinity.png'}" style="width:16px;height:16px;border-radius:4px">
                             <span>${data.user.username}</span>
                         </a>
                     `;
