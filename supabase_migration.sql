@@ -28,6 +28,24 @@ CREATE TABLE IF NOT EXISTS public.script_history (
     saved_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- ── 3. KEYS & HWID TABLE (KEY SYSTEM) ────────────────────
+CREATE TABLE IF NOT EXISTS public.keys (
+    id            BIGSERIAL   PRIMARY KEY,
+    key           TEXT        NOT NULL UNIQUE,
+    status        TEXT        NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'used', 'revoked', 'expired')),
+    hwid          TEXT        DEFAULT NULL,
+    note          TEXT        DEFAULT '',
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    registered_at TIMESTAMPTZ DEFAULT NULL,
+    last_used     TIMESTAMPTZ DEFAULT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_keys_key    ON public.keys(key);
+CREATE INDEX IF NOT EXISTS idx_keys_hwid   ON public.keys(hwid);
+CREATE INDEX IF NOT EXISTS idx_keys_status ON public.keys(status);
+
+ALTER TABLE public.keys ENABLE ROW LEVEL SECURITY;
+
 -- ── 3. INDEXES ───────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_scripts_active     ON public.scripts(active);
 CREATE INDEX IF NOT EXISTS idx_scripts_updated_at ON public.scripts(updated_at DESC);

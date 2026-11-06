@@ -31,6 +31,19 @@
       "methods": ["POST", "OPTIONS"]
     },
     {
+      "src": "/api/verify",
+      "dest": "/api/verify.js",
+      "methods": ["POST", "OPTIONS"]
+    },
+    {
+      "src": "/api/admin/keys/([^/]+)",
+      "dest": "/api/admin/keys/[id].js"
+    },
+    {
+      "src": "/api/admin/keys",
+      "dest": "/api/admin/keys/index.js"
+    },
+    {
       "src": "/api/admin/scripts/([^/]+)",
       "dest": "/api/admin/scripts/[id].js"
     },

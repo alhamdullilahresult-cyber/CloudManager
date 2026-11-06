@@ -373,6 +373,9 @@
             <div class="nav-item" onclick="showPage('scripts')" id="nav-scripts">
                 <span class="icon">📜</span> Scripts
             </div>
+            <div class="nav-item" onclick="showPage('keys')" id="nav-keys">
+                <span class="icon">🔑</span> Key & HWID
+            </div>
             <div class="nav-item" onclick="showPage('docs')" id="nav-docs">
                 <span class="icon">📖</span> API Docs
             </div>
@@ -470,6 +473,54 @@
                     </thead>
                     <tbody id="scriptsTbody">
                         <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:40px"><span class="spinner"></span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PAGE: KEYS & HWID -->
+        <div class="page" id="page-keys">
+            <div class="stats-grid" style="margin-bottom:20px">
+                <div class="stat-card">
+                    <div class="stat-label">Total Keys</div>
+                    <div class="stat-value" id="stat-key-total">—</div>
+                    <div class="stat-sub">Generated keys</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">Bound HWID</div>
+                    <div class="stat-value" id="stat-key-bound">—</div>
+                    <div class="stat-sub">Active users</div>
+                </div>
+                <div class="stat-card accent">
+                    <div class="stat-label">Unused Keys</div>
+                    <div class="stat-value" id="stat-key-unused">—</div>
+                    <div class="stat-sub">Ready to claim</div>
+                </div>
+            </div>
+
+            <div class="section-header" style="margin-bottom:16px">
+                <div class="section-title">Key Management & HWID Binding</div>
+                <div style="display:flex;gap:10px;align-items:center">
+                    <input type="text" class="search-input" placeholder="🔍 Search key, HWID, note..." id="keySearchInput" oninput="filterKeys()">
+                    <button class="btn btn-primary" onclick="openKeyModal()">+ Generate Key</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="scripts-table">
+                    <thead>
+                        <tr>
+                            <th>Key (BOY∞-XXXX)</th>
+                            <th>Status</th>
+                            <th>Bound HWID</th>
+                            <th>Note / User</th>
+                            <th>Created</th>
+                            <th>Last Used</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keysTbody">
+                        <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px"><span class="spinner"></span></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -604,6 +655,37 @@ end</pre>
     </div>
 </div>
 
+<!-- ═══ KEY GENERATE MODAL ═══ -->
+<div class="modal-overlay" id="keyModal">
+    <div class="modal" style="max-width:500px">
+        <div class="modal-header">
+            <div class="modal-title">Generate New Key</div>
+            <button class="modal-close" onclick="closeKeyModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Key Format</label>
+                <input type="text" class="form-input" value="BOY∞-XXXX-XXXX-XXXX (Auto)" readonly style="opacity:0.7">
+                <div class="form-hint">Format otomatis sesuai standar sistem Boyfinity.</div>
+            </div>
+            <div class="form-group">
+                <label>Note / User Label (Opsional)</label>
+                <input type="text" class="form-input" id="keyNote" placeholder="Contoh: VIP Member - Jhon">
+            </div>
+            <div class="form-group">
+                <label>Jumlah Key</label>
+                <input type="number" class="form-input" id="keyCount" value="1" min="1" max="20">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeKeyModal()">Batal</button>
+            <button class="btn btn-primary" id="btnGenKey" onclick="generateKeySubmit()">
+                <span>🔑</span> Buat Key
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- ═══ CONFIRM DELETE MODAL ═══ -->
 <div class="modal-overlay" id="confirmModal">
     <div class="confirm-modal">
@@ -661,6 +743,7 @@ function apiFetch(url, opts = {}) {
 const pages = {
     dashboard: { title: 'Dashboard', subtitle: 'Overview of your Script Management Platform' },
     scripts:   { title: 'Scripts', subtitle: 'Manage all Lua scripts' },
+    keys:      { title: 'Key & HWID Management', subtitle: 'Manage access keys, user HWIDs, and resets' },
     docs:      { title: 'API Docs', subtitle: 'Public endpoint reference and compatibility guide' }
 };
 
@@ -674,6 +757,7 @@ function showPage(name) {
 
     if (name === 'dashboard') loadDashboard();
     if (name === 'scripts') loadScripts();
+    if (name === 'keys') loadKeys();
     if (name === 'docs') {
         document.getElementById('docsBaseUrl').textContent = window.location.origin + '/api/scripts/{id}';
     }
@@ -1026,6 +1110,164 @@ async function executeDelete() {
         btn.disabled = false;
         btn.textContent = 'Yes, Delete';
     }
+}
+
+// ═══════════════════════════════════════════════
+// KEYS & HWID MANAGEMENT
+// ═══════════════════════════════════════════════
+let allKeys = [];
+
+async function loadKeys() {
+    document.getElementById('keysTbody').innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px"><span class="spinner"></span></td></tr>`;
+    try {
+        const res = await apiFetch('/api/admin/keys');
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        allKeys = data.keys || [];
+        renderKeys(allKeys);
+        updateKeyStats(allKeys);
+    } catch (err) {
+        toast('Gagal memuat daftar Key: ' + err.message, 'error');
+    }
+}
+
+function updateKeyStats(keys) {
+    const total = keys.length;
+    const bound = keys.filter(k => k.hwid).length;
+    const unused = keys.filter(k => !k.hwid && k.status === 'active').length;
+
+    document.getElementById('stat-key-total').textContent = total;
+    document.getElementById('stat-key-bound').textContent = bound;
+    document.getElementById('stat-key-unused').textContent = unused;
+}
+
+function renderKeys(keys) {
+    const tbody = document.getElementById('keysTbody');
+    if (keys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">🔑</div><h3>Belum ada Key</h3><p>Klik tombol "+ Generate Key" untuk membuat key baru.</p></div></td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = keys.map(k => {
+        let statusBadge = '<span class="badge badge-active">● Active</span>';
+        if (k.status === 'used') {
+            statusBadge = '<span class="badge" style="background:rgba(59,130,246,0.15);color:#93c5fd;border:1px solid rgba(59,130,246,0.3)">🔒 Bound</span>';
+        } else if (k.status === 'revoked') {
+            statusBadge = '<span class="badge badge-inactive">✖ Revoked</span>';
+        }
+
+        const hwidDisplay = k.hwid 
+            ? `<span style="font-family:monospace;font-size:11px;color:#cbd5e1;background:var(--surface2);padding:2px 6px;border-radius:4px" title="${escHtml(k.hwid)}">${escHtml(k.hwid.slice(0, 16))}...</span>`
+            : `<span style="color:var(--text3);font-size:12px">Belum Terikat</span>`;
+
+        return `
+            <tr>
+                <td>
+                    <div style="font-family:monospace;font-weight:700;color:#c084fc;font-size:13px;display:flex;align-items:center;gap:6px">
+                        ${escHtml(k.key)}
+                        <button class="btn btn-sm" style="padding:2px 6px;font-size:10px" onclick="copyText('${k.key}', 'Key disalin!')">📋</button>
+                    </div>
+                </td>
+                <td>${statusBadge}</td>
+                <td>${hwidDisplay}</td>
+                <td style="color:var(--text2);font-size:12px">${escHtml(k.note || '—')}</td>
+                <td style="color:var(--text3);font-size:12px">${new Date(k.created_at).toLocaleDateString()}</td>
+                <td style="color:var(--text3);font-size:12px">${k.last_used ? new Date(k.last_used).toLocaleDateString() : '—'}</td>
+                <td>
+                    <div class="action-btns">
+                        ${k.hwid ? `<button class="btn btn-sm btn-warning" style="background:rgba(245,158,11,0.1);color:#fcd34d;border-color:rgba(245,158,11,0.3)" onclick="resetKeyHwid('${k.id || k.key}')">🔄 Reset HWID</button>` : ''}
+                        <button class="btn btn-sm btn-danger" onclick="deleteKey('${k.id || k.key}')">🗑 Hapus</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function filterKeys() {
+    const q = document.getElementById('keySearchInput').value.toLowerCase();
+    if (!q) { renderKeys(allKeys); return; }
+    renderKeys(allKeys.filter(k => 
+        k.key.toLowerCase().includes(q) ||
+        (k.hwid || '').toLowerCase().includes(q) ||
+        (k.note || '').toLowerCase().includes(q)
+    ));
+}
+
+function openKeyModal() {
+    document.getElementById('keyNote').value = '';
+    document.getElementById('keyCount').value = 1;
+    document.getElementById('keyModal').classList.add('open');
+}
+
+function closeKeyModal() {
+    document.getElementById('keyModal').classList.remove('open');
+}
+
+async function generateKeySubmit() {
+    const note = document.getElementById('keyNote').value.trim();
+    const count = parseInt(document.getElementById('keyCount').value, 10) || 1;
+    const btn = document.getElementById('btnGenKey');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Membuat...';
+
+    try {
+        const res = await apiFetch('/api/admin/keys', {
+            method: 'POST',
+            body: JSON.stringify({ note, count })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        toast(`✅ Berhasil membuat ${data.keys.length} Key baru!`, 'success');
+        closeKeyModal();
+        loadKeys();
+    } catch (err) {
+        toast('Gagal generate key: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🔑</span> Buat Key';
+    }
+}
+
+async function resetKeyHwid(idOrKey) {
+    if (!confirm('Yakin ingin mereset HWID key ini? User akan bisa mengikat perangkat baru.')) return;
+    try {
+        const res = await apiFetch(`/api/admin/keys/${encodeURIComponent(idOrKey)}`, {
+            method: 'PUT',
+            body: JSON.stringify({ action: 'reset_hwid' })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        toast('🔄 HWID berhasil di-reset!', 'success');
+        loadKeys();
+    } catch (err) {
+        toast('Gagal reset HWID: ' + err.message, 'error');
+    }
+}
+
+async function deleteKey(idOrKey) {
+    if (!confirm('Yakin ingin menghapus key ini secara permanen?')) return;
+    try {
+        const res = await apiFetch(`/api/admin/keys/${encodeURIComponent(idOrKey)}`, {
+            method: 'DELETE'
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        toast('🗑 Key berhasil dihapus!', 'success');
+        loadKeys();
+    } catch (err) {
+        toast('Gagal menghapus key: ' + err.message, 'error');
+    }
+}
+
+function copyText(str, successMsg = 'Teks disalin!') {
+    navigator.clipboard.writeText(str);
+    toast('📋 ' + successMsg, 'success');
 }
 
 // ═══════════════════════════════════════════════
