@@ -168,6 +168,8 @@
             align-items: center;
             gap: 40px;
             min-height: 72vh;
+            position: relative;
+            overflow: hidden;
         }
 
         .hero-left {
@@ -314,7 +316,7 @@
             margin-left: 4px;
         }
 
-        /* ── HERO RIGHT — HALFTONE ANIMATION ── */
+        /* ── HERO RIGHT — SVG LOGO EMBLEM ── */
         .hero-right {
             display: flex;
             justify-content: flex-end;
@@ -322,58 +324,60 @@
             position: relative;
         }
 
-        .hero-halftone-wrap {
+        /* Halftone WebP as full-hero ambient background texture */
+        .hero-halftone-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/assets/HalftoneAnimation.webp');
+            background-size: cover;
+            background-position: center right;
+            background-repeat: no-repeat;
+            opacity: 0.07;
+            mix-blend-mode: screen;
+            filter: hue-rotate(258deg) saturate(0.6) brightness(0.9);
+            pointer-events: none;
+            z-index: 0;
+            border-radius: inherit;
+        }
+
+        /* SVG Emblem wrap */
+        .hero-emblem-wrap {
             position: relative;
-            width: 440px;
-            height: 440px;
+            z-index: 1;
+            width: 400px;
+            height: 400px;
             max-width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-shrink: 0;
+            animation: emblemFloat 6s ease-in-out infinite;
         }
 
-        /* Soft radial glow behind the halftone */
-        .hero-halftone-wrap::before {
+        @keyframes emblemFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50%       { transform: translateY(-14px) scale(1.018); }
+        }
+
+        /* Outer glow ring */
+        .hero-emblem-wrap::before {
             content: '';
             position: absolute;
-            inset: 0;
+            inset: -20px;
             border-radius: 50%;
             background: radial-gradient(ellipse at center,
-                rgba(52, 38, 77, 0.55) 0%,
-                rgba(77, 57, 112, 0.18) 55%,
+                rgba(77, 57, 112, 0.30) 0%,
+                rgba(52, 38, 77, 0.12) 55%,
                 transparent 80%);
             pointer-events: none;
-            z-index: 0;
-            animation: halftoneGlow 6s ease-in-out infinite;
+            animation: glowPulse 4s ease-in-out infinite;
         }
 
-        @keyframes halftoneGlow {
-            0%, 100% { opacity: 0.75; transform: scale(1); }
-            50%       { opacity: 1;    transform: scale(1.06); }
-        }
-
-        .hero-halftone-img {
-            position: relative;
-            z-index: 1;
-            width: 420px;
-            height: 420px;
-            max-width: 100%;
-            object-fit: contain;
-            display: block;
-            /* Blend into dark bg and shift palette toward purple */
-            mix-blend-mode: screen;
-            filter: hue-rotate(258deg) saturate(0.75) brightness(0.72);
-            animation: halftoneFloat 6s ease-in-out infinite;
-            transform-origin: center center;
-            will-change: transform;
-            transition: transform 0.08s linear;
-        }
-
-        @keyframes halftoneFloat {
-            0%,  100% { transform: translateY(0px)   rotate(0deg)    scale(1);     }
-            33%        { transform: translateY(-10px)  rotate(0.6deg)  scale(1.012); }
-            66%        { transform: translateY(-5px)   rotate(-0.4deg) scale(1.006); }
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50%       { opacity: 1;   transform: scale(1.08); }
         }
 
         /* ── METRICS SECTION (NOW 3 CARDS, HIGH AIRY MARGIN-TOP, ALIGNED 1120px) ── */
@@ -827,12 +831,7 @@
                 justify-content: center;
             }
 
-            .hero-halftone-wrap {
-                width: 280px;
-                height: 280px;
-            }
-
-            .hero-halftone-img {
+            .hero-emblem-wrap {
                 width: 260px;
                 height: 260px;
             }
@@ -923,10 +922,116 @@
                 </a>
             </div>
 
-            <!-- 6. Halftone Animation — Right Hero Visual -->
+            <!-- Halftone WebP — full-hero ambient background texture -->
+            <div class="hero-halftone-bg" aria-hidden="true"></div>
+
+            <!-- 6. Right: Custom SVG Emblem — clean, animated, no broken image -->
             <div class="hero-right">
-                <div class="hero-halftone-wrap" id="halftoneWrap">
-                    <img src="/assets/HalftoneAnimation.webp" alt="" class="hero-halftone-img" id="halftoneImg" loading="eager" draggable="false">
+                <div class="hero-emblem-wrap" id="heroEmblem">
+                    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" width="380" height="380" aria-hidden="true">
+                        <defs>
+                            <!-- Main purple radial -->
+                            <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%"   stop-color="#2A1D40" stop-opacity="0.9"/>
+                                <stop offset="100%" stop-color="#08090B" stop-opacity="0"/>
+                            </radialGradient>
+                            <!-- Accent ring gradient -->
+                            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%"   stop-color="#6B4FA0"/>
+                                <stop offset="50%"  stop-color="#34264D"/>
+                                <stop offset="100%" stop-color="#9B77D4"/>
+                            </linearGradient>
+                            <!-- Inner glow -->
+                            <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%"   stop-color="#D2C4ED" stop-opacity="0.95"/>
+                                <stop offset="40%"  stop-color="#9B77D4" stop-opacity="0.6"/>
+                                <stop offset="100%" stop-color="#34264D" stop-opacity="0"/>
+                            </radialGradient>
+                            <filter id="blur1" x="-30%" y="-30%" width="160%" height="160%">
+                                <feGaussianBlur stdDeviation="8"/>
+                            </filter>
+                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="3" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Ambient bg circle -->
+                        <circle cx="200" cy="200" r="180" fill="url(#bgGrad)"/>
+
+                        <!-- Outer dashed orbit ring -->
+                        <circle cx="200" cy="200" r="165" fill="none"
+                            stroke="#4D3970" stroke-width="1" stroke-dasharray="6 10" opacity="0.5">
+                            <animateTransform attributeName="transform" type="rotate"
+                                from="0 200 200" to="360 200 200" dur="30s" repeatCount="indefinite"/>
+                        </circle>
+
+                        <!-- Mid solid ring -->
+                        <circle cx="200" cy="200" r="140" fill="none"
+                            stroke="url(#ringGrad)" stroke-width="1.5" opacity="0.7"/>
+
+                        <!-- Inner ring with dash -->
+                        <circle cx="200" cy="200" r="110" fill="none"
+                            stroke="#6B4FA0" stroke-width="1" stroke-dasharray="3 7" opacity="0.4">
+                            <animateTransform attributeName="transform" type="rotate"
+                                from="360 200 200" to="0 200 200" dur="20s" repeatCount="indefinite"/>
+                        </circle>
+
+                        <!-- Dot nodes on outer orbit -->
+                        <g opacity="0.8">
+                            <circle cx="365" cy="200" r="4" fill="#9B77D4">
+                                <animateTransform attributeName="transform" type="rotate"
+                                    from="0 200 200" to="360 200 200" dur="30s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="35"  cy="200" r="3" fill="#6B4FA0">
+                                <animateTransform attributeName="transform" type="rotate"
+                                    from="180 200 200" to="540 200 200" dur="30s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="200" cy="35"  r="4" fill="#D2C4ED">
+                                <animateTransform attributeName="transform" type="rotate"
+                                    from="90 200 200" to="450 200 200" dur="30s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="200" cy="365" r="3" fill="#9B77D4">
+                                <animateTransform attributeName="transform" type="rotate"
+                                    from="270 200 200" to="630 200 200" dur="30s" repeatCount="indefinite"/>
+                            </circle>
+                        </g>
+
+                        <!-- Core glow blob -->
+                        <circle cx="200" cy="200" r="68" fill="url(#coreGrad)" filter="url(#blur1)" opacity="0.55">
+                            <animate attributeName="r" values="68;74;68" dur="4s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.55;0.75;0.55" dur="4s" repeatCount="indefinite"/>
+                        </circle>
+
+                        <!-- Letter B — BOYFINITY mark -->
+                        <text x="200" y="222" text-anchor="middle" dominant-baseline="middle"
+                            font-family="'Plus Jakarta Sans', system-ui, sans-serif"
+                            font-weight="900" font-size="96" fill="#F1F1F3"
+                            filter="url(#glow)" opacity="0.95">B</text>
+
+                        <!-- Subtle dot grid texture (halftone feel) -->
+                        <g opacity="0.12" fill="#9B77D4">
+                            <circle cx="145" cy="145" r="2"/><circle cx="165" cy="145" r="2"/>
+                            <circle cx="185" cy="145" r="2"/><circle cx="205" cy="145" r="2"/>
+                            <circle cx="225" cy="145" r="2"/><circle cx="245" cy="145" r="2"/>
+                            <circle cx="145" cy="165" r="2"/><circle cx="245" cy="165" r="2"/>
+                            <circle cx="145" cy="255" r="2"/><circle cx="165" cy="255" r="2"/>
+                            <circle cx="185" cy="255" r="2"/><circle cx="205" cy="255" r="2"/>
+                            <circle cx="225" cy="255" r="2"/><circle cx="245" cy="255" r="2"/>
+                        </g>
+
+                        <!-- Brand label -->
+                        <text x="200" y="296" text-anchor="middle"
+                            font-family="'Plus Jakarta Sans', system-ui, sans-serif"
+                            font-weight="700" font-size="13" fill="#9B77D4"
+                            letter-spacing="5" opacity="0.7">BOYFINITY</text>
+
+                        <!-- Corner tick marks -->
+                        <line x1="82"  y1="200" x2="90"  y2="200" stroke="#4D3970" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="310" y1="200" x2="318" y2="200" stroke="#4D3970" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="200" y1="82"  x2="200" y2="90"  stroke="#4D3970" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="200" y1="310" x2="200" y2="318" stroke="#4D3970" stroke-width="1.5" opacity="0.6"/>
+                    </svg>
                 </div>
             </div>
         </main>
@@ -1319,43 +1424,39 @@
         });
     </script>
 
-    <!-- ── HALFTONE PARALLAX — Interactive mouse-tracking effect ── -->
+    <!-- ── EMBLEM PARALLAX — Smooth mouse-tracking on hero SVG ── -->
     <script>
         (function () {
-            const hero = document.querySelector('.hero');
-            const img  = document.getElementById('halftoneImg');
-            if (!hero || !img) return;
+            const hero   = document.querySelector('.hero');
+            const emblem = document.getElementById('heroEmblem');
+            if (!hero || !emblem) return;
 
-            let rafId = null;
             let targetX = 0, targetY = 0;
             let currentX = 0, currentY = 0;
-            const STRENGTH = 14;   // max px shift
-            const LERP     = 0.07; // smoothing (lower = smoother)
+            const STRENGTH = 10;
+            const LERP     = 0.06;
 
             function lerp(a, b, t) { return a + (b - a) * t; }
 
-            function tick() {
+            (function tick() {
                 currentX = lerp(currentX, targetX, LERP);
                 currentY = lerp(currentY, targetY, LERP);
-                img.style.transform = `translate(${currentX.toFixed(2)}px, ${currentY.toFixed(2)}px)`;
-                rafId = requestAnimationFrame(tick);
-            }
+                emblem.style.transform = `translate(${currentX.toFixed(2)}px, ${currentY.toFixed(2)}px)`;
+                requestAnimationFrame(tick);
+            })();
 
             hero.addEventListener('mousemove', function (e) {
                 const rect = hero.getBoundingClientRect();
-                const nx = (e.clientX - rect.left)  / rect.width  - 0.5;  // -0.5 .. 0.5
+                const nx = (e.clientX - rect.left)  / rect.width  - 0.5;
                 const ny = (e.clientY - rect.top)   / rect.height - 0.5;
-                targetX =  nx * STRENGTH;
-                targetY =  ny * STRENGTH;
+                targetX = nx * STRENGTH;
+                targetY = ny * STRENGTH;
             });
 
             hero.addEventListener('mouseleave', function () {
                 targetX = 0;
                 targetY = 0;
             });
-
-            /* Start the smooth loop once */
-            rafId = requestAnimationFrame(tick);
         })();
     </script>
 </body>
