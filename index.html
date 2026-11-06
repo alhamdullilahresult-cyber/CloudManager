@@ -314,7 +314,7 @@
             margin-left: 4px;
         }
 
-        /* Hero Logo (Clean, Balanced & Perfectly Sized) */
+        /* ── HERO RIGHT — HALFTONE ANIMATION ── */
         .hero-right {
             display: flex;
             justify-content: flex-end;
@@ -322,26 +322,58 @@
             position: relative;
         }
 
-        .hero-clean-logo {
-            width: 380px;
-            height: 380px;
+        .hero-halftone-wrap {
+            position: relative;
+            width: 440px;
+            height: 440px;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* Soft radial glow behind the halftone */
+        .hero-halftone-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center,
+                rgba(52, 38, 77, 0.55) 0%,
+                rgba(77, 57, 112, 0.18) 55%,
+                transparent 80%);
+            pointer-events: none;
+            z-index: 0;
+            animation: halftoneGlow 6s ease-in-out infinite;
+        }
+
+        @keyframes halftoneGlow {
+            0%, 100% { opacity: 0.75; transform: scale(1); }
+            50%       { opacity: 1;    transform: scale(1.06); }
+        }
+
+        .hero-halftone-img {
+            position: relative;
+            z-index: 1;
+            width: 420px;
+            height: 420px;
             max-width: 100%;
             object-fit: contain;
             display: block;
-            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 30px rgba(107, 79, 160, 0.28));
-            animation: cleanLogoFloat 5s ease-in-out infinite;
+            /* Blend into dark bg and shift palette toward purple */
+            mix-blend-mode: screen;
+            filter: hue-rotate(258deg) saturate(0.75) brightness(0.72);
+            animation: halftoneFloat 6s ease-in-out infinite;
+            transform-origin: center center;
+            will-change: transform;
+            transition: transform 0.08s linear;
         }
 
-        @keyframes cleanLogoFloat {
-
-            0%,
-            100% {
-                transform: translateY(0px) scale(1);
-            }
-
-            50% {
-                transform: translateY(-12px) scale(1.02);
-            }
+        @keyframes halftoneFloat {
+            0%,  100% { transform: translateY(0px)   rotate(0deg)    scale(1);     }
+            33%        { transform: translateY(-10px)  rotate(0.6deg)  scale(1.012); }
+            66%        { transform: translateY(-5px)   rotate(-0.4deg) scale(1.006); }
         }
 
         /* ── METRICS SECTION (NOW 3 CARDS, HIGH AIRY MARGIN-TOP, ALIGNED 1120px) ── */
@@ -795,9 +827,14 @@
                 justify-content: center;
             }
 
-            .hero-clean-logo {
+            .hero-halftone-wrap {
                 width: 280px;
                 height: 280px;
+            }
+
+            .hero-halftone-img {
+                width: 260px;
+                height: 260px;
             }
 
             .metrics-grid-3 {
@@ -886,9 +923,11 @@
                 </a>
             </div>
 
-            <!-- 6. Logo on the Right: Clean, Beautifully Scaled & Aligned -->
+            <!-- 6. Halftone Animation — Right Hero Visual -->
             <div class="hero-right">
-                <img src="/assets/boyfinity.png" alt="BOYFINITY Emblem" class="hero-clean-logo">
+                <div class="hero-halftone-wrap" id="halftoneWrap">
+                    <img src="/assets/HalftoneAnimation.webp" alt="" class="hero-halftone-img" id="halftoneImg" loading="eager" draggable="false">
+                </div>
             </div>
         </main>
 
@@ -1278,6 +1317,46 @@
                 gateway.style.display = 'none';
             }
         });
+    </script>
+
+    <!-- ── HALFTONE PARALLAX — Interactive mouse-tracking effect ── -->
+    <script>
+        (function () {
+            const hero = document.querySelector('.hero');
+            const img  = document.getElementById('halftoneImg');
+            if (!hero || !img) return;
+
+            let rafId = null;
+            let targetX = 0, targetY = 0;
+            let currentX = 0, currentY = 0;
+            const STRENGTH = 14;   // max px shift
+            const LERP     = 0.07; // smoothing (lower = smoother)
+
+            function lerp(a, b, t) { return a + (b - a) * t; }
+
+            function tick() {
+                currentX = lerp(currentX, targetX, LERP);
+                currentY = lerp(currentY, targetY, LERP);
+                img.style.transform = `translate(${currentX.toFixed(2)}px, ${currentY.toFixed(2)}px)`;
+                rafId = requestAnimationFrame(tick);
+            }
+
+            hero.addEventListener('mousemove', function (e) {
+                const rect = hero.getBoundingClientRect();
+                const nx = (e.clientX - rect.left)  / rect.width  - 0.5;  // -0.5 .. 0.5
+                const ny = (e.clientY - rect.top)   / rect.height - 0.5;
+                targetX =  nx * STRENGTH;
+                targetY =  ny * STRENGTH;
+            });
+
+            hero.addEventListener('mouseleave', function () {
+                targetX = 0;
+                targetY = 0;
+            });
+
+            /* Start the smooth loop once */
+            rafId = requestAnimationFrame(tick);
+        })();
     </script>
 </body>
 
