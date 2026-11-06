@@ -28,13 +28,27 @@ export default async function handler(req, res) {
     // CORS - allow any origin (needed for game:HttpGet in Roblox)
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, User-Agent');
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
     if (req.method === 'OPTIONS') return res.status(204).end();
     if (req.method !== 'GET') {
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         return res.status(405).send('-- Error: Method not allowed');
+    }
+
+    // Block standard web browsers from viewing raw script source
+    const userAgent = (req.headers['user-agent'] || '').toLowerCase();
+    const secFetchDest = req.headers['sec-fetch-dest'] || '';
+    const secFetchMode = req.headers['sec-fetch-mode'] || '';
+    const acceptHeader = (req.headers['accept'] || '').toLowerCase();
+
+    const isBrowserNavigation = secFetchMode === 'navigate' || secFetchDest === 'document' || acceptHeader.includes('text/html');
+    const isCommonBrowser = /mozilla\/|chrome\/|safari\/|edg\/|opera\//i.test(userAgent) && !/roblox/i.test(userAgent);
+
+    if (isBrowserNavigation || isCommonBrowser) {
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        return res.status(404).send('404 Not Found: Anda tidak diizinkan mengakses endpoint ini.');
     }
 
     // Rate limiting
