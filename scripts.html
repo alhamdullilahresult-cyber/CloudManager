@@ -90,14 +90,21 @@
         .badge-purple { background: var(--accent-muted); color: var(--accent-text); border: 1px solid var(--accent-border); }
         .metric-value { font-size: 22px; font-weight: 700; letter-spacing: -0.6px; color: var(--text-primary); }
 
-        /* ── SEARCH & FILTER BAR (SUBTLE BORDERED CARD) ── */
+        /* ── SEARCH & FILTER BAR (SUBTLE BORDERED CARD WITH SLEEK SVG ICON) ── */
         .search-card {
             background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
             padding: 14px 18px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between;
             gap: 16px; flex-wrap: wrap;
         }
         .search-input-wrap {
-            display: flex; align-items: center; gap: 10px; flex: 1; min-width: 260px;
+            display: flex; align-items: center; gap: 12px; flex: 1; min-width: 260px;
+        }
+        .search-svg-icon {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         .search-input {
             width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
@@ -348,11 +355,16 @@
                 <p class="page-desc">Cloud-hosted script automation suites for supported Roblox experiences.</p>
             </div>
 
-            <!-- SEARCH & FILTER CARD -->
+            <!-- SEARCH & FILTER CARD (MODERN SVG SEARCH ICON) -->
             <div class="search-card">
                 <div class="search-input-wrap">
-                    <span>🔍</span>
-                    <input type="text" id="gameSearchInput" class="search-input" placeholder="Search scripts by title or feature..." onkeyup="filterGames()">
+                    <span class="search-svg-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </span>
+                    <input type="text" id="gameSearchInput" class="search-input" placeholder="Search scripts by title or keyword..." onkeyup="filterGames()">
                 </div>
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="setFilter('all', this)">All Games</button>
@@ -481,7 +493,6 @@
                 const original = btn.innerHTML;
                 btn.innerHTML = '<span>✓ Copied</span>';
                 
-                // Increment visual counter
                 copyStats[gameKey]++;
                 const counterEl = document.getElementById(`copyCount-${gameKey}`);
                 if (counterEl) counterEl.innerText = `${copyStats[gameKey].toLocaleString()} Copies`;
