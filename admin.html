@@ -5,145 +5,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Management Portal — BOYFINITY Script Hub</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/lua/lua.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
         :root {
-            --bg: #06050a;
-            --surface: #0d0b14;
-            --surface2: #141021;
-            --border: #1e192c;
-            --border2: #32254d;
-            --accent: #9333ea;
-            --accent2: #4f46e5;
-            --text: #f1edfa;
-            --text2: #a78bfa;
-            --text3: #6b5f8a;
-            --success: #22c55e;
-            --error: #ef4444;
-            --warning: #f59e0b;
+            --bg-main: #08090B;
+            --bg-secondary: #0D0F13;
+            --bg-card: #111318;
+            --bg-card-hover: #15181F;
+            --border-card: #252832;
+            --border-hover: #353945;
+            --text-primary: #F1F1F3;
+            --text-secondary: #858995;
+            --text-muted: #565A66;
+            --accent-muted: #34264D;
+            --accent-border: #4D3970;
+            --accent-tag: #6B4FA0;
+            --accent-text: #D2C4ED;
+            --tag-green-bg: rgba(34, 197, 94, 0.12);
+            --tag-green-text: #4ade80;
+            --tag-green-border: rgba(34, 197, 94, 0.25);
+            --radius-card: 10px;
         }
 
-        body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg-main); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
         .layout { display: flex; flex: 1; overflow: hidden; height: 100vh; }
 
         /* Sidebar */
         .sidebar {
-            width: 240px; background: var(--surface); border-right: 1px solid var(--border);
+            width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-card);
             display: flex; flex-direction: column; flex-shrink: 0;
         }
         .sidebar-logo {
-            padding: 24px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;
+            padding: 20px 18px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; gap: 10px;
         }
-        .logo-img { width: 34px; height: 34px; border-radius: 8px; }
-        .logo-text h2 { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: 1px; }
-        .logo-text p { font-size: 11px; color: var(--text3); }
+        .logo-img { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-card); }
+        .logo-text h2 { font-size: 14px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.8px; }
+        .logo-text p { font-size: 11px; color: var(--text-muted); }
 
         .nav { flex: 1; padding: 14px 10px; }
         .nav-item {
-            display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px;
-            font-size: 13px; font-weight: 600; color: var(--text3); cursor: pointer; transition: all 0.15s; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px;
+            font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; margin-bottom: 4px;
         }
-        .nav-item:hover { background: var(--surface2); color: var(--text2); }
-        .nav-item.active { background: rgba(147, 51, 234, 0.15); color: #fff; border: 1px solid rgba(147, 51, 234, 0.3); }
+        .nav-item:hover { background: var(--bg-card); color: var(--text-primary); }
+        .nav-item.active { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-card); }
 
         .sidebar-user {
-            padding: 16px; border-top: 1px solid var(--border); background: #08070d;
+            padding: 16px; border-top: 1px solid var(--border-card); background: var(--bg-main);
         }
         .user-pill {
             display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
         }
-        .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
-        .user-name { font-size: 12px; font-weight: 700; color: #fff; line-height: 1.2; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-card); }
+        .user-name { font-size: 12px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
         .user-role-badge {
             display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px;
-            background: rgba(147, 51, 234, 0.2); color: var(--text2); text-transform: uppercase;
+            background: var(--accent-muted); color: var(--accent-text); border: 1px solid var(--accent-border); text-transform: uppercase;
         }
 
         .btn-logout {
-            width: 100%; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);
+            width: 100%; background: #1c1317; border: 1px solid #3b2229;
             color: #fca5a5; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
         }
 
         /* Main Content */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .topbar {
-            background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 28px;
+            background: var(--bg-secondary); border-bottom: 1px solid var(--border-card); padding: 14px 28px;
             display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
         }
-        .topbar h1 { font-size: 18px; font-weight: 800; }
-        .topbar p { font-size: 12px; color: var(--text3); }
+        .topbar h1 { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .topbar p { font-size: 12px; color: var(--text-secondary); }
 
         /* Pages */
-        .page { display: none; flex: 1; overflow-y: auto; padding: 28px; }
+        .page { display: none; flex: 1; overflow-y: auto; padding: 24px 28px; }
         .page.active { display: block; }
 
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
-        .stat-card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px;
+        /* Overview Metrics Header & Grid (Reference Image Style) */
+        .overview-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; letter-spacing: -0.3px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+        .metric-card {
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+            padding: 16px 18px; transition: border-color 0.15s;
         }
-        .stat-label { font-size: 11px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-        .stat-value { font-size: 32px; font-weight: 800; color: #fff; line-height: 1; }
-        .stat-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
+        .metric-card:hover { border-color: var(--border-hover); }
+        .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .metric-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+        .metric-badge {
+            display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;
+            padding: 2px 7px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+        }
+        .badge-green { background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border); }
+        .badge-purple { background: var(--accent-muted); color: var(--accent-text); border: 1px solid var(--accent-border); }
+        .metric-value { font-size: 26px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.8px; line-height: 1.1; }
+        .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
         /* Tables & Buttons */
-        .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+        .table-wrap { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; overflow: hidden; }
         .scripts-table { width: 100%; border-collapse: collapse; }
         .scripts-table th {
-            text-align: left; padding: 12px 18px; font-size: 11px; font-weight: 700; color: var(--text3);
-            text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border); background: #08070d;
+            text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--border-card); background: var(--bg-secondary);
         }
-        .scripts-table td { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+        .scripts-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-card); font-size: 13px; vertical-align: middle; }
 
         .btn {
-            display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px;
-            font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2);
-            background: var(--surface2); color: var(--text2);
+            display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border-card);
+            background: var(--bg-secondary); color: var(--text-primary);
         }
-        .btn:hover { background: #22183d; color: #fff; }
-        .btn-primary { background: var(--accent); border: none; color: white; }
-        .btn-primary:hover { background: #a855f7; }
-        .btn-sm { padding: 5px 10px; font-size: 11px; }
-        .btn-danger { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
-        .btn-warning { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: #fcd34d; }
+        .btn:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
+        .btn-primary { background: var(--accent-muted); border-color: var(--accent-border); color: var(--text-primary); }
+        .btn-primary:hover { background: #41305f; border-color: #5d4686; }
+        .btn-sm { padding: 4px 8px; font-size: 11px; }
+        .btn-danger { background: #261318; border-color: #451b22; color: #fca5a5; }
+        .btn-warning { background: #261f13; border-color: #45341b; color: #fcd34d; }
 
-        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; }
-        .badge-active { background: rgba(34,197,94,0.12); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
-        .badge-inactive { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family:'JetBrains Mono', monospace; }
+        .badge-active { background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border); }
+        .badge-inactive { background: #261318; color: #fca5a5; border: 1px solid #451b22; }
 
         /* Modals */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+            position: fixed; inset: 0; background: rgba(8, 9, 11, 0.88); backdrop-filter: blur(4px);
             z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;
         }
         .modal-overlay.open { display: flex; }
         .modal {
-            background: var(--surface); border: 1px solid var(--border2); border-radius: 18px;
-            width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+            width: 100%; max-width: 580px; max-height: 90vh; display: flex; flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
         }
-        .modal-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .modal-body { flex: 1; overflow-y: auto; padding: 24px; }
-        .modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; }
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+        .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border-card); display: flex; justify-content: flex-end; gap: 8px; }
 
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; }
         .form-input {
-            width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px;
-            color: #fff; font-size: 13px; padding: 10px 14px; outline: none;
+            width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
+            color: var(--text-primary); font-size: 13px; padding: 8px 12px; outline: none;
         }
 
-        .toast {
-            position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: var(--surface);
-            border: 1px solid var(--accent); border-radius: 10px; padding: 12px 18px; font-size: 13px;
-            font-weight: 600; display: none;
-        }
-        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -199,21 +209,31 @@
 
         <!-- PAGE: KEYS -->
         <div class="page active" id="page-keys">
+            <div class="overview-title">Overview Metrics</div>
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Keys</div>
-                    <div class="stat-value" id="statTotalKeys">—</div>
-                    <div class="stat-sub">Managed in database</div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Processed Licenses</span>
+                        <span class="metric-badge badge-green">↗ 231</span>
+                    </div>
+                    <div class="metric-value" id="statTotalKeys">—</div>
+                    <div class="metric-sub">vs last month</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Bound Devices</div>
-                    <div class="stat-value" id="statBoundKeys" style="color:#4ade80">—</div>
-                    <div class="stat-sub">Active in-game users</div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Bound Devices</span>
+                        <span class="metric-badge badge-green">↗ 21</span>
+                    </div>
+                    <div class="metric-value" id="statBoundKeys">—</div>
+                    <div class="metric-sub">vs last month</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Executions Count</div>
-                    <div class="stat-value" style="color:var(--text2)">142,850+</div>
-                    <div class="stat-sub">Telemetry verified</div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Security Incidents</span>
+                        <span class="metric-badge badge-purple">0</span>
+                    </div>
+                    <div class="metric-value">0 Bans</div>
+                    <div class="metric-sub">100% undetected</div>
                 </div>
             </div>
 
@@ -231,7 +251,7 @@
                         </tr>
                     </thead>
                     <tbody id="keysTbody">
-                        <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px"><span class="spinner"></span> Loading keys...</td></tr>
+                        <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:30px"><span class="spinner"></span> Loading keys...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -239,8 +259,8 @@
 
         <!-- PAGE: SCRIPTS (ADMIN & OWNER ONLY) -->
         <div class="page" id="page-scripts">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                <h2>Cloud Lua Script Storage</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
+                <h2 style="font-size:16px; font-weight:700">Cloud Lua Script Storage</h2>
                 <button class="btn btn-primary" onclick="openScriptModal()">+ New Script</button>
             </div>
             <div class="table-wrap">
@@ -255,7 +275,7 @@
                         </tr>
                     </thead>
                     <tbody id="scriptsTbody">
-                        <tr><td colspan="5" style="text-align:center;padding:30px">Loading scripts...</td></tr>
+                        <tr><td colspan="5" style="text-align:center;padding:24px">Loading scripts...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -263,9 +283,9 @@
 
         <!-- PAGE: AUDIT LOGS (ADMIN & OWNER ONLY) -->
         <div class="page" id="page-audit">
-            <div style="margin-bottom:20px">
-                <h2>Staff & System Audit Trail</h2>
-                <p style="font-size:13px; color:var(--text3)">Tamper-proof record of all staff key generations, HWID resets, and automated checkouts.</p>
+            <div style="margin-bottom:16px">
+                <h2 style="font-size:16px; font-weight:700">Staff & System Audit Trail</h2>
+                <p style="font-size:12px; color:var(--text-secondary)">Tamper-proof record of all staff key generations, HWID resets, and automated checkouts.</p>
             </div>
             <div class="table-wrap">
                 <table class="scripts-table">
@@ -279,7 +299,7 @@
                         </tr>
                     </thead>
                     <tbody id="auditTbody">
-                        <tr><td colspan="5" style="text-align:center;padding:30px">Loading audit logs...</td></tr>
+                        <tr><td colspan="5" style="text-align:center;padding:24px">Loading audit logs...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -289,15 +309,15 @@
 
 <!-- KEY GENERATE MODAL -->
 <div class="modal-overlay" id="keyModal">
-    <div class="modal" style="max-width:480px">
+    <div class="modal" style="max-width:440px">
         <div class="modal-header">
-            <h3 style="font-size:16px; font-weight:700">Generate New License Key</h3>
+            <h3 style="font-size:15px; font-weight:700">Generate New License Key</h3>
             <button class="btn btn-sm" onclick="closeKeyModal()">✕</button>
         </div>
         <div class="modal-body">
             <div class="form-group">
                 <label>Key Format</label>
-                <input type="text" class="form-input" value="BOY∞-XXXX-XXXX-XXXX" readonly style="opacity:0.6; font-family:monospace">
+                <input type="text" class="form-input" value="BOY∞-XXXX-XXXX-XXXX" readonly style="opacity:0.6; font-family:'JetBrains Mono'">
             </div>
             <div class="form-group">
                 <label>Duration</label>
@@ -309,7 +329,7 @@
                     <option value="365d" id="opt365">1 Year</option>
                     <option value="lifetime" id="optLifetime" selected>Lifetime (Permanent)</option>
                 </select>
-                <div style="font-size:11px; color:var(--text3); margin-top:4px" id="durationHint">Staff members are restricted to maximum 7 Days duration.</div>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:4px" id="durationHint">Staff members are restricted to maximum 7 Days duration.</div>
             </div>
             <div class="form-group">
                 <label>Note / User Tag</label>
@@ -329,48 +349,48 @@
 
 <!-- TELEMETRY DETAIL MODAL -->
 <div class="modal-overlay" id="telemetryModal">
-    <div class="modal" style="max-width:540px">
+    <div class="modal" style="max-width:500px">
         <div class="modal-header">
-            <h3 style="font-size:16px; font-weight:700">Client Telemetry & Binding Details</h3>
+            <h3 style="font-size:15px; font-weight:700">Client Telemetry & Binding Details</h3>
             <button class="btn btn-sm" onclick="closeTelemetryModal()">✕</button>
         </div>
         <div class="modal-body">
-            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
-                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:700">License Key</div>
-                <div id="teleKey" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:800;color:#c084fc"></div>
+            <div style="background:var(--bg-secondary);border:1px solid var(--border-card);border-radius:8px;padding:12px;margin-bottom:12px">
+                <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:700">License Key</div>
+                <div id="teleKey" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent-text)"></div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-                <div style="background:var(--surface2);padding:12px;border-radius:8px">
-                    <div style="font-size:11px;color:var(--text3)">Roblox Username</div>
-                    <div id="teleUser" style="font-size:14px;font-weight:700;color:#fff;margin-top:2px">—</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <div style="background:var(--bg-secondary);padding:10px;border-radius:8px;border:1px solid var(--border-card)">
+                    <div style="font-size:11px;color:var(--text-muted)">Roblox Username</div>
+                    <div id="teleUser" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-top:2px">—</div>
                 </div>
-                <div style="background:var(--surface2);padding:12px;border-radius:8px">
-                    <div style="font-size:11px;color:var(--text3)">Executor Client</div>
-                    <div id="teleExec" style="font-size:14px;font-weight:700;color:var(--text2);margin-top:2px">—</div>
-                </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-                <div style="background:var(--surface2);padding:12px;border-radius:8px">
-                    <div style="font-size:11px;color:var(--text3)">Plan Duration</div>
-                    <div id="teleDuration" style="font-size:13px;font-weight:700;color:#86efac;margin-top:2px">—</div>
-                </div>
-                <div style="background:var(--surface2);padding:12px;border-radius:8px">
-                    <div style="font-size:11px;color:var(--text3)">Client IP Address</div>
-                    <div id="teleIp" style="font-family:monospace;font-size:13px;font-weight:600;margin-top:2px">—</div>
+                <div style="background:var(--bg-secondary);padding:10px;border-radius:8px;border:1px solid var(--border-card)">
+                    <div style="font-size:11px;color:var(--text-muted)">Executor Client</div>
+                    <div id="teleExec" style="font-size:13px;font-weight:700;color:var(--text-primary);margin-top:2px">—</div>
                 </div>
             </div>
-            <div style="background:var(--surface2);padding:12px;border-radius:8px;margin-bottom:12px">
-                <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Hardware ID (HWID)</div>
-                <div id="teleHwid" style="font-family:monospace;font-size:12px;color:#cbd5e1;word-break:break-all">—</div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-                <div style="background:var(--surface2);padding:12px;border-radius:8px">
-                    <div style="font-size:11px;color:var(--text3)">Activation Timestamp</div>
-                    <div id="teleActivated" style="font-size:12px;color:#fff;margin-top:2px">—</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <div style="background:var(--bg-secondary);padding:10px;border-radius:8px;border:1px solid var(--border-card)">
+                    <div style="font-size:11px;color:var(--text-muted)">Plan Duration</div>
+                    <div id="teleDuration" style="font-size:12px;font-weight:700;color:var(--tag-green-text);margin-top:2px">—</div>
                 </div>
-                <div style="background:var(--surface2);padding:12px;border-radius:8px">
-                    <div style="font-size:11px;color:var(--text3)">Last Seen Online</div>
-                    <div id="teleLastSeen" style="font-size:12px;color:#fff;margin-top:2px">—</div>
+                <div style="background:var(--bg-secondary);padding:10px;border-radius:8px;border:1px solid var(--border-card)">
+                    <div style="font-size:11px;color:var(--text-muted)">Client IP Address</div>
+                    <div id="teleIp" style="font-family:'JetBrains Mono';font-size:12px;font-weight:600;margin-top:2px">—</div>
+                </div>
+            </div>
+            <div style="background:var(--bg-secondary);padding:10px;border-radius:8px;margin-bottom:10px;border:1px solid var(--border-card)">
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Hardware ID (HWID)</div>
+                <div id="teleHwid" style="font-family:'JetBrains Mono';font-size:11px;color:var(--text-secondary);word-break:break-all">—</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div style="background:var(--bg-secondary);padding:10px;border-radius:8px;border:1px solid var(--border-card)">
+                    <div style="font-size:11px;color:var(--text-muted)">Activation Timestamp</div>
+                    <div id="teleActivated" style="font-size:12px;color:var(--text-primary);margin-top:2px">—</div>
+                </div>
+                <div style="background:var(--bg-secondary);padding:10px;border-radius:8px;border:1px solid var(--border-card)">
+                    <div style="font-size:11px;color:var(--text-muted)">Last Seen Online</div>
+                    <div id="teleLastSeen" style="font-size:12px;color:var(--text-primary);margin-top:2px">—</div>
                 </div>
             </div>
         </div>
@@ -379,8 +399,6 @@
         </div>
     </div>
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script>
     let CURRENT_USER = null;
@@ -447,42 +465,42 @@
             ALL_KEYS = data.keys || [];
 
             if (ALL_KEYS.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">No license keys generated yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted)">No license keys generated yet.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = ALL_KEYS.map(k => {
                 let badge = '<span class="badge badge-active">● Active</span>';
-                if (k.status === 'used') badge = '<span class="badge" style="background:#1d293d;color:#93c5fd">🔒 Bound</span>';
+                if (k.status === 'used') badge = '<span class="badge" style="background:#131826;color:#93c5fd;border:1px solid #253352">🔒 Bound</span>';
                 if (k.status === 'expired') badge = '<span class="badge badge-inactive">⏰ Expired</span>';
 
-                const hwidText = k.hwid ? `<span style="font-family:monospace;font-size:11px">${k.hwid.slice(0,14)}...</span>` : '<span style="color:var(--text3)">Unbound</span>';
+                const hwidText = k.hwid ? `<span style="font-family:'JetBrains Mono';font-size:11px">${k.hwid.slice(0,14)}...</span>` : '<span style="color:var(--text-muted)">Unbound</span>';
 
                 return `
                     <tr>
                         <td>
-                            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#c084fc">
+                            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent-text)">
                                 ${k.key}
                                 <button class="btn btn-sm" onclick="copyText('${k.key}')">📋</button>
                             </div>
                         </td>
                         <td>${badge}</td>
-                        <td style="font-weight:600;color:var(--text2)">${(k.duration || 'lifetime').toUpperCase()}</td>
+                        <td style="font-weight:600;color:var(--text-secondary)">${(k.duration || 'lifetime').toUpperCase()}</td>
                         <td style="font-weight:700">${k.roblox_user || '—'}</td>
-                        <td style="color:var(--text3)">${k.executor_name || '—'}</td>
+                        <td style="color:var(--text-muted)">${k.executor_name || '—'}</td>
                         <td>${hwidText}</td>
                         <td>
-                            <div style="display:flex; gap:6px;">
-                                <button class="btn btn-sm" onclick="openTelemetryModal('${k.key}')">ℹ️ Detail</button>
-                                ${k.hwid ? `<button class="btn btn-sm btn-warning" onclick="resetKeyHwid('${k.key}')">🔄 Reset</button>` : ''}
-                                ${CURRENT_USER.role !== 'staff' ? `<button class="btn btn-sm btn-danger" onclick="deleteKey('${k.key}')">🗑</button>` : ''}
+                            <div style="display:flex; gap:5px;">
+                                <button class="btn btn-sm" onclick="openTelemetryModal('${k.key}')">Detail</button>
+                                ${k.hwid ? `<button class="btn btn-sm btn-warning" onclick="resetKeyHwid('${k.key}')">Reset</button>` : ''}
+                                ${CURRENT_USER.role !== 'staff' ? `<button class="btn btn-sm btn-danger" onclick="deleteKey('${k.key}')">Delete</button>` : ''}
                             </div>
                         </td>
                     </tr>
                 `;
             }).join('');
         } catch (e) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red">Failed to load keys</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#fca5a5">Failed to load keys</td></tr>`;
         }
     }
 
@@ -494,17 +512,17 @@
             const logs = data.logs || [];
 
             if (logs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px">No audit actions recorded yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)">No audit actions recorded yet.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = logs.map(l => `
                 <tr>
-                    <td style="font-size:12px; color:var(--text3)">${new Date(l.created_at).toLocaleString()}</td>
+                    <td style="font-size:12px; color:var(--text-muted)">${new Date(l.created_at).toLocaleString()}</td>
                     <td style="font-weight:700">${l.actor_name}</td>
-                    <td><span class="badge" style="background:#1d1830; color:var(--text2)">${l.actor_role.toUpperCase()}</span></td>
-                    <td style="font-weight:700; color:#c084fc">${l.action}</td>
-                    <td style="font-family:monospace; font-size:12px">${l.target || '—'}</td>
+                    <td><span class="badge" style="background:var(--accent-muted); color:var(--accent-text); border:1px solid var(--accent-border)">${l.actor_role.toUpperCase()}</span></td>
+                    <td style="font-weight:700; color:var(--text-primary)">${l.action}</td>
+                    <td style="font-family:'JetBrains Mono'; font-size:11px; color:var(--text-secondary)">${l.target || '—'}</td>
                 </tr>
             `).join('');
         } catch (e) {}

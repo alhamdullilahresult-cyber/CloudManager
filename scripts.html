@@ -5,116 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supported Scripts — BOYFINITY Script Hub</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #06050a;
-            --bg-card: #0d0b14;
-            --bg-card-hover: #141021;
-            --border: #1e192c;
-            --border-hover: #372952;
-            --accent: #9333ea;
-            --accent-glow: rgba(147, 51, 234, 0.25);
-            --accent-light: #c084fc;
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --success: #22c55e;
+            --bg-main: #08090B;
+            --bg-secondary: #0D0F13;
+            --bg-card: #111318;
+            --bg-card-hover: #15181F;
+            --border-card: #252832;
+            --border-hover: #353945;
+            --text-primary: #F1F1F3;
+            --text-secondary: #858995;
+            --text-muted: #565A66;
+            --accent-muted: #34264D;
+            --accent-border: #4D3970;
+            --accent-tag: #6B4FA0;
+            --accent-text: #D2C4ED;
+            --tag-green-bg: rgba(34, 197, 94, 0.12);
+            --tag-green-text: #4ade80;
+            --tag-green-border: rgba(34, 197, 94, 0.25);
+            --radius-card: 10px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-        body { background-color: var(--bg-base); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
 
         .noise-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.04; z-index: 9999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.025; z-index: 9999;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-
-        .ambient-glow {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(circle at 50% 10%, rgba(147, 51, 234, 0.1) 0%, transparent 50%);
-            z-index: -1; pointer-events: none;
         }
 
         /* Floating Pill Navbar */
         .nav-wrapper {
-            position: fixed; top: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; padding: 0 20px;
+            position: fixed; top: 18px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; padding: 0 20px;
         }
         .floating-pill {
             display: flex; align-items: center; justify-content: space-between;
-            background: rgba(13, 11, 20, 0.75); backdrop-filter: blur(16px);
-            border: 1px solid var(--border); border-radius: 9999px; padding: 8px 10px 8px 24px;
-            width: 100%; max-width: 960px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            background: rgba(13, 15, 19, 0.88); backdrop-filter: blur(14px);
+            border: 1px solid var(--border-card); border-radius: 9999px; padding: 8px 10px 8px 22px;
+            width: 100%; max-width: 980px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
         }
         .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-img { width: 32px; height: 32px; border-radius: 8px; }
-        .logo-title { font-size: 16px; font-weight: 800; letter-spacing: 1.5px; color: #fff; }
+        .logo-img { width: 30px; height: 30px; border-radius: 8px; object-fit: contain; border: 1px solid var(--border-card); }
+        .logo-title { font-size: 15px; font-weight: 800; letter-spacing: 1.2px; color: var(--text-primary); }
         .nav-links { display: flex; align-items: center; gap: 24px; }
-        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 600; }
-        .nav-link.active, .nav-link:hover { color: #fff; }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.15s; }
+        .nav-link.active, .nav-link:hover { color: var(--text-primary); }
 
         .btn-signin {
-            display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff;
-            font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 9999px; text-decoration: none;
-            box-shadow: 0 2px 14px var(--accent-glow);
+            display: inline-flex; align-items: center; gap: 8px; background: var(--accent-muted); color: var(--text-primary);
+            font-size: 12px; font-weight: 700; letter-spacing: 0.5px; padding: 8px 16px; border-radius: 9999px; text-decoration: none;
+            border: 1px solid var(--accent-border); transition: all 0.2s;
         }
+        .btn-signin:hover { background: #41305f; border-color: #5d4686; }
 
-        .container { max-width: 1100px; margin: 120px auto 60px; padding: 0 24px; }
+        .container { max-width: 1120px; margin: 110px auto 60px; padding: 0 24px; }
 
-        /* ── STATISTICS AT THE TOP OF SCRIPTS PAGE ── */
-        .stats-top {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 50px;
+        /* Overview Metrics (Subtle Bordered Cards) */
+        .section-sub-header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
         }
-        .stat-box {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
-            padding: 24px; text-align: center;
-        }
-        .stat-val { font-size: 38px; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 6px; }
-        .stat-lbl { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .section-sub-header h3 { font-size: 15px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
 
-        /* Section Header */
-        .page-header { text-align: left; margin-bottom: 36px; }
-        .page-title { font-size: 34px; font-weight: 800; margin-bottom: 8px; }
-        .page-desc { color: var(--text-secondary); font-size: 15px; }
+        .overview-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px;
+        }
+        .metric-card {
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+            padding: 18px 20px; transition: border-color 0.15s;
+        }
+        .metric-card:hover { border-color: var(--border-hover); }
+        .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .metric-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+        .metric-badge {
+            display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;
+            padding: 2px 7px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+        }
+        .badge-green { background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border); }
+        .badge-purple { background: var(--accent-muted); color: var(--accent-text); border: 1px solid var(--accent-border); }
+        .metric-body { display: flex; align-items: baseline; justify-content: space-between; }
+        .metric-value { font-size: 28px; font-weight: 700; letter-spacing: -0.8px; color: var(--text-primary); }
+        .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Page Header */
+        .page-header { text-align: left; margin-bottom: 28px; }
+        .page-title { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 6px; color: var(--text-primary); }
+        .page-desc { color: var(--text-secondary); font-size: 14px; }
 
         /* Scripts Grid - STRICTLY 2 GAMES */
         .games-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
         }
         .game-card {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
-            overflow: hidden; display: flex; flex-direction: column; transition: all 0.25s;
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+            overflow: hidden; display: flex; flex-direction: column; transition: border-color 0.15s;
         }
-        .game-card:hover { border-color: var(--border-hover); transform: translateY(-4px); }
+        .game-card:hover { border-color: var(--border-hover); }
 
         .game-thumb {
-            height: 200px; width: 100%; object-fit: cover; background: #120e21; display: block;
+            height: 190px; width: 100%; object-fit: cover; background: #0b0d11; display: block;
+            border-bottom: 1px solid var(--border-card);
         }
-        .game-content { padding: 26px; flex: 1; display: flex; flex-direction: column; }
-        .game-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .game-content { padding: 22px; flex: 1; display: flex; flex-direction: column; }
+        .game-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .game-status {
-            font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px;
-            background: rgba(34, 197, 94, 0.12); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25);
+            font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+            background: var(--tag-green-bg); color: var(--tag-green-text); border: 1px solid var(--tag-green-border);
         }
-        .game-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-        .game-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; flex: 1; }
+        .game-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary); }
+        .game-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; flex: 1; }
 
-        .feature-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
-        .feature-tag {
-            background: #151122; border: 1px solid #282138; color: var(--accent-light);
-            font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+        /* Code loader block */
+        .loader-block {
+            background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
+            padding: 12px 14px; margin-bottom: 18px;
+        }
+        .loader-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+        .loader-code {
+            font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-secondary);
+            word-break: break-all; user-select: all; background: none; border: none; width: 100%;
         }
 
-        .btn-launch {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            background: var(--accent); color: #fff; padding: 12px; border-radius: 10px;
-            font-size: 13px; font-weight: 700; text-decoration: none; transition: all 0.2s;
+        .btn-copy {
+            width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: var(--bg-secondary); border: 1px solid var(--border-card); color: var(--text-primary);
+            padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
         }
-        .btn-launch:hover { background: #a855f7; }
+        .btn-copy:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
 
-        @media (max-width: 860px) {
-            .stats-top { grid-template-columns: 1fr; }
+        .footer {
+            border-top: 1px solid var(--border-card); padding: 32px 24px; background: var(--bg-secondary); margin-top: 80px;
+        }
+        .footer-inner {
+            max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+        }
+
+        @media (max-width: 768px) {
             .games-grid { grid-template-columns: 1fr; }
+            .overview-grid { grid-template-columns: 1fr; }
             .nav-links { display: none; }
         }
     </style>
@@ -122,8 +151,8 @@
 <body>
 
     <div class="noise-overlay"></div>
-    <div class="ambient-glow"></div>
 
+    <!-- FLOATING PILL NAVBAR -->
     <div class="nav-wrapper">
         <header class="floating-pill">
             <a href="/" class="logo-wrap">
@@ -135,6 +164,7 @@
                 <a href="/scripts" class="nav-link active">Scripts</a>
                 <a href="/status" class="nav-link">Status</a>
                 <a href="/get-key" class="nav-link">Get Key</a>
+                <a href="/#faq" class="nav-link">FAQ</a>
             </nav>
             <div id="navAuthArea">
                 <a href="/api/auth/discord/login" class="btn-signin">
@@ -146,83 +176,136 @@
     </div>
 
     <div class="container">
-        <!-- ── TOP STATISTICS (MOVED TO TOP OF SCRIPTS PAGE) ── -->
-        <div class="stats-top">
-            <div class="stat-box">
-                <div class="stat-val" style="color:var(--accent-light)">2 Verified Games</div>
-                <div class="stat-lbl">Supported Games</div>
+        <!-- TOP OVERVIEW METRICS (IMAGE REFERENCE STYLE) -->
+        <div class="section-sub-header">
+            <h3>Overview Metrics</h3>
+        </div>
+        <div class="overview-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Active Script Suites</span>
+                    <span class="metric-badge badge-green">↗ 2</span>
+                </div>
+                <div class="metric-body">
+                    <div class="metric-value">2 Games</div>
+                </div>
+                <div class="metric-sub">Violence District & Sniper Arena</div>
             </div>
-            <div class="stat-box">
-                <div class="stat-val">142,850+</div>
-                <div class="stat-lbl">Total Executions</div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Total Executions</span>
+                    <span class="metric-badge badge-green">↗ 231</span>
+                </div>
+                <div class="metric-body">
+                    <div class="metric-value">48,290</div>
+                </div>
+                <div class="metric-sub">verified game sessions</div>
             </div>
-            <div class="stat-box">
-                <div class="stat-val" style="color:#4ade80">100% Active</div>
-                <div class="stat-lbl">Undetected Status</div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Detection Rate</span>
+                    <span class="metric-badge badge-purple">100%</span>
+                </div>
+                <div class="metric-body">
+                    <div class="metric-value">0 Bans</div>
+                </div>
+                <div class="metric-sub">Hyperion 2026 protection</div>
             </div>
         </div>
 
         <div class="page-header">
-            <h1 class="page-title">Supported Game Scripts</h1>
-            <p class="page-desc">Official scripts crafted specifically for competitive domination with built-in HWID protection.</p>
+            <h1 class="page-title">Supported Games</h1>
+            <p class="page-desc">Official cloud-hosted script suites for supported Roblox experiences.</p>
         </div>
 
+        <!-- STRICTLY 2 GAMES -->
         <div class="games-grid">
-            <!-- 1. VIOLENCE DISTRICT -->
+            <!-- 1. Violence District -->
             <div class="game-card">
-                <img src="/assets/Violence District.webp" alt="Violence District" class="game-thumb">
+                <img src="/assets/violencedistrict.png" alt="Violence District" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
                 <div class="game-content">
                     <div class="game-top">
-                        <span class="game-status">● 100% UNDETECTED</span>
-                        <span style="font-size:12px; color:var(--text-muted); font-family:monospace">Build v3.0.2B</span>
+                        <span class="game-status">● Undetected</span>
+                        <span style="font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono';">v3.4.1</span>
                     </div>
                     <h2 class="game-title">Violence District</h2>
                     <p class="game-desc">
-                        Advanced tactical enhancement script featuring Silent Aim, Custom Hitbox Expander, Bone ESP, Infinite Stamina, and automated resource progression.
+                        Full-spectrum automation suite featuring Silent Aim, Rage ESP, Kill Aura, Instant Reload, and Auto-Parry module with low telemetry footprint.
                     </p>
-                    <div class="feature-tags">
-                        <span class="feature-tag">Silent Aimbot</span>
-                        <span class="feature-tag">Bone ESP</span>
-                        <span class="feature-tag">Hitbox Expand</span>
-                        <span class="feature-tag">Anti-Stun</span>
+
+                    <div class="loader-block">
+                        <div class="loader-label">Quick Loadstring (Requires Key)</div>
+                        <input readonly class="loader-code" value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()'>
                     </div>
-                    <a href="/get-key" class="btn-launch">Get Access Key →</a>
+
+                    <button class="btn-copy" onclick="copyLoader(this, 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj&quot;))()')">
+                        <span>Copy Loadstring</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- 2. SNIPER ARENA -->
+            <!-- 2. Sniper Arena -->
             <div class="game-card">
-                <img src="/assets/Coming Soon Card Ung.png" alt="Sniper Arena" class="game-thumb">
+                <img src="/assets/sniperarena.png" alt="Sniper Arena" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
                 <div class="game-content">
                     <div class="game-top">
-                        <span class="game-status">● 100% UNDETECTED</span>
-                        <span style="font-size:12px; color:var(--text-muted); font-family:monospace">Build v2.1.0</span>
+                        <span class="game-status">● Undetected</span>
+                        <span style="font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono';">v2.1.0</span>
                     </div>
                     <h2 class="game-title">Sniper Arena</h2>
                     <p class="game-desc">
-                        Precision marksman suite engineered for high-velocity snipers with instant wall penetration, bullet-drop predictor, crosshair lock, and FOV customizer.
+                        Precision enhancement suite equipped with Velocity Prediction Box, Bone Hitbox Expansion, Bullet Tracer Lines, and Wall-Bang penetration assist.
                     </p>
-                    <div class="feature-tags">
-                        <span class="feature-tag">Bullet Drop Predictor</span>
-                        <span class="feature-tag">Wallbang Trace</span>
-                        <span class="feature-tag">Smooth Aim</span>
-                        <span class="feature-tag">Chams Glow</span>
+
+                    <div class="loader-block">
+                        <div class="loader-label">Quick Loadstring (Requires Key)</div>
+                        <input readonly class="loader-code" value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q"))()'>
                     </div>
-                    <a href="/get-key" class="btn-launch">Get Access Key →</a>
+
+                    <button class="btn-copy" onclick="copyLoader(this, 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q&quot;))()')">
+                        <span>Copy Loadstring</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="logo-wrap">
+                <img src="/assets/boyfinity.png" alt="BOYFINITY" style="width:22px; height:22px; border-radius:6px;">
+                <span style="font-size:12px; color:var(--text-secondary)">© 2026 BOYFINITY Script Hub. All rights reserved.</span>
+            </div>
+            <div style="display:flex; gap:18px;">
+                <a href="/scripts" class="nav-link">Scripts</a>
+                <a href="/status" class="nav-link">Status</a>
+                <a href="/get-key" class="nav-link">Get Key</a>
+                <a href="/admin" class="nav-link">Staff Portal</a>
+            </div>
+        </div>
+    </footer>
+
     <script>
+        function copyLoader(btn, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const original = btn.innerHTML;
+                btn.innerHTML = '<span>✓ Copied to Clipboard</span>';
+                setTimeout(() => btn.innerHTML = original, 2000);
+            });
+        }
+
         async function checkSession() {
             try {
                 const res = await fetch('/api/auth/me');
                 const data = await res.json();
                 if (data.success && data.user) {
-                    document.getElementById('navAuthArea').innerHTML = `
-                        <a href="/admin" class="btn-signin" style="background:#1e192c; border-color:var(--accent);">
-                            <img src="${data.user.avatar || '/assets/boyfinity.png'}" style="width:18px;height:18px;border-radius:50%">
+                    const authArea = document.getElementById('navAuthArea');
+                    authArea.innerHTML = `
+                        <a href="/admin" class="btn-signin" style="background:var(--bg-secondary); border-color:var(--border-card);">
+                            <img src="${data.user.avatar || '/assets/boyfinity.png'}" style="width:16px;height:16px;border-radius:50%">
                             <span>${data.user.username}</span>
                         </a>
                     `;

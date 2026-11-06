@@ -5,143 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Sign In — BOYFINITY Script Hub</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #06050a;
-            --bg-card: #0d0b14;
-            --border: #1e192c;
-            --border-hover: #372952;
-            --accent: #9333ea;
-            --accent-glow: rgba(147, 51, 234, 0.25);
-            --accent-light: #c084fc;
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
+            --bg-main: #08090B;
+            --bg-secondary: #0D0F13;
+            --bg-card: #111318;
+            --bg-card-hover: #15181F;
+            --border-card: #252832;
+            --border-hover: #353945;
+            --text-primary: #F1F1F3;
+            --text-secondary: #858995;
+            --text-muted: #565A66;
+            --accent-muted: #34264D;
+            --accent-border: #4D3970;
+            --accent-tag: #6B4FA0;
+            --accent-text: #D2C4ED;
             --discord: #5865f2;
+            --radius-card: 10px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
         body {
-            background-color: var(--bg-base); color: var(--text-primary); min-height: 100vh;
+            background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh;
             display: flex; align-items: center; justify-content: center; padding: 24px;
         }
 
         .noise-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.04; z-index: 9999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.025; z-index: 9999;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        .ambient-glow {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(circle at 50% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 60%);
-            z-index: -1; pointer-events: none;
-        }
-
         .card {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
-            padding: 44px 38px; width: 100%; max-width: 440px; text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px var(--accent-glow);
+            background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px;
+            padding: 36px 32px; width: 100%; max-width: 420px; text-align: center;
         }
 
-        .logo-img { width: 56px; height: 56px; border-radius: 14px; margin-bottom: 20px; box-shadow: 0 0 20px var(--accent-glow); }
-        .title { font-size: 24px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
-        .desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+        .logo-img { width: 44px; height: 44px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border-card); }
+        .title { font-size: 20px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.4px; color: var(--text-primary); }
+        .desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
 
         /* Discord OAuth2 Button */
         .btn-discord {
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            background: var(--discord); color: #fff; padding: 14px 20px; border-radius: 12px;
-            font-size: 14px; font-weight: 700; text-decoration: none; width: 100%;
-            box-shadow: 0 4px 18px rgba(88, 101, 242, 0.4); transition: all 0.25s; margin-bottom: 24px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: #181c2c; border: 1px solid #2d365b; color: #cdd6f9; padding: 11px 18px; border-radius: 8px;
+            font-size: 13px; font-weight: 600; text-decoration: none; width: 100%;
+            transition: all 0.15s; margin-bottom: 20px;
         }
-        .btn-discord:hover { background: #6975f5; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(88, 101, 242, 0.55); }
+        .btn-discord:hover { background: #20263c; border-color: #3b4675; }
 
         .divider {
-            display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
             color: var(--text-muted); font-size: 11px; text-transform: uppercase; font-weight: 700;
         }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border-card); }
 
-        /* Master Owner Password Fallback */
+        /* Emergency Master Password Fallback */
         .owner-box { text-align: left; }
-        .input-wrap { margin-bottom: 16px; }
-        .input-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .input-wrap { margin-bottom: 14px; }
+        .input-label { display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; }
         .input-text {
-            width: 100%; background: #07060b; border: 1px solid var(--border); border-radius: 10px;
-            padding: 12px 14px; color: #fff; font-size: 14px; outline: none; transition: border-color 0.2s;
+            width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-card); border-radius: 8px;
+            padding: 10px 12px; color: var(--text-primary); font-size: 13px; outline: none; transition: border-color 0.15s;
         }
-        .input-text:focus { border-color: var(--accent); }
+        .input-text:focus { border-color: var(--accent-border); }
 
         .btn-owner {
-            width: 100%; background: #141021; border: 1px solid var(--border); color: #fff;
-            padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-card); color: var(--text-primary);
+            padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s;
         }
-        .btn-owner:hover { background: #1c1630; border-color: var(--border-hover); }
+        .btn-owner:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
 
-        .footer-note { font-size: 11px; color: var(--text-muted); margin-top: 26px; }
+        .footer-note { font-size: 11px; color: var(--text-muted); margin-top: 22px; }
     </style>
 </head>
 <body>
 
     <div class="noise-overlay"></div>
-    <div class="ambient-glow"></div>
 
     <div class="card">
         <img src="/assets/boyfinity.png" alt="BOYFINITY" class="logo-img">
         <h1 class="title">Sign In to BOYFINITY</h1>
-        <p class="desc">Authenticate with your Discord account to access the staff portal, view license telemetry, or manage script configurations.</p>
+        <p class="desc">Authenticate with your Discord account to access the staff portal and manage licenses.</p>
 
         <!-- Discord OAuth2 Primary Button -->
         <a href="/api/auth/discord/login" class="btn-discord">
-            <svg width="22" height="17" viewBox="0 0 127.14 96.36" fill="currentColor">
+            <svg width="20" height="15" viewBox="0 0 127.14 96.36" fill="currentColor">
                 <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
             </svg>
             <span>Sign In with Discord</span>
         </a>
 
-        <div class="divider">Or Emergency Owner Pass</div>
+        <div class="divider">or emergency master key</div>
 
-        <!-- Master Password Form -->
-        <form class="owner-box" onsubmit="handleOwnerLogin(event)">
+        <!-- Master Owner Password Fallback -->
+        <form id="ownerLoginForm" class="owner-box" onsubmit="handleOwnerLogin(event)">
             <div class="input-wrap">
-                <label class="input-label">Master Password</label>
-                <input type="password" id="ownerPass" class="input-text" placeholder="Enter owner key..." required>
+                <label class="input-label" for="ownerPassword">Master Password</label>
+                <input type="password" id="ownerPassword" class="input-text" placeholder="Enter master password" required>
             </div>
-            <button type="submit" id="btnOwner" class="btn-owner">Authenticate as Owner</button>
+            <button type="submit" class="btn-owner" id="btnOwnerSubmit">Login as Master Owner</button>
         </form>
 
-        <div class="footer-note">
-            Role-Based Access Control • Owner / Admin / Staff
-        </div>
+        <p class="footer-note">Role elevation (Owner/Admin/Staff) is assigned based on verified Discord User IDs.</p>
     </div>
 
     <script>
         async function handleOwnerLogin(e) {
             e.preventDefault();
-            const pass = document.getElementById('ownerPass').value;
-            const btn = document.getElementById('btnOwner');
-            btn.disabled = true;
+            const pw = document.getElementById('ownerPassword').value;
+            const btn = document.getElementById('btnOwnerSubmit');
             btn.innerText = 'Verifying...';
+            btn.disabled = true;
 
             try {
-                const res = await fetch('/api/auth/login', {
+                const res = await fetch('/api/admin/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: pass })
+                    body: JSON.stringify({ password: pw })
                 });
                 const data = await res.json();
-                if (data.success && data.token) {
-                    localStorage.setItem('admin_token', data.token);
+                if (data.success) {
                     window.location.href = '/admin';
                 } else {
-                    alert(data.error || 'Authentication failed');
+                    alert('Authentication failed: ' + (data.error || 'Invalid credentials'));
+                    btn.innerText = 'Login as Master Owner';
+                    btn.disabled = false;
                 }
             } catch (err) {
                 alert('Connection error: ' + err.message);
-            } finally {
+                btn.innerText = 'Login as Master Owner';
                 btn.disabled = false;
-                btn.innerText = 'Authenticate as Owner';
             }
         }
     </script>

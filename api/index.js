@@ -58,11 +58,11 @@ async function deliverKeyViaWebhook(webhookUrl, { key, duration, buyerDiscord, b
         const embed = {
             title: '⚡ BOYFINITY Script Hub — Key Delivery',
             description: `A new license key has been successfully generated & delivered!`,
-            color: 0x9333ea, // Purple
+            color: 0x34264d, // Dark Muted Purple Accent
             fields: [
                 { name: 'License Key', value: `\`\`\`${key}\`\`\``, inline: false },
                 { name: 'Duration', value: `${(duration || 'LIFETIME').toUpperCase()}`, inline: true },
-                { name: 'Game', value: `${game || 'Violence District'}`, inline: true },
+                { name: 'Game', value: `${game || 'Violence District & Sniper Arena'}`, inline: true },
                 { name: 'Recipient', value: buyerDiscord ? `<@${buyerDiscord}>` : (buyerEmail || 'Anonymous Guest'), inline: true },
                 { name: 'Status', value: '🟢 Ready to Bind (HWID Unlinked)', inline: false }
             ],
@@ -85,22 +85,23 @@ async function deliverKeyViaWebhook(webhookUrl, { key, duration, buyerDiscord, b
 
 // Verify Cloudflare Turnstile Token
 async function verifyTurnstile(token, remoteip) {
-    const secret = process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY;
-    if (!secret) return true; // If not configured, pass-through gracefully
+    const secret = process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY || 
+                   process.env.TURNSTILE_SECRET_KEY;
+    if (!secret) return true; // If not configured in Vercel, pass-through gracefully
     try {
         const formData = new URLSearchParams();
         formData.append('secret', secret);
         formData.append('response', token);
-        if (remoteip) formData.append('remoteip', remoteip);
+        if (remoteip && remoteip !== 'unknown') formData.append('remoteip', remoteip);
 
         const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
             method: 'POST',
             body: formData
         });
         const outcome = await res.json();
-        return outcome.success;
+        return outcome.success === true;
     } catch (e) {
-        console.error('[Turnstile] Error:', e);
+        console.error('[Turnstile Verify Error]:', e);
         return false;
     }
 }
@@ -125,6 +126,20 @@ export default async function handler(req, res) {
     }
 
     try {
+        // ─────────────────────────────────────────────────────────────
+        // 0. CONFIG / PUBLIC ENV EXPOSURE (FOR TURNSTILE SITEKEY)
+        // ─────────────────────────────────────────────────────────────
+        if (pathname === '/api/config') {
+            const siteKey = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY || 
+                            process.env.CLOUDFLARE_TURNSTILE_SITE_KEY || 
+                            process.env.TURNSTILE_SITE_KEY || 
+                            '';
+            return res.status(200).json({
+                success: true,
+                turnstileSiteKey: siteKey
+            });
+        }
+
         // ─────────────────────────────────────────────────────────────
         // 1. PUBLIC: RAW LUA SCRIPT ENDPOINTS
         // ─────────────────────────────────────────────────────────────
@@ -324,7 +339,6 @@ export default async function handler(req, res) {
             const redirectUri = process.env.DISCORD_REDIRECT_URI || `${proto}://${host}/api/auth/discord/callback`;
 
             if (!clientId) {
-                // Graceful fallback if Discord credentials not yet set
                 return res.redirect(`/login?error=discord_not_configured`);
             }
 
@@ -377,7 +391,6 @@ export default async function handler(req, res) {
                 .maybeSingle();
 
             if (existingUser) {
-                // Preserve admin/staff role unless elevated to owner
                 if (existingUser.role === 'admin' || existingUser.role === 'staff' || existingUser.role === 'owner') {
                     assignedRole = existingUser.role;
                 }
@@ -408,7 +421,6 @@ export default async function handler(req, res) {
             };
             const token = signToken(sessionPayload);
 
-            // Set Cookie and Redirect to Admin/Dashboard
             res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`);
             return res.redirect(`/admin?auth_success=1`);
         }
@@ -420,7 +432,7 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, user: session });
         }
 
-        // Direct Password Login (Fallback for Master Owner if needed)
+        // Direct Password Login (Fallback for Master Owner)
         if (pathname === '/api/auth/login') {
             if (method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
             const { password } = body;
@@ -451,14 +463,14 @@ export default async function handler(req, res) {
 
             const { plan, buyer_email, buyer_discord } = body;
             let duration = 'lifetime';
-            let amountUsd = '$85.00';
+            let amountUsd = '$9.99';
 
             if (plan === 'monthly') {
                 duration = '30d';
-                amountUsd = '$35.00';
+                amountUsd = '$3.50';
             } else if (plan === '1day' || plan === 'daily') {
                 duration = '1d';
-                amountUsd = '$5.00';
+                amountUsd = '$1.00';
             }
 
             const newKey = generateBoyfinityKey();
@@ -482,7 +494,6 @@ export default async function handler(req, res) {
 
             if (keyErr) throw keyErr;
 
-            // Deliver via Discord Webhook
             const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
             await deliverKeyViaWebhook(webhookUrl, {
                 key: newKey,
@@ -492,7 +503,6 @@ export default async function handler(req, res) {
                 game: 'Violence District & Sniper Arena'
             });
 
-            // Log to Audit Trail
             await logAudit(
                 { id: buyer_discord || 'checkout_user', username: buyer_email || 'Web Purchaser', role: 'user' },
                 'CHECKOUT_PURCHASE',
@@ -513,7 +523,7 @@ export default async function handler(req, res) {
         // 6. PROTECTED: ADMIN & STAFF KEY GENERATOR & STATS
         // ─────────────────────────────────────────────────────────────
         if (pathname === '/api/admin/stats') {
-            const user = requireAuth(req, res); // Staff, Admin, or Owner
+            const user = requireAuth(req, res);
             if (!user) return;
 
             const { count: total } = await supabase.from('scripts').select('id', { count: 'exact', head: true });
@@ -535,7 +545,7 @@ export default async function handler(req, res) {
 
         // Audit Logs (Admin & Owner Only)
         if (pathname === '/api/admin/audit-logs') {
-            const user = requireAuth(req, res, 'admin'); // Staff cannot view audit logs
+            const user = requireAuth(req, res, 'admin');
             if (!user) return;
 
             const { data: logs, error } = await supabase
@@ -550,13 +560,12 @@ export default async function handler(req, res) {
 
         // Staff & Key Management: /api/admin/keys
         if (pathname === '/api/admin/keys') {
-            const user = requireAuth(req, res); // Staff, Admin, Owner
+            const user = requireAuth(req, res);
             if (!user) return;
 
             if (method === 'GET') {
                 let query = supabase.from('keys').select('*').order('created_at', { ascending: false });
                 
-                // If role is staff, only show keys created by this staff member
                 if (user.role === 'staff') {
                     query = query.eq('created_by', user.id);
                 }
@@ -571,13 +580,12 @@ export default async function handler(req, res) {
                 const requestedCount = parseInt(body.count, 10) || 1;
                 const requestedDuration = body.duration || 'lifetime';
 
-                // STAFF RESTRICTION: Staff cannot generate Lifetime or > 5 keys at a time
                 let count = requestedCount;
                 let duration = requestedDuration;
                 if (user.role === 'staff') {
                     count = Math.min(Math.max(count, 1), 5);
                     if (duration === 'lifetime' || duration === '365d') {
-                        duration = '7d'; // Staff capped at max 7 days
+                        duration = '7d';
                     }
                 } else {
                     count = Math.min(Math.max(count, 1), 50);
@@ -605,7 +613,6 @@ export default async function handler(req, res) {
                 const { data, error } = await supabase.from('keys').insert(newKeys).select();
                 if (error) throw error;
 
-                // Log to Audit Log
                 await logAudit(
                     user,
                     'GENERATE_KEY',
@@ -635,7 +642,6 @@ export default async function handler(req, res) {
 
                     await logAudit(user, 'RESET_HWID', keyParam, {});
                 } else {
-                    // Only Admin/Owner can alter duration or custom status
                     if (user.role === 'staff') {
                         return res.status(403).json({ success: false, error: 'Staff can only reset HWID' });
                     }
@@ -655,7 +661,6 @@ export default async function handler(req, res) {
             }
 
             if (method === 'DELETE') {
-                // STAFF CANNOT DELETE KEYS
                 if (user.role === 'staff') {
                     return res.status(403).json({ success: false, error: 'Staff members are not permitted to delete keys.' });
                 }
@@ -668,7 +673,7 @@ export default async function handler(req, res) {
 
         // Scripts Management
         if (pathname === '/api/admin/scripts') {
-            const user = requireAuth(req, res, 'admin'); // Admin/Owner only
+            const user = requireAuth(req, res, 'admin');
             if (!user) return;
 
             if (method === 'GET') {
