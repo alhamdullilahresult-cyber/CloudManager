@@ -807,19 +807,25 @@ export default async function handler(req, res) {
 
             if (method === 'GET') {
                 const { data, error } = await supabase.from('scripts').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
-                return res.status(200).json({ success: true, scripts: data });
+                if (error) {
+                    console.error('[Admin Scripts GET Error]:', error);
+                    return res.status(500).json({ success: false, error: error.message });
+                }
+                return res.status(200).json({ success: true, scripts: data || [] });
             }
 
             if (method === 'POST') {
-                const { name, description, code, active } = body;
-                if (!name) return res.status(400).json({ success: false, error: 'Script name required' });
-                const scriptId = generateScriptId(name);
+                const { name, description, code, active } = body || {};
+                if (!name || typeof name !== 'string' || !name.trim()) {
+                    return res.status(400).json({ success: false, error: 'Script name is required' });
+                }
+                const trimmedName = name.trim().slice(0, 100);
+                const scriptId = generateScriptId(trimmedName);
                 const now = new Date().toISOString();
 
                 const { data, error } = await supabase.from('scripts').insert({
                     id: scriptId,
-                    name: name.trim(),
+                    name: trimmedName,
                     description: (description || '').trim(),
                     code: typeof code === 'string' ? code : '',
                     active: active !== false,
@@ -828,8 +834,11 @@ export default async function handler(req, res) {
                     version: 1
                 }).select().single();
 
-                if (error) throw error;
-                await logAudit(user, 'CREATE_SCRIPT', scriptId, { name });
+                if (error) {
+                    console.error('[Admin Scripts POST Error]:', error);
+                    return res.status(500).json({ success: false, error: error.message });
+                }
+                await logAudit(user, 'CREATE_SCRIPT', scriptId, { name: trimmedName });
                 return res.status(201).json({ success: true, script: data });
             }
         }
