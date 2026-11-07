@@ -252,10 +252,17 @@ export default async function handler(req, res) {
 
             let gamesList = [];
             if (!error && Array.isArray(dbScripts) && dbScripts.length > 0) {
-                gamesList = dbScripts.map((s, idx) => {
-                    const fallbackImg = s.id.includes('sniper') ? '/assets/SniperArena.webp'
-                                      : s.id.includes('violence') ? '/assets/ViolenceDistrict.webp'
-                                      : '/assets/boyfinity.png';
+                // Filter only visible / active cards for public display
+                const visibleScripts = dbScripts.filter(s => s.active !== false);
+
+                gamesList = visibleScripts.map((s, idx) => {
+                    // Priority for banner image: explicit custom image -> default webp -> boyfinity logo
+                    let bannerImg = (s.image_url || '').trim();
+                    if (!bannerImg) {
+                        bannerImg = s.id.includes('sniper') ? '/assets/SniperArena.webp'
+                                  : s.id.includes('violence') ? '/assets/ViolenceDistrict.webp'
+                                  : '/assets/boyfinity.png';
+                    }
 
                     const ver = (s.version !== undefined && s.version !== null)
                         ? (String(s.version).startsWith('v') ? s.version : `v${s.version}`)
@@ -275,9 +282,9 @@ export default async function handler(req, res) {
                         status: statusText,
                         version: ver,
                         loader: defaultLoader,
-                        image: fallbackImg,
+                        image: bannerImg,
                         copyCount: 5000 + ((idx + 1) * 2340),
-                        active: s.active !== false
+                        active: true
                     };
                 });
             } else {
@@ -857,7 +864,7 @@ export default async function handler(req, res) {
             }
 
             if (method === 'POST') {
-                const { name, description, code, active, status, version } = body || {};
+                const { name, description, code, active, status, version, image_url } = body || {};
                 if (!name || typeof name !== 'string' || !name.trim()) {
                     return res.status(400).json({ success: false, error: 'Script / Game name is required' });
                 }
@@ -884,7 +891,20 @@ export default async function handler(req, res) {
                     version: numVersion
                 };
 
-                const { data, error } = await supabase.from('scripts').insert(insertPayload).select().single();
+                // Add image_url and status if available
+                if (image_url !== undefined && typeof image_url === 'string') {
+                    insertPayload.image_url = image_url.trim();
+                }
+
+                let { data, error } = await supabase.from('scripts').insert(insertPayload).select().single();
+
+                // If error mentions column image_url not found, retry without image_url gracefully
+                if (error && error.message && error.message.includes('image_url')) {
+                    delete insertPayload.image_url;
+                    const retry = await supabase.from('scripts').insert(insertPayload).select().single();
+                    data = retry.data;
+                    error = retry.error;
+                }
 
                 if (error) {
                     console.error('[Admin Scripts POST Error]:', error);
@@ -907,12 +927,13 @@ export default async function handler(req, res) {
             }
 
             if (method === 'PUT') {
-                const { name, description, code, active, version } = body || {};
+                const { name, description, code, active, version, image_url } = body || {};
                 const updatePayload = { updated_at: new Date().toISOString() };
                 if (name !== undefined) updatePayload.name = name.trim().slice(0, 100);
                 if (description !== undefined) updatePayload.description = description.trim();
                 if (typeof code === 'string') updatePayload.code = code;
                 if (active !== undefined) updatePayload.active = !!active;
+                if (image_url !== undefined) updatePayload.image_url = typeof image_url === 'string' ? image_url.trim() : '';
                 if (version !== undefined) {
                     let numVersion = 1;
                     if (typeof version === 'number') numVersion = version;
@@ -923,12 +944,21 @@ export default async function handler(req, res) {
                     updatePayload.version = numVersion;
                 }
 
-                const { data: updated, error } = await supabase.from('scripts').update(updatePayload).eq('id', scriptId).select().single();
+                let { data: updated, error } = await supabase.from('scripts').update(updatePayload).eq('id', scriptId).select().single();
+
+                // If error mentions column image_url not found, retry without image_url
+                if (error && error.message && error.message.includes('image_url')) {
+                    delete updatePayload.image_url;
+                    const retry = await supabase.from('scripts').update(updatePayload).eq('id', scriptId).select().single();
+                    updated = retry.data;
+                    error = retry.error;
+                }
+
                 if (error) {
                     console.error('[Admin Scripts PUT Error]:', error);
                     return res.status(500).json({ success: false, error: error.message });
                 }
-                await logAudit(user, 'UPDATE_SCRIPT', scriptId, { name: updatePayload.name || scriptId });
+                await logAudit(user, 'UPDATE_SCRIPT', scriptId, { name: updatePayload.name || scriptId, active: updatePayload.active });
                 return res.status(200).json({ success: true, script: updated });
             }
 

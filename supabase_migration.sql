@@ -85,6 +85,12 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='keys' AND column_name='buyer_email') THEN
         ALTER TABLE public.keys ADD COLUMN buyer_email TEXT DEFAULT NULL;
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='scripts' AND column_name='image_url') THEN
+        ALTER TABLE public.scripts ADD COLUMN image_url TEXT DEFAULT '';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='scripts' AND column_name='status') THEN
+        ALTER TABLE public.scripts ADD COLUMN status TEXT DEFAULT 'working';
+    END IF;
 END $$;
 
 -- Indexes
