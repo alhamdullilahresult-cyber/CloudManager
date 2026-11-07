@@ -815,15 +815,23 @@ export default async function handler(req, res) {
             }
 
             if (method === 'POST') {
-                const { name, description, code, active } = body || {};
+                const { name, description, code, active, status, version } = body || {};
                 if (!name || typeof name !== 'string' || !name.trim()) {
-                    return res.status(400).json({ success: false, error: 'Script name is required' });
+                    return res.status(400).json({ success: false, error: 'Script / Game name is required' });
                 }
                 const trimmedName = name.trim().slice(0, 100);
                 const scriptId = generateScriptId(trimmedName);
                 const now = new Date().toISOString();
 
-                const { data, error } = await supabase.from('scripts').insert({
+                // Compute numeric or version value
+                let numVersion = 1;
+                if (typeof version === 'number') numVersion = version;
+                else if (typeof version === 'string') {
+                    const parsed = parseInt(version.replace(/[^0-9]/g, ''), 10);
+                    if (!isNaN(parsed) && parsed > 0) numVersion = parsed;
+                }
+
+                const insertPayload = {
                     id: scriptId,
                     name: trimmedName,
                     description: (description || '').trim(),
@@ -831,8 +839,10 @@ export default async function handler(req, res) {
                     active: active !== false,
                     created_at: now,
                     updated_at: now,
-                    version: 1
-                }).select().single();
+                    version: numVersion
+                };
+
+                const { data, error } = await supabase.from('scripts').insert(insertPayload).select().single();
 
                 if (error) {
                     console.error('[Admin Scripts POST Error]:', error);
@@ -855,21 +865,37 @@ export default async function handler(req, res) {
             }
 
             if (method === 'PUT') {
-                const { name, description, code, active } = body;
+                const { name, description, code, active, version } = body || {};
                 const updatePayload = { updated_at: new Date().toISOString() };
-                if (name !== undefined) updatePayload.name = name.trim();
+                if (name !== undefined) updatePayload.name = name.trim().slice(0, 100);
                 if (description !== undefined) updatePayload.description = description.trim();
                 if (typeof code === 'string') updatePayload.code = code;
                 if (active !== undefined) updatePayload.active = !!active;
+                if (version !== undefined) {
+                    let numVersion = 1;
+                    if (typeof version === 'number') numVersion = version;
+                    else if (typeof version === 'string') {
+                        const parsed = parseInt(version.replace(/[^0-9]/g, ''), 10);
+                        if (!isNaN(parsed) && parsed > 0) numVersion = parsed;
+                    }
+                    updatePayload.version = numVersion;
+                }
 
                 const { data: updated, error } = await supabase.from('scripts').update(updatePayload).eq('id', scriptId).select().single();
-                if (error) throw error;
-                await logAudit(user, 'UPDATE_SCRIPT', scriptId, { name });
+                if (error) {
+                    console.error('[Admin Scripts PUT Error]:', error);
+                    return res.status(500).json({ success: false, error: error.message });
+                }
+                await logAudit(user, 'UPDATE_SCRIPT', scriptId, { name: updatePayload.name || scriptId });
                 return res.status(200).json({ success: true, script: updated });
             }
 
             if (method === 'DELETE') {
-                await supabase.from('scripts').delete().eq('id', scriptId);
+                const { error } = await supabase.from('scripts').delete().eq('id', scriptId);
+                if (error) {
+                    console.error('[Admin Scripts DELETE Error]:', error);
+                    return res.status(500).json({ success: false, error: error.message });
+                }
                 await logAudit(user, 'DELETE_SCRIPT', scriptId, {});
                 return res.status(200).json({ success: true, message: 'Script deleted' });
             }

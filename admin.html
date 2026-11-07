@@ -269,38 +269,27 @@
         <!-- PAGE 2: CLOUD SCRIPTS & GAME CARDS (ADMIN & OWNER ONLY) -->
         <div class="page" id="page-scripts">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
-                <h2 style="font-size:16px; font-weight:700">Cloud Lua Scripts & Public Game Cards</h2>
-                <button class="btn btn-primary" onclick="openScriptModal()">+ New Script</button>
-            </div>
-            
-            <div class="box-card">
-                <div style="font-size:14px; font-weight:700; margin-bottom:6px;">Current Active Games on Website</div>
-                <div style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">Both games below are synced live with the frontend Scripts catalog:</div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-                    <div style="background:var(--bg-secondary); border:1px solid var(--border-card); border-radius:8px; padding:12px;">
-                        <strong style="color:var(--text-primary); font-size:13px;">1. Violence District</strong>
-                        <p style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Asymmetrical horror game suite • v3.4.1 • Status: Working</p>
-                    </div>
-                    <div style="background:var(--bg-secondary); border:1px solid var(--border-card); border-radius:8px; padding:12px;">
-                        <strong style="color:var(--text-primary); font-size:13px;">2. Sniper Arena</strong>
-                        <p style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Exciting sniper battles suite • v2.1.0 • Status: Working</p>
-                    </div>
+                <div>
+                    <h2 style="font-size:16px; font-weight:700">Cloud Scripts &amp; Games Management</h2>
+                    <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Manage official games, cloud scripts, execution status, and quick loadstrings.</p>
                 </div>
+                <button class="btn btn-primary" onclick="openScriptModal()">+ Add New Game / Script</button>
             </div>
 
             <div class="table-wrap">
                 <table class="scripts-table">
                     <thead>
                         <tr>
-                            <th>Script Name</th>
+                            <th style="min-width:180px;">Game / Script Name</th>
                             <th>Script ID</th>
                             <th>Status</th>
+                            <th style="min-width:240px;">Loadstring (Loader)</th>
                             <th>Version</th>
-                            <th>Actions</th>
+                            <th style="text-align:right; min-width:160px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="scriptsTbody">
-                        <tr><td colspan="5" style="text-align:center;padding:24px">Loading scripts...</td></tr>
+                        <tr><td colspan="6" style="text-align:center;padding:24px">Loading scripts...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -373,37 +362,51 @@
     </div>
 </div>
 
-<!-- SCRIPT MODAL (ADD / EDIT SCRIPT) -->
+<!-- SCRIPT / GAME MODAL (ADD / EDIT SCRIPT) -->
 <div class="modal-overlay" id="scriptModal">
     <div class="modal" style="max-width:580px">
         <div class="modal-header">
-            <h3 style="font-size:15px; font-weight:700" id="scriptModalTitle">Create Cloud Lua Script</h3>
+            <h3 style="font-size:15px; font-weight:700" id="scriptModalTitle">Add Game / Cloud Script</h3>
             <button class="btn btn-sm" onclick="closeScriptModal()">✕</button>
         </div>
         <div class="modal-body">
             <input type="hidden" id="editScriptId">
             <div class="form-group">
-                <label>Script Name *</label>
-                <input type="text" class="form-input" id="scriptName" placeholder="e.g. Violence District Main Hub" required>
+                <label>Game / Script Name *</label>
+                <input type="text" class="form-input" id="scriptName" placeholder="e.g. Violence District or Sniper Arena" required>
             </div>
             <div class="form-group">
                 <label>Description</label>
-                <input type="text" class="form-input" id="scriptDesc" placeholder="e.g. Asymmetrical horror suite with silent aim and esp">
+                <input type="text" class="form-input" id="scriptDesc" placeholder="Short description of features, suites, or game details">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Status (Execution State)</label>
+                    <select class="form-input" id="scriptStatusSelect">
+                        <option value="working" selected>Working (Undetected)</option>
+                        <option value="maintenance">Maintenance (Updating)</option>
+                        <option value="testing">Testing (Private)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Version</label>
+                    <input type="text" class="form-input" id="scriptVersionInput" placeholder="e.g. v1.0.0 or 1">
+                </div>
             </div>
             <div class="form-group">
-                <label>Lua Code (Cloud Source)</label>
-                <textarea class="form-input" id="scriptCode" rows="8" placeholder="-- Paste your raw Lua code here&#10;print('Hello from Boyfinity Cloud!')" style="font-family:'JetBrains Mono',monospace;font-size:12px;resize:vertical;"></textarea>
+                <label>Lua Code / Cloud Source</label>
+                <textarea class="form-input" id="scriptCode" rows="8" placeholder="-- Paste raw Lua script code or KeySystem loader here&#10;print('Hello from Boyfinity Cloud Script!')" style="font-family:'JetBrains Mono',monospace;font-size:12px;resize:vertical;"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0">
                 <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
                     <input type="checkbox" id="scriptActive" checked style="accent-color:#9B77D4; width:16px; height:16px;">
-                    <span>Active (Available for Execution &amp; Loader)</span>
+                    <span>Active (Available for Loader &amp; Cloud Execution)</span>
                 </label>
             </div>
         </div>
         <div class="modal-footer">
             <button class="btn" onclick="closeScriptModal()">Cancel</button>
-            <button class="btn btn-primary" id="btnScriptSubmit" onclick="submitScript()">Save Script</button>
+            <button class="btn btn-primary" id="btnScriptSubmit" onclick="submitScript()">Save Game / Script</button>
         </div>
     </div>
 </div>
@@ -564,13 +567,15 @@
     }
 
     function openScriptModal(isEdit = false) {
-        document.getElementById('scriptModalTitle').innerText = isEdit ? 'Edit Cloud Lua Script' : 'Create Cloud Lua Script';
-        document.getElementById('btnScriptSubmit').innerText = isEdit ? 'Update Script' : 'Save Script';
+        document.getElementById('scriptModalTitle').innerText = isEdit ? 'Edit Game / Cloud Script' : 'Add New Game / Script';
+        document.getElementById('btnScriptSubmit').innerText = isEdit ? 'Update Game / Script' : 'Save Game / Script';
         if (!isEdit) {
             document.getElementById('editScriptId').value = '';
             document.getElementById('scriptName').value = '';
             document.getElementById('scriptDesc').value = '';
             document.getElementById('scriptCode').value = '';
+            document.getElementById('scriptStatusSelect').value = 'working';
+            document.getElementById('scriptVersionInput').value = 'v1.0.0';
             document.getElementById('scriptActive').checked = true;
         }
         document.getElementById('scriptModal').classList.add('open');
@@ -580,36 +585,51 @@
         document.getElementById('scriptModal').classList.remove('open');
     }
 
+    function getLoadstring(scriptId) {
+        const origin = window.location.origin;
+        return `loadstring(game:HttpGet("${origin}/api/scripts/${scriptId}"))()`;
+    }
+
     async function loadScripts() {
         const tbody = document.getElementById('scriptsTbody');
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)">Loading scripts...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">Loading scripts...</td></tr>`;
         try {
             const res = await fetch('/api/admin/scripts');
             if (res.status === 401 || res.status === 403) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:#fca5a5">Access denied. Admin or Owner permission required.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#fca5a5">Access denied. Admin or Owner permission required.</td></tr>`;
                 return;
             }
             const data = await res.json();
             if (!data.success) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:#fca5a5">Error loading scripts: ${data.error || 'Unknown error'}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#fca5a5">Error loading scripts: ${data.error || 'Unknown error'}</td></tr>`;
                 return;
             }
             const scripts = data.scripts || [];
             if (scripts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)">No scripts found. Click "+ New Script" above to add one.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">No games or scripts found. Click "+ Add New Game / Script" above.</td></tr>`;
                 return;
             }
             tbody.innerHTML = scripts.map(s => {
-                const activeBadge = s.active
-                    ? `<span class="badge badge-active">● Active</span>`
-                    : `<span class="badge badge-inactive">○ Inactive</span>`;
+                const isWorking = s.active && s.status !== 'maintenance';
+                let statusBadge = '<span class="badge badge-active">● Working</span>';
+                if (!s.active || s.status === 'maintenance') {
+                    statusBadge = '<span class="badge badge-inactive">⚠ Maintenance</span>';
+                } else if (s.status === 'testing') {
+                    statusBadge = '<span class="badge" style="background:#1e1b4b;color:#c7d2fe;border:1px solid #3730a3">🔒 Testing</span>';
+                }
+
                 const scriptIdSafe = (s.id || '').replace(/'/g, "\\'");
                 const scriptNameSafe = (s.name || '').replace(/'/g, "\\'");
+                const loadstringStr = getLoadstring(s.id);
+                const loadstringSafe = loadstringStr.replace(/'/g, "\\'");
+
+                const verDisplay = (s.version !== undefined && s.version !== null) ? (String(s.version).startsWith('v') ? s.version : `v${s.version}`) : 'v1.0';
+
                 return `
                     <tr>
                         <td style="font-weight:600;color:var(--text-primary)">
-                            <div>${s.name || '—'}</div>
-                            ${s.description ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${s.description}</div>` : ''}
+                            <div style="font-size:13px; font-weight:700;">${s.name || '—'}</div>
+                            ${s.description ? `<div style="font-size:11px;color:var(--text-secondary);margin-top:3px;max-width:260px;line-height:1.4;">${s.description}</div>` : ''}
                         </td>
                         <td>
                             <div style="display:flex;align-items:center;gap:6px;">
@@ -617,19 +637,27 @@
                                 <button class="btn btn-sm" onclick="copyText('${scriptIdSafe}')" title="Copy Script ID">📋</button>
                             </div>
                         </td>
-                        <td>${activeBadge}</td>
-                        <td style="color:var(--text-secondary)">v${s.version || 1}</td>
+                        <td>${statusBadge}</td>
                         <td>
-                            <div style="display:flex;gap:6px;">
-                                <button class="btn btn-sm" onclick="openEditScript('${scriptIdSafe}')">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteScript('${scriptIdSafe}', '${scriptNameSafe}')">Delete</button>
+                            <div style="display:flex;align-items:center;gap:6px;max-width:320px;">
+                                <input type="text" readonly value="${loadstringStr}" class="form-input" style="font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 8px;height:28px;background:var(--bg-secondary);color:var(--text-secondary);" title="${loadstringStr}">
+                                <button class="btn btn-sm btn-primary" onclick="copyText('${loadstringSafe}')" style="white-space:nowrap;padding:4px 10px;font-size:11px;height:28px;" title="Copy Loadstring">
+                                    ⚡ Copy
+                                </button>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-secondary);font-weight:600;font-size:12px;">${verDisplay}</td>
+                        <td style="text-align:right;">
+                            <div style="display:inline-flex;gap:6px;">
+                                <button class="btn btn-sm" onclick="openEditScript('${scriptIdSafe}')" title="Edit Game/Script details">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteScript('${scriptIdSafe}', '${scriptNameSafe}')" title="Delete from Database">Hapus</button>
                             </div>
                         </td>
                     </tr>
                 `;
             }).join('');
         } catch (e) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:#fca5a5">Failed to fetch scripts: ${e.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#fca5a5">Failed to fetch scripts: ${e.message}</td></tr>`;
         }
     }
 
@@ -643,7 +671,9 @@
             document.getElementById('scriptName').value = s.name || '';
             document.getElementById('scriptDesc').value = s.description || '';
             document.getElementById('scriptCode').value = s.code || '';
-            document.getElementById('scriptActive').checked = s.active !== false;
+            document.getElementById('scriptStatusSelect').value = s.status || (s.active ? 'working' : 'maintenance');
+            document.getElementById('scriptVersionInput').value = s.version || 'v1.0.0';
+            document.getElementById('scriptActive').checked = s.active !== false && s.status !== 'maintenance';
             openScriptModal(true);
         } catch (e) {
             alert('Error loading script: ' + e.message);
@@ -651,12 +681,12 @@
     }
 
     async function deleteScript(scriptId, scriptName) {
-        if (!confirm(`Are you sure you want to delete script "${scriptName}" (${scriptId})? This cannot be undone.`)) return;
+        if (!confirm(`Are you sure you want to delete "${scriptName}" (${scriptId}) from Supabase? This action cannot be undone.`)) return;
         try {
             const res = await fetch(`/api/admin/scripts/${encodeURIComponent(scriptId)}`, { method: 'DELETE' });
             const data = await res.json();
             if (data.success) {
-                alert('🗑 Script deleted successfully!');
+                alert('🗑 Game / Script deleted successfully!');
                 loadScripts();
             } else {
                 alert('Delete failed: ' + (data.error || 'Unknown error'));
@@ -667,25 +697,32 @@
     }
 
     async function submitScript() {
-        const idEl   = document.getElementById('editScriptId');
-        const nameEl = document.getElementById('scriptName');
-        const descEl = document.getElementById('scriptDesc');
-        const codeEl = document.getElementById('scriptCode');
-        const actEl  = document.getElementById('scriptActive');
-        const btn    = document.getElementById('btnScriptSubmit');
+        const idEl      = document.getElementById('editScriptId');
+        const nameEl    = document.getElementById('scriptName');
+        const descEl    = document.getElementById('scriptDesc');
+        const codeEl    = document.getElementById('scriptCode');
+        const statusEl  = document.getElementById('scriptStatusSelect');
+        const verEl     = document.getElementById('scriptVersionInput');
+        const actEl     = document.getElementById('scriptActive');
+        const btn       = document.getElementById('btnScriptSubmit');
 
         const nameVal = nameEl ? nameEl.value.trim() : '';
         if (!nameVal) {
-            alert('Script Name is required.');
+            alert('Game / Script Name is required.');
             if (nameEl) nameEl.focus();
             return;
         }
+
+        const selectedStatus = statusEl ? statusEl.value : 'working';
+        const isActive = actEl ? actEl.checked && selectedStatus !== 'maintenance' : true;
 
         const payload = {
             name: nameVal,
             description: descEl ? descEl.value.trim() : '',
             code: codeEl ? codeEl.value : '',
-            active: actEl ? actEl.checked : true
+            status: selectedStatus,
+            version: verEl && verEl.value.trim() ? verEl.value.trim() : 1,
+            active: isActive
         };
 
         const isEdit = idEl && idEl.value;
@@ -703,17 +740,17 @@
             });
             const data = await res.json();
             if (data.success) {
-                alert(isEdit ? '✅ Script updated successfully!' : '✅ Script created successfully!');
+                alert(isEdit ? '✅ Game / Script updated successfully!' : '✅ Game / Script saved to Supabase successfully!');
                 closeScriptModal();
                 loadScripts();
             } else {
-                alert('Failed to save script: ' + (data.error || 'Unknown error'));
+                alert('Failed to save: ' + (data.error || 'Unknown error'));
             }
         } catch (e) {
             alert('Network error: ' + e.message);
         } finally {
             btn.disabled = false;
-            btn.innerText = isEdit ? 'Update Script' : 'Save Script';
+            btn.innerText = isEdit ? 'Update Game / Script' : 'Save Game / Script';
         }
     }
 
