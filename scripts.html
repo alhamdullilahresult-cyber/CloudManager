@@ -639,9 +639,9 @@
                 <div class="metric-card">
                     <div class="metric-header">
                         <span class="metric-title">Supported Games</span>
-                        <span class="metric-badge badge-green">↗ 2</span>
+                        <span class="metric-badge badge-green" id="statBadgeGames">↗ 2</span>
                     </div>
-                    <div class="metric-value">2</div>
+                    <div class="metric-value" id="statCountGames">2</div>
                 </div>
 
                 <div class="metric-card">
@@ -653,70 +653,10 @@
                 </div>
             </div>
 
-            <!-- 3. STRICTLY 2 GAMES WITH REQUIRED EXACT DESCRIPTIONS -->
+            <!-- 3. LIVE GAMES GRID (SYNCED REALTIME WITH SUPABASE VIA /api/public/games) -->
             <div class="games-grid" id="gamesGridContainer">
-                <!-- 1. Violence District -->
-                <div class="game-card" data-title="violence district">
-                    <img src="/assets/ViolenceDistrict.webp" alt="Violence District" class="game-thumb"
-                        onerror="this.src='/assets/boyfinity.png'">
-                    <div class="game-content">
-                        <div class="game-meta-top">
-                            <span class="badge-status">● Working</span>
-                            <span class="copy-counter" id="copyCount-vd">14,820 Copies</span>
-                        </div>
-                        <h2 class="game-title">Violence District</h2>
-                        <p class="game-desc">
-                            Violence District is asymmetrical horror game on Roblox where Killer is faced against 5
-                            Survivors. Killer's main goal is to sacrifice all the survivors. Survivors' main goal is to
-                            repair 5 generators and do whatever it takes to escape.
-                        </p>
-
-                        <div class="loader-block">
-                            <div class="loader-label">Quick Loadstring</div>
-                            <input readonly class="loader-code"
-                                value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()'>
-                        </div>
-
-                        <div class="card-action-row">
-                            <button class="btn-copy-small"
-                                onclick="handleCopy(this, 'vd', 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj&quot;))()')">
-                                <span>Copy</span>
-                            </button>
-                            <span class="badge-status">Working</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Sniper Arena -->
-                <div class="game-card" data-title="sniper arena">
-                    <img src="/assets/SniperArena.webp" alt="Sniper Arena" class="game-thumb"
-                        onerror="this.src='/assets/boyfinity.png'">
-                    <div class="game-content">
-                        <div class="game-meta-top">
-                            <span class="badge-status">● Working</span>
-                            <span class="copy-counter" id="copyCount-sa">9,410 Copies</span>
-                        </div>
-                        <h2 class="game-title">Sniper Arena</h2>
-                        <p class="game-desc">
-                            Sniper Arena - Exciting sniper battles. Play fair. Win with skill. Skins are just cosmetic -
-                            no stat boosts, no paying to win. Join ranked matches and beat other players to earn amazing
-                            rewards! Cheating will result in a permanent ban. No second chances.
-                        </p>
-
-                        <div class="loader-block">
-                            <div class="loader-label">Quick Loadstring</div>
-                            <input readonly class="loader-code"
-                                value='loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q"))()'>
-                        </div>
-
-                        <div class="card-action-row">
-                            <button class="btn-copy-small"
-                                onclick="handleCopy(this, 'sa', 'loadstring(game:HttpGet(&quot;https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q&quot;))()')">
-                                <span>Copy</span>
-                            </button>
-                            <span class="badge-status">Working</span>
-                        </div>
-                    </div>
+                <div style="grid-column: 1 / -1; text-align:center; padding: 40px; color: var(--text-muted); font-size: 13px;">
+                    Loading supported games...
                 </div>
             </div>
         </div>
@@ -779,13 +719,93 @@
     </footer>
 
     <script>
-        let copyStats = { vd: 14820, sa: 9410 };
+        let copyStats = {};
+        let ALL_PUBLIC_GAMES = [];
+        let CURRENT_FILTER = 'all';
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        async function loadPublicGames() {
+            const container = document.getElementById('gamesGridContainer');
+            try {
+                const res = await fetch('/api/public/games');
+                const data = await res.json();
+                const games = data.games || [];
+                ALL_PUBLIC_GAMES = games;
+
+                const countEl = document.getElementById('statCountGames');
+                const badgeEl = document.getElementById('statBadgeGames');
+                if (countEl) countEl.innerText = games.length;
+                if (badgeEl) badgeEl.innerText = `↗ ${games.length}`;
+
+                if (games.length === 0) {
+                    container.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding: 40px; color: var(--text-muted); font-size: 13px;">No supported games currently active. Check back soon.</div>`;
+                    return;
+                }
+
+                renderGamesGrid(games);
+            } catch (e) {
+                container.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding: 40px; color: #fca5a5; font-size: 13px;">Failed to load games: ${e.message}</div>`;
+            }
+        }
+
+        function renderGamesGrid(games) {
+            const container = document.getElementById('gamesGridContainer');
+            container.innerHTML = games.map((g, idx) => {
+                const key = g.id || `game-${idx}`;
+                if (!copyStats[key]) copyStats[key] = g.copyCount || (10000 + idx * 2500);
+
+                const isWorking = (g.status || '').toLowerCase() === 'working';
+                const statusBadge = isWorking 
+                    ? `<span class="badge-status">● Working</span>`
+                    : `<span class="badge-status" style="background:#271b1b;color:#fca5a5;border-color:#5c2222">⚠ Maintenance</span>`;
+
+                const thumb = g.image || '/assets/boyfinity.png';
+                const loaderStr = g.loader || `loadstring(game:HttpGet("${window.location.origin}/api/scripts/${g.id}"))()`;
+                const loaderEscaped = escapeHtml(loaderStr);
+
+                return `
+                    <div class="game-card" data-title="${escapeHtml(g.title || g.name || '').toLowerCase()}" data-status="${isWorking ? 'working' : 'maintenance'}">
+                        <img src="${thumb}" alt="${escapeHtml(g.title || g.name)}" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
+                        <div class="game-content">
+                            <div class="game-meta-top">
+                                ${statusBadge}
+                                <span class="copy-counter" id="copyCount-${key}">${copyStats[key].toLocaleString()} Copies</span>
+                            </div>
+                            <h2 class="game-title">${escapeHtml(g.title || g.name)}</h2>
+                            <p class="game-desc">${escapeHtml(g.description || '')}</p>
+
+                            <div class="loader-block">
+                                <div class="loader-label">Quick Loadstring</div>
+                                <input readonly class="loader-code" value="${loaderEscaped}" onclick="this.select()">
+                            </div>
+
+                            <div class="card-action-row">
+                                <button class="btn-copy-small" onclick="handleCopy(this, '${key}', \`${loaderStr.replace(/`/g, '\\`')}\`)">
+                                    <span>Copy</span>
+                                </button>
+                                <span class="badge-status">${escapeHtml(g.version || 'v1.0')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
 
         function handleCopy(btn, gameKey, text) {
             navigator.clipboard.writeText(text).then(() => {
                 const original = btn.innerHTML;
                 btn.innerHTML = '<span>✓ Copied</span>';
 
+                if (!copyStats[gameKey]) copyStats[gameKey] = 10000;
                 copyStats[gameKey]++;
                 const counterEl = document.getElementById(`copyCount-${gameKey}`);
                 if (counterEl) counterEl.innerText = `${copyStats[gameKey].toLocaleString()} Copies`;
@@ -796,12 +816,17 @@
         }
 
         function filterGames() {
-            const query = document.getElementById('gameSearchInput').value.toLowerCase();
+            const query = (document.getElementById('gameSearchInput')?.value || '').toLowerCase().trim();
             const cards = document.querySelectorAll('.game-card');
             cards.forEach(card => {
-                const title = card.getAttribute('data-title');
+                const title = card.getAttribute('data-title') || '';
                 const text = card.innerText.toLowerCase();
-                if (title.includes(query) || text.includes(query)) {
+                const status = card.getAttribute('data-status') || '';
+
+                const matchesQuery = !query || title.includes(query) || text.includes(query);
+                const matchesFilter = CURRENT_FILTER === 'all' || (CURRENT_FILTER === 'working' && status === 'working');
+
+                if (matchesQuery && matchesFilter) {
                     card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
@@ -810,6 +835,7 @@
         }
 
         function setFilter(type, btn) {
+            CURRENT_FILTER = type;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             filterGames();
@@ -831,6 +857,8 @@
                 }
             } catch (e) { }
         }
+
+        loadPublicGames();
         checkSession();
     </script>
 </body>

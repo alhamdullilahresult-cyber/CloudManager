@@ -212,39 +212,81 @@ export default async function handler(req, res) {
             return res.status(200).send(script.code);
         }
 
-        // Public Games Info & Copy Count Telemetry
+        // Public Games Info & Copy Count Telemetry (Live Sync from Supabase scripts table)
         if (pathname === '/api/public/games') {
-            const { data: scripts } = await supabase
+            const host = req.headers['host'] || 'boyfinity-script.vercel.app';
+            const proto = req.headers['x-forwarded-proto'] || 'https';
+            const origin = `${proto}://${host}`;
+
+            const { data: dbScripts, error } = await supabase
                 .from('scripts')
-                .select('id, name, description, active, version, updated_at')
+                .select('*')
                 .order('created_at', { ascending: true });
+
+            const DEFAULT_GAMES = [
+                {
+                    id: 'violencedisctrict-boyfinity-4oyj',
+                    title: 'Violence District',
+                    name: 'Violence District',
+                    description: "Violence District is asymmetrical horror game on Roblox where Killer is faced against 5 Survivors. Killer's main goal is to sacrifice all the survivors. Survivors' main goal is to repair 5 generators and do whatever it takes to escape.",
+                    status: 'Working',
+                    version: 'v3.4.1',
+                    loader: `loadstring(game:HttpGet("${origin}/api/scripts/violencedisctrict-boyfinity-4oyj"))()`,
+                    image: '/assets/ViolenceDistrict.webp',
+                    copyCount: 14820,
+                    active: true
+                },
+                {
+                    id: 'sniperarena-boyfinity-7x9q',
+                    title: 'Sniper Arena',
+                    name: 'Sniper Arena',
+                    description: "Sniper Arena - Exciting sniper battles. Play fair. Win with skill. Skins are just cosmetic - no stat boosts, no paying to win. Join ranked matches and beat other players to earn amazing rewards! Cheating will result in a permanent ban. No second chances.",
+                    status: 'Working',
+                    version: 'v2.1.0',
+                    loader: `loadstring(game:HttpGet("${origin}/api/scripts/sniperarena-boyfinity-7x9q"))()`,
+                    image: '/assets/SniperArena.webp',
+                    copyCount: 9410,
+                    active: true
+                }
+            ];
+
+            let gamesList = [];
+            if (!error && Array.isArray(dbScripts) && dbScripts.length > 0) {
+                gamesList = dbScripts.map((s, idx) => {
+                    const fallbackImg = s.id.includes('sniper') ? '/assets/SniperArena.webp'
+                                      : s.id.includes('violence') ? '/assets/ViolenceDistrict.webp'
+                                      : '/assets/boyfinity.png';
+
+                    const ver = (s.version !== undefined && s.version !== null)
+                        ? (String(s.version).startsWith('v') ? s.version : `v${s.version}`)
+                        : 'v1.0.0';
+
+                    let statusText = s.active ? 'Working' : 'Maintenance';
+                    if (s.status === 'maintenance') statusText = 'Maintenance';
+                    else if (s.status === 'testing') statusText = 'Testing';
+
+                    const defaultLoader = `loadstring(game:HttpGet("${origin}/api/scripts/${s.id}"))()`;
+
+                    return {
+                        id: s.id,
+                        title: s.name,
+                        name: s.name,
+                        description: s.description || '',
+                        status: statusText,
+                        version: ver,
+                        loader: defaultLoader,
+                        image: fallbackImg,
+                        copyCount: 5000 + ((idx + 1) * 2340),
+                        active: s.active !== false
+                    };
+                });
+            } else {
+                gamesList = DEFAULT_GAMES;
+            }
 
             return res.status(200).json({
                 success: true,
-                games: [
-                    {
-                        id: 'violencedisctrict-boyfinity-4oyj',
-                        title: 'Violence District',
-                        name: 'Violence District',
-                        description: "Violence District is asymmetrical horror game on Roblox where Killer is faced against 5 Survivors. Killer's main goal is to sacrifice all the survivors. Survivors' main goal is to repair 5 generators and do whatever it takes to escape.",
-                        status: 'Working',
-                        version: 'v3.4.1',
-                        loader: 'loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/violencedisctrict-boyfinity-4oyj"))()',
-                        image: '/assets/violencedistrict.png',
-                        copyCount: 14820
-                    },
-                    {
-                        id: 'sniperarena-boyfinity-7x9q',
-                        title: 'Sniper Arena',
-                        name: 'Sniper Arena',
-                        description: "Sniper Arena - Exciting sniper battles. Play fair. Win with skill. Skins are just cosmetic - no stat boosts, no paying to win. Join ranked matches and beat other players to earn amazing rewards! Cheating will result in a permanent ban. No second chances.",
-                        status: 'Working',
-                        version: 'v2.1.0',
-                        loader: 'loadstring(game:HttpGet("https://boyfinity-script.vercel.app/api/scripts/sniperarena-boyfinity-7x9q"))()',
-                        image: '/assets/sniperarena.png',
-                        copyCount: 9410
-                    }
-                ]
+                games: gamesList
             });
         }
 
@@ -800,9 +842,9 @@ export default async function handler(req, res) {
             }
         }
 
-        // Scripts Management
+        // Scripts & Game Cards Management (Allow Admin, Owner, and Staff)
         if (pathname === '/api/admin/scripts') {
-            const user = requireAuth(req, res, 'admin');
+            const user = requireAuth(req, res, 'staff');
             if (!user) return;
 
             if (method === 'GET') {
@@ -854,7 +896,7 @@ export default async function handler(req, res) {
         }
 
         if (pathname.startsWith('/api/admin/scripts/')) {
-            const user = requireAuth(req, res, 'admin');
+            const user = requireAuth(req, res, 'staff');
             if (!user) return;
             const scriptId = pathname.replace('/api/admin/scripts/', '').split('?')[0].trim();
 

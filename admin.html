@@ -180,7 +180,7 @@
                 <span>🔑</span> Key Management
             </div>
             <div class="nav-item" onclick="showPage('scripts')" id="nav-scripts">
-                <span>📜</span> Cloud Scripts & Games
+                <span>🎮</span> Game Cards &amp; Scripts
             </div>
             <div class="nav-item" onclick="showPage('staff')" id="nav-staff">
                 <span>👥</span> Staff Management
@@ -266,14 +266,14 @@
             </div>
         </div>
 
-        <!-- PAGE 2: CLOUD SCRIPTS & GAME CARDS (ADMIN & OWNER ONLY) -->
+        <!-- PAGE 2: GAME CARDS & CLOUD SCRIPTS (ADMIN, OWNER & STAFF) -->
         <div class="page" id="page-scripts">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
                 <div>
-                    <h2 style="font-size:16px; font-weight:700">Cloud Scripts &amp; Games Management</h2>
-                    <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Manage official games, cloud scripts, execution status, and quick loadstrings.</p>
+                    <h2 style="font-size:16px; font-weight:700">Game Cards &amp; Cloud Scripts Management</h2>
+                    <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Add, edit, or delete game cards shown live on the public /scripts page. All changes sync in realtime with Supabase.</p>
                 </div>
-                <button class="btn btn-primary" onclick="openScriptModal()">+ Add New Game / Script</button>
+                <button class="btn btn-primary" onclick="openScriptModal()">+ Add New Game Card</button>
             </div>
 
             <div class="table-wrap">
@@ -521,9 +521,8 @@
             document.getElementById('sidebarRole').innerText = CURRENT_USER.role.toUpperCase();
             if (CURRENT_USER.avatar) document.getElementById('sidebarAvatar').src = CURRENT_USER.avatar;
 
-            // Restrict UI for Staff
+            // Restrict UI for Staff (Staff can access Key Management and Game Cards)
             if (CURRENT_USER.role === 'staff') {
-                document.getElementById('nav-scripts').style.display = 'none';
                 document.getElementById('nav-staff').style.display = 'none';
                 document.getElementById('nav-audit').style.display = 'none';
                 document.getElementById('opt365').disabled = true;
