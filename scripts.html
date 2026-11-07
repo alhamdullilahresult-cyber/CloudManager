@@ -631,6 +631,8 @@
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="setFilter('all', this)">All Games</button>
                     <button class="filter-btn" onclick="setFilter('working', this)">Working</button>
+                    <button class="filter-btn" onclick="setFilter('maintenance', this)">Maintenance</button>
+                    <button class="filter-btn" onclick="setFilter('coming', this)">Coming Soon</button>
                 </div>
             </div>
 
@@ -763,17 +765,75 @@
                 const key = g.id || `game-${idx}`;
                 if (!copyStats[key]) copyStats[key] = g.copyCount || (10000 + idx * 2500);
 
-                const isWorking = (g.status || '').toLowerCase() === 'working';
-                const statusBadge = isWorking 
-                    ? `<span class="badge-status">● Working</span>`
-                    : `<span class="badge-status" style="background:#271b1b;color:#fca5a5;border-color:#5c2222">⚠ Maintenance</span>`;
+                const stRaw = String(g.status || 'Working').trim();
+                const stLower = stRaw.toLowerCase();
+
+                let statusBadge = '<span class="badge-status">● Working</span>';
+                let isComingSoon = false;
+                let isMaintenance = false;
+                let filterCategory = 'working';
+
+                if (stLower.includes('coming')) {
+                    isComingSoon = true;
+                    filterCategory = 'coming';
+                    statusBadge = '<span class="badge-status" style="background:#241d3b;color:#d8b4fe;border-color:#581c87;">⏳ Coming Soon</span>';
+                } else if (stLower.includes('maintenance')) {
+                    isMaintenance = true;
+                    filterCategory = 'maintenance';
+                    statusBadge = '<span class="badge-status" style="background:#271b1b;color:#fca5a5;border-color:#5c2222;">⚠ Maintenance</span>';
+                }
 
                 const thumb = g.image || '/assets/boyfinity.png';
                 const loaderStr = g.loader || `loadstring(game:HttpGet("${window.location.origin}/api/scripts/${g.id}"))()`;
                 const loaderEscaped = escapeHtml(loaderStr);
 
+                // Action area rendering depending on status
+                let loaderBoxHtml = `
+                    <div class="loader-block">
+                        <div class="loader-label">Quick Loadstring</div>
+                        <input readonly class="loader-code" value="${loaderEscaped}" onclick="this.select()">
+                    </div>
+                `;
+
+                let actionRowHtml = `
+                    <div class="card-action-row">
+                        <button class="btn-copy-small" onclick="handleCopy(this, '${key}', \`${loaderStr.replace(/`/g, '\\`')}\`)">
+                            <span>Copy</span>
+                        </button>
+                        <span class="badge-status">${escapeHtml(g.version || 'v1.0')}</span>
+                    </div>
+                `;
+
+                if (isComingSoon) {
+                    loaderBoxHtml = `
+                        <div class="loader-block" style="opacity:0.6; border-style:dashed;">
+                            <div class="loader-label">Status</div>
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">
+                                In Development • Not yet available for execution
+                            </div>
+                        </div>
+                    `;
+                    actionRowHtml = `
+                        <div class="card-action-row">
+                            <button class="btn-copy-small" disabled style="opacity:0.4; cursor:not-allowed; background:#1b1e28; border-color:#2a3040; color:var(--text-muted);">
+                                <span>Coming Soon</span>
+                            </button>
+                            <span class="badge-status" style="background:#241d3b;color:#d8b4fe;border-color:#581c87;">Preview</span>
+                        </div>
+                    `;
+                } else if (isMaintenance) {
+                    actionRowHtml = `
+                        <div class="card-action-row">
+                            <button class="btn-copy-small" onclick="handleCopy(this, '${key}', \`${loaderStr.replace(/`/g, '\\`')}\`)" style="background:#271b1b;border-color:#5c2222;color:#fca5a5;">
+                                <span>Copy (Maintenance)</span>
+                            </button>
+                            <span class="badge-status" style="background:#271b1b;color:#fca5a5;border-color:#5c2222;">Updating</span>
+                        </div>
+                    `;
+                }
+
                 return `
-                    <div class="game-card" data-title="${escapeHtml(g.title || g.name || '').toLowerCase()}" data-status="${isWorking ? 'working' : 'maintenance'}">
+                    <div class="game-card" data-title="${escapeHtml(g.title || g.name || '').toLowerCase()}" data-status="${filterCategory}">
                         <img src="${thumb}" alt="${escapeHtml(g.title || g.name)}" class="game-thumb" onerror="this.src='/assets/boyfinity.png'">
                         <div class="game-content">
                             <div class="game-meta-top">
@@ -783,17 +843,8 @@
                             <h2 class="game-title">${escapeHtml(g.title || g.name)}</h2>
                             <p class="game-desc">${escapeHtml(g.description || '')}</p>
 
-                            <div class="loader-block">
-                                <div class="loader-label">Quick Loadstring</div>
-                                <input readonly class="loader-code" value="${loaderEscaped}" onclick="this.select()">
-                            </div>
-
-                            <div class="card-action-row">
-                                <button class="btn-copy-small" onclick="handleCopy(this, '${key}', \`${loaderStr.replace(/`/g, '\\`')}\`)">
-                                    <span>Copy</span>
-                                </button>
-                                <span class="badge-status">${escapeHtml(g.version || 'v1.0')}</span>
-                            </div>
+                            ${loaderBoxHtml}
+                            ${actionRowHtml}
                         </div>
                     </div>
                 `;
@@ -801,7 +852,9 @@
         }
 
         function handleCopy(btn, gameKey, text) {
-            navigator.clipboard.writeText(text).then(() => {
+            if (!text) return;
+
+            const onCopied = () => {
                 const original = btn.innerHTML;
                 btn.innerHTML = '<span>✓ Copied</span>';
 
@@ -811,8 +864,33 @@
                 if (counterEl) counterEl.innerText = `${copyStats[gameKey].toLocaleString()} Copies`;
 
                 fetch('/api/public/games/copy', { method: 'POST' }).catch(() => { });
-                setTimeout(() => btn.innerHTML = original, 2000);
-            });
+                setTimeout(() => { btn.innerHTML = original; }, 2000);
+            };
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(onCopied).catch(() => {
+                    fallbackCopy(text);
+                    onCopied();
+                });
+            } else {
+                fallbackCopy(text);
+                onCopied();
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.top = '-9999px';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            try {
+                document.execCommand('copy');
+            } catch (e) {}
+            document.body.removeChild(ta);
         }
 
         function filterGames() {
@@ -824,7 +902,7 @@
                 const status = card.getAttribute('data-status') || '';
 
                 const matchesQuery = !query || title.includes(query) || text.includes(query);
-                const matchesFilter = CURRENT_FILTER === 'all' || (CURRENT_FILTER === 'working' && status === 'working');
+                const matchesFilter = CURRENT_FILTER === 'all' || (CURRENT_FILTER === status);
 
                 if (matchesQuery && matchesFilter) {
                     card.style.display = 'flex';

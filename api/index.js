@@ -268,9 +268,16 @@ export default async function handler(req, res) {
                         ? (String(s.version).startsWith('v') ? s.version : `v${s.version}`)
                         : 'v1.0.0';
 
-                    let statusText = s.active ? 'Working' : 'Maintenance';
-                    if (s.status === 'maintenance') statusText = 'Maintenance';
-                    else if (s.status === 'testing') statusText = 'Testing';
+                    // Compute status from database field or active flag
+                    let statusText = 'Working';
+                    if (s.status) {
+                        const st = String(s.status).toLowerCase();
+                        if (st.includes('maintenance')) statusText = 'Maintenance';
+                        else if (st.includes('coming')) statusText = 'Coming Soon';
+                        else statusText = 'Working';
+                    } else if (s.active === false) {
+                        statusText = 'Maintenance';
+                    }
 
                     const defaultLoader = `loadstring(game:HttpGet("${origin}/api/scripts/${s.id}"))()`;
 
@@ -880,37 +887,57 @@ export default async function handler(req, res) {
                     if (!isNaN(parsed) && parsed > 0) numVersion = parsed;
                 }
 
+                // Normalize status string (Working, Maintenance, Coming Soon)
+                let normalizedStatus = 'Working';
+                if (status) {
+                    const st = String(status).toLowerCase();
+                    if (st.includes('maintenance')) normalizedStatus = 'Maintenance';
+                    else if (st.includes('coming')) normalizedStatus = 'Coming Soon';
+                    else normalizedStatus = 'Working';
+                }
+
                 const insertPayload = {
                     id: scriptId,
                     name: trimmedName,
                     description: (description || '').trim(),
                     code: typeof code === 'string' ? code : '',
+                    status: normalizedStatus,
                     active: active !== false,
                     created_at: now,
                     updated_at: now,
                     version: numVersion
                 };
 
-                // Add image_url and status if available
+                // Add image_url if available
                 if (image_url !== undefined && typeof image_url === 'string') {
                     insertPayload.image_url = image_url.trim();
                 }
 
                 let { data, error } = await supabase.from('scripts').insert(insertPayload).select().single();
 
-                // If error mentions column image_url not found, retry without image_url gracefully
-                if (error && error.message && error.message.includes('image_url')) {
-                    delete insertPayload.image_url;
-                    const retry = await supabase.from('scripts').insert(insertPayload).select().single();
-                    data = retry.data;
-                    error = retry.error;
+                // Graceful fallback if columns image_url or status do not exist yet in Supabase
+                if (error && error.message) {
+                    let retryNeeded = false;
+                    if (error.message.includes('image_url')) {
+                        delete insertPayload.image_url;
+                        retryNeeded = true;
+                    }
+                    if (error.message.includes('status')) {
+                        delete insertPayload.status;
+                        retryNeeded = true;
+                    }
+                    if (retryNeeded) {
+                        const retry = await supabase.from('scripts').insert(insertPayload).select().single();
+                        data = retry.data;
+                        error = retry.error;
+                    }
                 }
 
                 if (error) {
                     console.error('[Admin Scripts POST Error]:', error);
                     return res.status(500).json({ success: false, error: error.message });
                 }
-                await logAudit(user, 'CREATE_SCRIPT', scriptId, { name: trimmedName });
+                await logAudit(user, 'CREATE_SCRIPT', scriptId, { name: trimmedName, status: normalizedStatus });
                 return res.status(201).json({ success: true, script: data });
             }
         }
@@ -927,13 +954,21 @@ export default async function handler(req, res) {
             }
 
             if (method === 'PUT') {
-                const { name, description, code, active, version, image_url } = body || {};
+                const { name, description, code, active, version, image_url, status } = body || {};
                 const updatePayload = { updated_at: new Date().toISOString() };
                 if (name !== undefined) updatePayload.name = name.trim().slice(0, 100);
                 if (description !== undefined) updatePayload.description = description.trim();
                 if (typeof code === 'string') updatePayload.code = code;
                 if (active !== undefined) updatePayload.active = !!active;
                 if (image_url !== undefined) updatePayload.image_url = typeof image_url === 'string' ? image_url.trim() : '';
+
+                if (status !== undefined) {
+                    const st = String(status).toLowerCase();
+                    if (st.includes('maintenance')) updatePayload.status = 'Maintenance';
+                    else if (st.includes('coming')) updatePayload.status = 'Coming Soon';
+                    else updatePayload.status = 'Working';
+                }
+
                 if (version !== undefined) {
                     let numVersion = 1;
                     if (typeof version === 'number') numVersion = version;
@@ -946,19 +981,29 @@ export default async function handler(req, res) {
 
                 let { data: updated, error } = await supabase.from('scripts').update(updatePayload).eq('id', scriptId).select().single();
 
-                // If error mentions column image_url not found, retry without image_url
-                if (error && error.message && error.message.includes('image_url')) {
-                    delete updatePayload.image_url;
-                    const retry = await supabase.from('scripts').update(updatePayload).eq('id', scriptId).select().single();
-                    updated = retry.data;
-                    error = retry.error;
+                // Graceful fallback if column image_url or status does not exist yet
+                if (error && error.message) {
+                    let retryNeeded = false;
+                    if (error.message.includes('image_url')) {
+                        delete updatePayload.image_url;
+                        retryNeeded = true;
+                    }
+                    if (error.message.includes('status')) {
+                        delete updatePayload.status;
+                        retryNeeded = true;
+                    }
+                    if (retryNeeded) {
+                        const retry = await supabase.from('scripts').update(updatePayload).eq('id', scriptId).select().single();
+                        updated = retry.data;
+                        error = retry.error;
+                    }
                 }
 
                 if (error) {
                     console.error('[Admin Scripts PUT Error]:', error);
                     return res.status(500).json({ success: false, error: error.message });
                 }
-                await logAudit(user, 'UPDATE_SCRIPT', scriptId, { name: updatePayload.name || scriptId, active: updatePayload.active });
+                await logAudit(user, 'UPDATE_SCRIPT', scriptId, { name: updatePayload.name || scriptId, active: updatePayload.active, status: updatePayload.status });
                 return res.status(200).json({ success: true, script: updated });
             }
 

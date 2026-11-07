@@ -398,9 +398,9 @@
                 <div class="form-group" style="margin-bottom:0">
                     <label>Status (Execution State)</label>
                     <select class="form-input" id="scriptStatusSelect">
-                        <option value="working" selected>Working (Undetected)</option>
-                        <option value="maintenance">Maintenance (Updating)</option>
-                        <option value="testing">Testing (Private)</option>
+                        <option value="Working" selected>Working (Undetected)</option>
+                        <option value="Maintenance">Maintenance (Updating)</option>
+                        <option value="Coming Soon">Coming Soon (In Development)</option>
                     </select>
                 </div>
                 <div class="form-group" style="margin-bottom:0">
@@ -683,11 +683,12 @@
                     ? `<span class="badge badge-active" style="display:inline-flex;align-items:center;gap:4px;">👁️ Visible</span>`
                     : `<span class="badge badge-inactive" style="display:inline-flex;align-items:center;gap:4px;background:#231a1a;color:#f87171;border-color:#5a2323;">🙈 Hidden</span>`;
 
+                const stLower = (s.status || '').toLowerCase();
                 let statusBadge = '<span class="badge badge-active">● Working</span>';
-                if (!isVisible || s.status === 'maintenance') {
+                if (stLower.includes('coming')) {
+                    statusBadge = '<span class="badge" style="background:#241d3b;color:#d8b4fe;border:1px solid #581c87;">⏳ Coming Soon</span>';
+                } else if (!isVisible || stLower.includes('maintenance')) {
                     statusBadge = '<span class="badge badge-inactive">⚠ Maintenance</span>';
-                } else if (s.status === 'testing') {
-                    statusBadge = '<span class="badge" style="background:#1e1b4b;color:#c7d2fe;border:1px solid #3730a3">🔒 Testing</span>';
                 }
 
                 const scriptIdSafe = (s.id || '').replace(/'/g, "\\'");
@@ -712,7 +713,7 @@
                         <td>
                             <div style="display:flex;align-items:center;gap:6px;">
                                 <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-text)">${s.id || '—'}</span>
-                                <button class="btn btn-sm" onclick="copyText('${scriptIdSafe}')" title="Copy Script ID">📋</button>
+                                <button class="btn btn-sm" onclick="copyText('${scriptIdSafe}', this)" title="Copy Script ID">📋</button>
                             </div>
                         </td>
                         <td>
@@ -724,7 +725,7 @@
                         <td>
                             <div style="display:flex;align-items:center;gap:6px;max-width:300px;">
                                 <input type="text" readonly value="${loadstringStr}" class="form-input" style="font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 8px;height:28px;background:var(--bg-secondary);color:var(--text-secondary);" title="${loadstringStr}">
-                                <button class="btn btn-sm btn-primary" onclick="copyText('${loadstringSafe}')" style="white-space:nowrap;padding:4px 10px;font-size:11px;height:28px;" title="Copy Loadstring">
+                                <button class="btn btn-sm btn-primary" onclick="copyText('${loadstringSafe}', this)" style="white-space:nowrap;padding:4px 10px;font-size:11px;height:28px;" title="Copy Loadstring">
                                     ⚡ Copy
                                 </button>
                             </div>
@@ -758,9 +759,15 @@
             document.getElementById('scriptDesc').value = s.description || '';
             document.getElementById('scriptImageUrl').value = s.image_url || '';
             document.getElementById('scriptCode').value = s.code || '';
-            document.getElementById('scriptStatusSelect').value = s.status || (s.active ? 'working' : 'maintenance');
+
+            // Match status dropdown: Working, Maintenance, or Coming Soon
+            const st = (s.status || '').toLowerCase();
+            if (st.includes('coming')) document.getElementById('scriptStatusSelect').value = 'Coming Soon';
+            else if (st.includes('maintenance')) document.getElementById('scriptStatusSelect').value = 'Maintenance';
+            else document.getElementById('scriptStatusSelect').value = 'Working';
+
             document.getElementById('scriptVersionInput').value = s.version || 'v1.0.0';
-            document.getElementById('scriptActive').checked = s.active !== false && s.status !== 'maintenance';
+            document.getElementById('scriptActive').checked = s.active !== false;
             updateBannerPreview(s.image_url || '');
             openScriptModal(true);
         } catch (e) {
@@ -802,8 +809,8 @@
             return;
         }
 
-        const selectedStatus = statusEl ? statusEl.value : 'working';
-        const isActive = actEl ? actEl.checked && selectedStatus !== 'maintenance' : true;
+        const selectedStatus = statusEl ? statusEl.value : 'Working';
+        const isActive = actEl ? actEl.checked : true;
 
         const payload = {
             name: nameVal,
@@ -1076,9 +1083,42 @@
         } catch (e) { alert(e.message); }
     }
 
-    function copyText(str) {
-        navigator.clipboard.writeText(str);
-        alert('📋 Copied: ' + str);
+    function copyText(str, btn = null) {
+        if (!str) return;
+        const doSuccess = () => {
+            if (btn) {
+                const prev = btn.innerHTML;
+                btn.innerHTML = '✓ Copied';
+                setTimeout(() => { btn.innerHTML = prev; }, 1800);
+            } else {
+                alert('📋 Copied: ' + (str.length > 50 ? str.slice(0, 47) + '...' : str));
+            }
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(str).then(doSuccess).catch(() => {
+                fallbackCopyText(str);
+                doSuccess();
+            });
+        } else {
+            fallbackCopyText(str);
+            doSuccess();
+        }
+    }
+
+    function fallbackCopyText(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.top = '-9999px';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (e) {}
+        document.body.removeChild(textArea);
     }
 
     async function logout() {
