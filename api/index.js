@@ -917,12 +917,13 @@ export default async function handler(req, res) {
 
                 // Graceful fallback if columns image_url or status do not exist yet in Supabase
                 if (error && error.message) {
+                    const msg = error.message.toLowerCase();
                     let retryNeeded = false;
-                    if (error.message.includes('image_url')) {
+                    if (msg.includes('image_url')) {
                         delete insertPayload.image_url;
                         retryNeeded = true;
                     }
-                    if (error.message.includes('status')) {
+                    if (msg.includes('status')) {
                         delete insertPayload.status;
                         retryNeeded = true;
                     }
@@ -981,14 +982,15 @@ export default async function handler(req, res) {
 
                 let { data: updated, error } = await supabase.from('scripts').update(updatePayload).eq('id', scriptId).select().single();
 
-                // Graceful fallback if column image_url or status does not exist yet
+                // Graceful fallback if column status or image_url does not exist in schema cache
                 if (error && error.message) {
+                    const msg = error.message.toLowerCase();
                     let retryNeeded = false;
-                    if (error.message.includes('image_url')) {
+                    if (msg.includes('image_url')) {
                         delete updatePayload.image_url;
                         retryNeeded = true;
                     }
-                    if (error.message.includes('status')) {
+                    if (msg.includes('status')) {
                         delete updatePayload.status;
                         retryNeeded = true;
                     }
